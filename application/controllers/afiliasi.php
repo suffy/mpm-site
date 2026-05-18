@@ -250,26 +250,26 @@ class Afiliasi extends MY_Controller
   }
 
   public function get_activities_by_date()
-{
-    $this->output->set_content_type('application/json');
-    
-    $date = $this->input->get('date');
-    if (!$date) {
-        echo json_encode(['success' => false, 'error' => 'Tanggal tidak ditemukan']);
-        return;
-    }
-    
-    $get_master_karyawan = $this->model_afiliasi->get_master_karyawan_by_nama($this->username);
-    if($get_master_karyawan->num_rows() > 0) {
-        $id_karyawan = $get_master_karyawan->row()->id;
-    } else {
-        echo json_encode(['success' => false, 'error' => 'Data karyawan tidak ditemukan']);
-        return;
-    }
-    
-    $activities = $this->model_afiliasi->get_activity_plan_by_date_for_calendar($date, $id_karyawan);
-    echo json_encode(['success' => true, 'data' => $activities, 'date' => $date]);
-}
+  {
+      $this->output->set_content_type('application/json');
+      
+      $date = $this->input->get('date');
+      if (!$date) {
+          echo json_encode(['success' => false, 'error' => 'Tanggal tidak ditemukan']);
+          return;
+      }
+      
+      $get_master_karyawan = $this->model_afiliasi->get_master_karyawan_by_nama($this->username);
+      if($get_master_karyawan->num_rows() > 0) {
+          $id_karyawan = $get_master_karyawan->row()->id;
+      } else {
+          echo json_encode(['success' => false, 'error' => 'Data karyawan tidak ditemukan']);
+          return;
+      }
+      
+      $activities = $this->model_afiliasi->get_activity_plan_by_date_for_calendar($date, $id_karyawan);
+      echo json_encode(['success' => true, 'data' => $activities, 'date' => $date]);
+  }
 
   public function monthly_planning_save()
   {
