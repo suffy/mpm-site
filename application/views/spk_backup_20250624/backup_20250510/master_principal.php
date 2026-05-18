@@ -1,0 +1,110 @@
+</div>
+
+<div class="container-fluid">
+
+<div class="az-content">
+    <div class="container-fluid">
+
+        <?php 
+            if ($this->session->userdata('username') == 'melinda' || $this->session->userdata('username') == 'tria' || $this->session->userdata('username') == 'fakhrul' ) { ?>
+                <?= $this->load->view('spk/component/sidebar_admin');?>
+            <?php
+            }else{ ?>
+                <?= $this->load->view('spk/component/sidebar');?>
+            <?php
+            }
+        ?>
+
+        <div class="az-content-body pd-lg-l-40 d-flex flex-column">
+            <h2 class="az-content-title" id="form_spk"><?= $title; ?></h2>
+            <div class="row">
+                <div class="col-md-12">
+                <?php 
+                    if($this->session->flashdata('pesan')){ ?>
+                        <div class="alert alert-danger" role="alert">
+                            <?= $this->session->flashdata('pesan'); ?>
+                        </div>
+                    <?php
+                    }elseif($this->session->flashdata('pesan_success')){ ?>
+                        <div class="alert alert-success" role="alert">
+                            <?= $this->session->flashdata('pesan_success'); ?>
+                        </div>
+                    <?php
+                    }
+                ?>
+                </div>
+            </div>
+
+            <?php echo form_open($url); ?>
+            <div class="row mt-1">
+                <div class="col-md-12 mt-4">  
+                    <table id="tabel-data">
+                        <thead>
+                            <tr>   
+                                <th class="text-center col-1" style="background-color: #1d1d1d; color: white" >
+                                    <font size="1px" color="white"><input type="button" class="btn btn-default btn-sm" id="toggle"
+                                    value="click all" onclick="click_all_request()" style="background-color: #1d1d1d; color: white">
+                                </th>
+                                <th width="10%">Principal</th> 
+                                <th width="30%">Email PO</th> 
+                                <th width="30%">Email Retur</th> 
+                                <th width="10%">Prefix PO</th>
+                                <th width="10%">UpdatedBy</th> 
+                            </tr>
+                        </thead>
+                        <tbody>  
+                            <?php
+                            foreach ($get_data->result() as $a) : ?>
+                            <tr>
+                                <td>
+                                    <center>
+                                    <input type="checkbox" id="<?= $a->id; ?>" name="options[]" value="<?= $a->id; ?>">                          
+                                    </center>
+                                </td> 
+                                <td><?= $a->namasupp ?></td> 
+                                <td>
+                                    <textarea name="email_po[<?= $a->id ?>]" class="form-control" rows="4" cols="50"><?= $a->email ?></textarea>
+                                </td> 
+                                <td>
+                                    <textarea name="email_retur[<?= $a->id ?>]" class="form-control" rows="4" cols="50"><?= $a->email_retur ?></textarea>
+                                </td> 
+                                <td>
+                                    <input type="text" name="prefix_po[<?= $a->id ?>]" value="<?= $a->prefix_po ?>" class="form-control">
+                                </td> 
+                                <td><?= $a->updated_by.' - '.$a->updated_at ?></td> 
+                            
+                            </tr>
+                            <?php endforeach; ?>   
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <div class="row mb-5 mt-3">
+                <div class="col-lg-12 d-flex justify-content-center btn-group">
+                    <input type="submit" value="Submit Data" class="btn btn-submit-orange" style="width: 100%;">
+                </div>
+            </div>
+            <?php echo form_close(); ?>
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#btnBack").show();
+        $("#btnLoading").hide();
+        $('#tabel-data').DataTable({
+            "pageLength": 1000,
+            "ordering": true,
+            // "order": [5, 'desc'],
+            "aLengthMenu": [
+                [10, 20, 50, -1],
+                [10, 20, 50, "All"]
+            ],
+            "bInfo" : false,
+            "bPaginate": false
+        });
+    });
+</script>

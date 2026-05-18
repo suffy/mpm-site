@@ -1,0 +1,217 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"> -->
+    <title>MPM Site</title>
+
+    <style>
+        td {
+            font-size: 12px;
+        }
+
+        th {
+            font-size: 11px;
+        }
+
+        @page { margin: 100px 50px; }
+        #footer { position: fixed; left: 0px; bottom: -100px; right: 0px; height: 50px; }
+        #footer .page:after { content: "Page " counter(page) " of <?= $no_pengajuan; ?>"; }
+    </style>
+
+</head>
+
+<body>
+    <div id="content">
+        <table border="0" width="100%">
+            <tr>
+                <td style="text-align: left;" width="8%">Principal</td>
+                <td style="text-align: center;" width="1%"> : </td>
+                <td style="text-align: left;" width="20%"><strong><?= $namasupp; ?></strong></td>
+                <td style="text-align: right; padding-right: 100px;">ID Customer :</td>
+            </tr>
+            <tr>
+                <td>Nomor</td>
+                <td> : </td>
+                <td><strong><?= $no_pengajuan; ?></strong></td>
+                <td rowspan="2" style="text-align: center; border: 2px solid red"><strong>Keterangan dari Principal HO
+                    </strong><br><strong>"<?= $catatan_principal_ho ?>"</strong></td>
+                <!-- <td rowspan="2" style="text-align: center; border-top: 2px solid red"><strong><?= $catatan_principal_ho ?></strong></td> -->
+            </tr>
+            <tr>
+                <td>Branch</td>
+                <td> : </td>
+                <td><strong><?= $branch_name.' - '.$nama_comp.' - '.$site_code; ?></strong></td>
+            </tr>
+        </table>
+        <br>
+
+        <table class="table table-bordered">
+            <tr>
+                <th width="1%">#</th>
+                <th width="7%">Kodeprod</th>
+                <th width="10%">Namaprod</th>
+                <th width="10%">Batch number</th>
+                <th width="10%">Expired date</th>
+                <th width="7%">Qty approval</th>
+                <th width="7%">Qty approval HO</th>
+                <th width="7%">Satuan</th>
+                <th width="10%">Nama outlet</th>
+                <th width="10%">Alasan</th>
+                <th width="10%">Keterangan</th>
+                <th width="10%">Ket Principal Area</th>
+                <th width="10%">Ket Principal HO</th>
+            </tr>
+            <?php 
+                $no = 1;
+                foreach ($get_pengajuan_detail->result() as $row) { ?>
+            <tr>
+                <td>
+                    <font size="12px"><?php echo $no++; ?>
+                </td>
+                <td>
+                    <font size="12px"><?php echo $row->kodeprod; ?>
+                </td>
+                <td>
+                    <font size="12px"><?php echo $row->namaprod; ?>
+                </td>
+                <td>
+                    <font size="12px"><?php echo $row->batch_number; ?>
+                </td>
+                <td>
+                    <font size="12px"><?php echo $row->expired_date; ?>
+                </td>
+                <td>
+                    <font size="12px"><?php echo $row->qty_approval; ?>
+                </td>
+                <td>
+                    <font size="12px"><?php echo $row->qty_approval_ho; ?>
+                </td>
+                <td>
+                    <font size="12px"><?php echo $row->satuan; ?>
+                </td>
+                <td>
+                    <font size="12px"><?php echo $row->nama_outlet; ?>
+                </td>
+                <td>
+                    <font size="12px"><?php echo $row->alasan; ?>
+                </td>
+                <td>
+                    <font size="12px"><?php echo $row->keterangan; ?>
+                </td>
+                <td>
+                    <font size="12px"><?php echo $row->keterangan_principal_area; ?>
+                </td>
+                <td>
+                    <font size="12px"><?php echo $row->keterangan_principal_ho; ?>
+                </td>
+            </tr>
+            <?php } ?>
+        </table>
+
+        <br>
+
+        <table border="0" width="100%">
+            <tr>
+                <td align="center" width="25%">DP</td>
+                <td align="center" width="25%">Principal Area</td>
+                <td align="center" width="25%">MPM</td>
+                <td align="center" width="25%">Principal HO</td>
+            </tr>
+
+
+            <tr>
+                <td align="center">
+                    <?php 
+                    $file = './assets/uploads/signature/'.$digital_signature;
+                    if (file_exists($file)) { ?>
+                    <img src="<?= $file ?>" alt="<?= $digital_signature ?>" width="150px">
+                    <?php
+                    } 
+                ?>
+                </td>
+                <td align="center">
+                <?php 
+                    $file = './assets/uploads/signature/'.$principal_area_signature;
+                    $file2 = './assets_new/images/verified.png';
+                    if($tipe == 'khusus'){
+                        echo "<img src='$file2' alt='approved' width='90px'>";
+                    } else if ($principal_area_signature) {
+                        echo "<img src='$file' alt='$principal_area_signature' width='150px'>";
+                    }
+                ?>
+                </td>
+                <td align="center">
+                    <?php 
+                        $file = './assets/uploads/signature/ttd_p_fakhrul_stempel.jpg';
+                        $file2 = './assets_new/images/verified.png';
+                        if($tipe == 'khusus'){
+                            echo "<img src='$file2' alt='approved' width='90px'>";
+                        } else if ($verifikasi_signature) {
+                            echo "<img src='$file' alt='ttd' width='90px'>";
+                        }
+                    ?>
+                </td>
+                <td align="center">
+                    <?php 
+                    $file = './assets/uploads/signature/'.$principal_ho_signature;
+                    $file_edi_us = './assets/uploads/signature/edi-signature.png';
+                    if ($principal_ho_signature) { ?>
+
+                    <?php 
+                            if (file_exists($file_edi_us)) { ?>
+                    <img src="<?= $file_edi_us ?>" alt="<?= $principal_ho_signature ?>" width="150px">
+                    <?php
+                            }else{ ?>
+                    <img src="<?= $file ?>" alt="<?= $principal_ho_signature ?>" width="150px">
+                    <?php
+                            }
+                        ?>
+
+                    <!-- <img src="<?= $file ?>" alt="<?= $principal_ho_signature ?>" width="150px"> -->
+                    <?php
+                    }
+                ?>
+                </td>
+            </tr>
+
+            <tr>
+                <td align="center"><?= $nama ?></td>
+                <td align="center"><?= $principal_area_username ?></td>
+                <td align="center">Fakhrul Hidayat</td>
+                <td align="center">
+                    <?php 
+                            if (file_exists($file_edi_us)) { ?>
+                    EDI
+                    <?php
+                            }else{ ?>
+                    <?= $principal_ho_username ?>
+                    <?php
+                            }
+                        ?>
+                    <!-- <?= $principal_ho_username ?> -->
+                </td>
+            </tr>
+            <tr>
+                <td align="center"><?= $created_at ?></td>
+                <td align="center"><?= $principal_area_at ?></td>
+                <td align="center"><?= $verifikasi_at ?></td>
+                <td align="center"><?= $principal_ho_at ?></td>
+            </tr>
+
+        </table>
+    </div>
+    
+    <div id="footer">
+        <p style="text-align: right;" class="page"></p>
+    </div>
+
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"> -->
+</body>
+
+</html>

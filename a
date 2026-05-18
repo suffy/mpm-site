@@ -1,0 +1,901 @@
+[33mcommit a3b59bbac07ed8f446445a868624cd17ac48feeb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelopment[m[33m)[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Thu Nov 27 10:21:51 2025 +0700
+
+    add feat penta mgxmpmxsds di menu penta
+
+[33mcommit 192ebe19d065ac17847205a9e605b19c6e6809b2[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Thu Nov 27 09:04:52 2025 +0700
+
+    fix menu spk
+
+[33mcommit c71c6c9a16891da3c3d52d13e8b2db701a0a94fd[m[33m ([m[1;31morigin/development[m[33m)[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Sat Nov 8 19:39:50 2025 +0700
+
+    progress retur claim office
+
+[33mcommit 2c42efe528aa95dbdef826209a5efcef2ed438a6[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Sat Nov 8 14:06:25 2025 +0700
+
+    add feat konfirmasi informasi
+
+[33mcommit ba8e4438c5d3715c355290e2730203d2c47516cd[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Fri Nov 7 20:59:21 2025 +0700
+
+    progress biop
+
+[33mcommit 7afc96c42aead3dfc8cef3f4d8d3ca5a1543e6b7[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Nov 3 08:37:11 2025 +0700
+
+    progress biop
+
+[33mcommit 88dadeec9759cf90ecee61623fc6c05a08d9998d[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Fri Oct 31 08:18:38 2025 +0700
+
+    progress biop
+
+[33mcommit 59ec180417cd3971ff196438f02d1200dadc8ab2[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Thu Oct 30 10:16:48 2025 +0700
+
+    progress biop
+
+[33mcommit 473ec9433ae86dbce2748106b943a749b06396d2[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Oct 27 16:01:48 2025 +0700
+
+    progress biop
+
+[33mcommit ed77f5668e4fddeac96f3a9488fa5c074cc06099[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Oct 27 08:26:34 2025 +0700
+
+    start biop
+
+[33mcommit 18e3ef5c69bb134b412cb2848ca137fedc8343a7[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Fri Oct 24 16:53:09 2025 +0700
+
+    progress biop
+
+[33mcommit 753868b8c01e7fecdd6adb3e5e484a037c430365[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Thu Oct 23 16:33:38 2025 +0700
+
+    add feat report availability
+
+[33mcommit 5b6fad6533b12a7ed345ae2e73e83588c2044fde[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Wed Oct 22 12:56:30 2025 +0700
+
+    sebelum pull management_biop
+
+[33mcommit c2c34be279634895cc6beef0e8e9312ed7d03fb0[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Tue Oct 21 13:02:22 2025 +0700
+
+    add qty tolak di retur
+
+[33mcommit b3b37e538853b18eab8bb740c4a2881c7761d204[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Sun Oct 19 11:56:07 2025 +0700
+
+    start fix penta sesuai supp
+
+[33mcommit d11ff01c3f37d29caae89b4a9d0799084adfc4b8[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Sun Oct 19 11:39:42 2025 +0700
+
+    start fix penta sesuai supp
+
+[33mcommit 7c1e9559334f1f0bf791e5dbad9a8e4dcc09f085[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Sat Oct 18 19:02:22 2025 +0700
+
+    fix managament_office
+
+[33mcommit cf35d5921b3d62e980887769e02d7e842ccb4d33[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Sat Oct 18 18:49:42 2025 +0700
+
+    ambil file management_office
+
+[33mcommit cdd1abd15cbc195365691cbc6d0503997d3bc803[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Fri Oct 17 09:06:48 2025 +0700
+
+    feat monitoring feedback done
+
+[33mcommit 439eeb349c0afdbe06785cd1f712a0f5593b8f20[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Wed Oct 15 09:17:58 2025 +0700
+
+    feat monitoring feedback done
+
+[33mcommit 43e7bb8885d5c6302cf88918fb40475cfb0d086f[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Wed Oct 15 08:35:18 2025 +0700
+
+    progress kenaikan harga
+
+[33mcommit e4925488dfe437d7a203d9b124cda9b7202b96b1[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Oct 13 14:34:54 2025 +0700
+
+    add batch number on po_outstanding_us
+
+[33mcommit 10c2301a2343d81aca2cf3d8fd2b9f341827c998[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Oct 13 00:03:01 2025 +0700
+
+    progress kenaikan harga
+
+[33mcommit 0a3e9f967d146b787aa0d6611ad7a7cf5b018ca0[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Sat Oct 11 08:35:43 2025 +0700
+
+    add history get api
+
+[33mcommit 13050eeff0b1a8b319a4c61b9af856988b931568[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Sat Oct 11 08:04:04 2025 +0700
+
+    progress 2 menu kenaikan harga
+
+[33mcommit 5fedebfbe5fa47476c4e5b007fb2892c6f9e3b74[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Fri Oct 3 09:34:21 2025 +0700
+
+    progress 2 menu kenaikan harga
+
+[33mcommit a6c3170b9b4c999e6883c66ce8e52d506dbcfe54[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Sep 29 08:43:05 2025 +0700
+
+    progress menu kenaikan harga
+
+[33mcommit 2201ce5904bc81850ea987bded03902cd48aefd1[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Thu Sep 25 13:57:37 2025 +0700
+
+    import coretax
+
+[33mcommit 815e97a92e4278f2150cdacff7ae726d6d6695b9[m
+Merge: e96f21d 316c778
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Thu Sep 25 09:22:43 2025 +0700
+
+    Merge branch 'management_retur' of https://github.com/suffy/web-system-mpm into management_retur
+
+[33mcommit 316c7788b55276876b450137e306ec63e108ede5[m[33m ([m[1;31morigin/management_retur[m[33m)[m
+Author: ilham <ilhammsyah@gmail.com>
+Date:   Thu Sep 25 09:18:30 2025 +0700
+
+    penambahan fitur download template import coretax
+
+[33mcommit e96f21d8d877f44300108ff49a72beafa3ffdba3[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Sun Sep 21 20:04:48 2025 +0700
+
+    finish menu helpdesk
+
+[33mcommit eb8c0a1ad30c9c341074b92ca9bd60864c3ad37f[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Sat Sep 20 21:15:55 2025 +0700
+
+    summary doi diubah menjadi doi per principal
+
+[33mcommit 95a89009bd7d4a2d1dd68256c0b455a91547be80[m
+Merge: 384ce80 77400e5
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Sep 15 10:05:13 2025 +0700
+
+    Merge branch 'management_claim' into development
+
+[33mcommit 77400e5bd9844086c766dcb46c9ac4f2445143f3[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Sep 15 10:04:13 2025 +0700
+
+    fix dashboard doi
+
+[33mcommit 6bb8226df088d7223f3feb770f0e68573d67ce75[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Fri Sep 12 17:22:42 2025 +0700
+
+    dashboard doi dan ar akan 0 untuk supp selain 000
+
+[33mcommit 37f79b564eef18f388fc110437ea3bce0b7a0df4[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Fri Sep 12 08:31:19 2025 +0700
+
+    before improve dashboard
+
+[33mcommit fb98cc676181893a955c3acb812ad952f225968e[m
+Merge: a751fd1 48fe7fc
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Sep 8 14:19:44 2025 +0700
+
+    Merge branch 'management_claim' of https://github.com/suffy/web-system-mpm into management_claim
+
+[33mcommit 384ce8029810ee75309df37699d9c75ae92c76af[m
+Merge: a751fd1 48fe7fc
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Sep 8 14:09:02 2025 +0700
+
+    Merge branch 'management_claim' of https://github.com/suffy/web-system-mpm into development
+
+[33mcommit a751fd1153b72eb5376b448d0ff96bc9c3b25c30[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Sep 8 14:04:29 2025 +0700
+
+    feat dashboard new include doi
+
+[33mcommit 04f3bcf29e8deb44b0a09fc0b8679b97720c9766[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Sep 8 08:14:20 2025 +0700
+
+    on progress dashboard doi
+
+[33mcommit 6aad570f6adc3292493bfb7153c51fc58e4ad054[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Thu Sep 4 09:09:47 2025 +0700
+
+    commit sebelum develop doi di dashboard
+
+[33mcommit c0a140c5aa5dc0440129bf1c3532dc9506c486f5[m
+Author: ilham <ilhammsyah@gmail.com>
+Date:   Tue Sep 2 11:16:01 2025 +0700
+
+    penambahan kolom qty_karton di export laporan po
+
+[33mcommit 48fe7fcf22137842ed3ea4edd150853844400e1c[m[33m ([m[1;31morigin/management_claim[m[33m)[m
+Author: ilham <ilhammsyah@gmail.com>
+Date:   Tue Sep 2 09:39:05 2025 +0700
+
+    perbaikan view email dan accordion
+
+[33mcommit 74a87f148d89426c56e8b54a0c4b77748d0d8a17[m
+Author: ilham <ilhammsyah@gmail.com>
+Date:   Fri Aug 29 16:59:35 2025 +0700
+
+    perbaikan fitur nka dan email
+
+[33mcommit cccac4c6dbf1abb824fa2b91cdea1add02f03d0a[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Fri Aug 29 09:54:35 2025 +0700
+
+    commit sebelum pull management_claim
+
+[33mcommit 9ab45e8c196a591bbc670a747a6915c2b994f02b[m
+Author: ilham <ilhammsyah@gmail.com>
+Date:   Thu Aug 28 10:04:51 2025 +0700
+
+    commit perubahan accordion nka
+
+[33mcommit be9e11cdcdc7dc8748f80815e8b0ebc30f4ba948[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Thu Aug 28 08:46:51 2025 +0700
+
+    add master user deltomed gt
+
+[33mcommit e23b93aa07f7cd5fe005ce6a8e2616eb8a2736d6[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Thu Aug 28 07:50:51 2025 +0700
+
+    dev checklist di konfirmasi_po
+
+[33mcommit 3fd6d31017599942647c2656b8c8ff2dfade64e1[m
+Author: ilham <ilhammsyah@gmail.com>
+Date:   Wed Aug 27 11:53:58 2025 +0700
+
+    perubahan key_account menjadi channel, chanel pharma submit frengky dan zul
+
+[33mcommit 8fcb3e6813399b75ee4bc219936e34f8322c409d[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Aug 25 09:44:47 2025 +0700
+
+    dev feat nka pharma
+
+[33mcommit 62f089b090680f1e498b014f60670fae56d4065b[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Aug 25 09:20:08 2025 +0700
+
+    dev feat nka pharma
+
+[33mcommit 5d0f437ac3265ba414f602a525d8a0c753d46d5d[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Aug 25 08:38:26 2025 +0700
+
+    minor pdf
+
+[33mcommit 3c9739d2fbd2a4276f26824c2939abd1c87ca010[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Sat Aug 23 07:52:43 2025 +0700
+
+    add feat generate pdf
+
+[33mcommit fb32c3cbc80a3d83a84eaa3f9cfa5582ecd7f07b[m
+Merge: 12d0610 294b8cc
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Thu Aug 21 10:38:11 2025 +0700
+
+    Merge branch 'management_retur' of https://github.com/suffy/web-system-mpm into development
+
+[33mcommit 294b8ccacf20672dc85a8cef60374a8d70d0d4c0[m
+Author: ilham <ilhammsyah@gmail.com>
+Date:   Wed Aug 20 16:19:45 2025 +0700
+
+    penambahan fitur update nomor cortex
+
+[33mcommit 12d06109dc388524d2537ced0788c97f4edf3724[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Tue Aug 12 11:20:43 2025 +0700
+
+    menu claim penta aman
+
+[33mcommit 3cc14f49f8c163f372baa92f3bcc2c149f1e15ba[m
+Merge: 839c075 f6df82c
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Tue Aug 12 10:21:05 2025 +0700
+
+    Merge branch 'claim' of https://github.com/suffy/web-system-mpm into claim
+
+[33mcommit 839c0756152649822e648f696280564d0af0d9eb[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Tue Aug 12 10:18:47 2025 +0700
+
+    add node_modules
+
+[33mcommit 2fef62c0bb520cde38a81797eec99ac3ff8e9c26[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Sat Aug 9 19:32:12 2025 +0700
+
+    add transaksi_json di spreading
+
+[33mcommit f6df82c2dc775b406f5f9a84b841d77aeb287020[m[33m ([m[1;31morigin/claim[m[33m)[m
+Author: ilham <ilhammsyah@gmail.com>
+Date:   Wed Aug 6 17:07:10 2025 +0700
+
+    penambahan fitur email dan membuat filter akses controller sesuai aturan flow
+
+[33mcommit bb8a873ece1d6cb540f34a364ec5e3fc5bf6e260[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Wed Aug 6 09:12:30 2025 +0700
+
+    add deadline kirim barang on view pengajuan retur dp
+
+[33mcommit 0ae57773fb8ff02055d80641a3ce3b8bd5d6275c[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Tue Aug 5 16:36:51 2025 +0700
+
+    feat deadline kirim barang
+
+[33mcommit 860d1566d58fcf84553b42a16f9fa61c0ed8f80b[m
+Merge: bba77ba 0ae5777
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Tue Aug 5 16:35:19 2025 +0700
+
+    Merge pull request #14 from mulia-putra-mandiri-dev/development
+    
+    Development
+
+[33mcommit 56fff826a9fb478006ffffcdf9b3e0e6762a85c1[m
+Merge: 550601d 7de7dca
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Tue Aug 5 15:03:04 2025 +0700
+
+    Merge branch 'management_rpd' of https://github.com/suffy/web-system-mpm into management_rpd
+
+[33mcommit bba77ba6e2472d490935c140ddc1d14d9bf9d83d[m
+Merge: 27c4f01 7de7dca
+Author: millarosianad <163230583+millarosianad@users.noreply.github.com>
+Date:   Tue Aug 5 14:45:20 2025 +0700
+
+    Merge pull request #13 from mulia-putra-mandiri-dev/management_rpd
+    
+    Management rpd
+
+[33mcommit 7de7dcaf993b87fe64d5ca1900dd0197f66ba80e[m[33m ([m[1;31morigin/management_rpd[m[33m)[m
+Author: milla <millarosianad@gmail.com>
+Date:   Tue Aug 5 14:37:40 2025 +0700
+
+    update master karyawan input kode apps
+
+[33mcommit 27c4f01c2bd09b5a031cbbd1b5bd8a0d60ead4bb[m
+Merge: b3654be 550601d
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Tue Aug 5 14:14:41 2025 +0700
+
+    Merge pull request #12 from mulia-putra-mandiri-dev/development
+    
+    Development
+
+[33mcommit 550601d053f04a80ee552bb974c284b3a1da9f31[m
+Merge: 76b2de3 5f228f4
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Tue Aug 5 14:04:57 2025 +0700
+
+    Merge branch 'claim' into development
+
+[33mcommit 5f228f4e25e09a0c33cd5f3fa4f3f97b86edd29e[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Tue Aug 5 14:04:40 2025 +0700
+
+    fix ajuan_claim_nka_detail tambahkan jika routing null
+
+[33mcommit 4214aa7b00db5ba34101e365376b53c38bb5fe59[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Tue Aug 5 13:55:07 2025 +0700
+
+    add claim nka
+
+[33mcommit fb9777a3395183111b74c95aa7bec145cc7eb492[m
+Merge: b3654be 3d12eac
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Tue Aug 5 13:49:52 2025 +0700
+
+    Merge branch 'claim' of https://github.com/suffy/web-system-mpm into claim
+
+[33mcommit bb1e52cbab1307db227847f1efe3621d02c81bad[m
+Author: milla <millarosianad@gmail.com>
+Date:   Tue Aug 5 10:46:53 2025 +0700
+
+    update stock
+
+[33mcommit 76b2de3f9f7c7b0cb5963a3328d0e0272c371cff[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Tue Aug 5 09:09:28 2025 +0700
+
+    add if status_internal=26 di management_claim di function routing
+
+[33mcommit 3d12eacd5514b66bfcdee720cb9cda3b314126c8[m
+Author: ilham <ilhammsyah@gmail.com>
+Date:   Mon Aug 4 15:48:02 2025 +0700
+
+    penambahan fitur nomer claim internal mpm otomatis, revisi tampilan periode, revisi routing akses seblumnya username sekarang userid, attachment email approval dihilangkan dan setiap revisi tidak diwajibkan upload attachment
+
+[33mcommit b3654be8b7b3e3b23453a59272371e4baf93c9ab[m
+Merge: 44e77bb 7872d7c
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Mon Aug 4 13:29:59 2025 +0700
+
+    Merge pull request #10 from mulia-putra-mandiri-dev/development
+    
+    adding feature auto process admin mpm status
+
+[33mcommit 7872d7c59d62c60bafc25baaccd94cc99927939d[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Aug 4 13:26:53 2025 +0700
+
+    adding feature auto process admin mpm status
+
+[33mcommit 44e77bbe72ba84ad4d897e70c83b86e23d83e560[m
+Merge: 6a1b9d0 f21c269
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Mon Aug 4 09:30:29 2025 +0700
+
+    Merge pull request #9 from mulia-putra-mandiri-dev/development
+    
+    Development update controller apps, menambahkan availability permen
+
+[33mcommit f21c269d4b1112386e6351012f6c3c94dd8efd3f[m
+Merge: c1acc2f 7214b4d
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Aug 4 09:19:33 2025 +0700
+
+    Merge branch 'development'
+
+[33mcommit c1acc2f8782acfe437dd5c035f0dcbabc278095a[m
+Merge: b26c528 6a1b9d0
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Aug 4 09:19:06 2025 +0700
+
+    Merge branch 'main' of https://github.com/suffy/web-system-mpm
+
+[33mcommit 7214b4ddadefc29214c27fba0e02dc5d9e2ebf1b[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Aug 4 09:18:03 2025 +0700
+
+    ambil file management_claim.php dari cloud
+
+[33mcommit b26c5289a51518d0870d590f6a3a8ab27481a0b1[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Aug 4 08:50:46 2025 +0700
+
+    tambah kolom availability candy di view dan report + ubah flow di management_claim
+
+[33mcommit 77c1497af9b6f0b285d5170cc874b907c9954973[m
+Author: milla <millarosianad@gmail.com>
+Date:   Thu Jul 31 14:47:46 2025 +0700
+
+    managemnet_stock pindah ke bridging
+
+[33mcommit bcfa8f48d45ae9d2d672a72c22deccdaae31a5f2[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Tue Jul 29 09:24:56 2025 +0700
+
+    debug menu claim sebelum di compile master region MT
+
+[33mcommit 05599b2adc4fd062e2950b72a07d7d3a4340c4f8[m
+Author: milla <millarosianad@gmail.com>
+Date:   Mon Jul 28 17:16:30 2025 +0700
+
+    insert st
+
+[33mcommit 16f3e4183a8556d769f1f7b34138cce000d9fe50[m
+Merge: e312ae0 8255f0d
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Jul 28 14:35:38 2025 +0700
+
+    Merge branch 'claim' of https://github.com/suffy/web-system-mpm into development
+
+[33mcommit e312ae0b8ffc2d981e4d3b1178542bdab66f0bbe[m
+Merge: 4e61160 3344a43
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Jul 28 14:34:27 2025 +0700
+
+    Merge branch 'development' of https://github.com/suffy/web-system-mpm into development
+
+[33mcommit 4e61160005f0c68d64642003f576206bf1bd1e0b[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Jul 28 14:33:42 2025 +0700
+
+    fix navbar sebelum mulai develop claim
+
+[33mcommit 3dd9a0c0e785cf97d0fb5827b63b00830c92c8f9[m
+Author: milla <millarosianad@gmail.com>
+Date:   Thu Jul 24 17:05:35 2025 +0700
+
+    preview stock
+
+[33mcommit 8255f0d6d681839bb3467a12b9c5a21b78eba1d1[m
+Author: ilham <ilhammsyah@gmail.com>
+Date:   Thu Jul 24 16:51:28 2025 +0700
+
+    proses pembuatan controller insert data ajuan klaim dan log ajuan klaim
+
+[33mcommit d4533d3e4b1cae2a488212e226fcec954d8ef41a[m
+Author: milla <millarosianad@gmail.com>
+Date:   Wed Jul 23 17:04:48 2025 +0700
+
+    membuat management_stock sampai di view
+
+[33mcommit 1d8dfb3e5054fe8f879800e43ac6971986b4e1c2[m
+Author: ilham <ilhammsyah@gmail.com>
+Date:   Wed Jul 23 16:39:04 2025 +0700
+
+    project claim, proses pembuatan view
+
+[33mcommit 6a1b9d0e8ad26f8188c24f7f4ce10969f922069b[m
+Merge: aecfc58 3344a43
+Author: millarosianad <163230583+millarosianad@users.noreply.github.com>
+Date:   Wed Jul 23 08:35:30 2025 +0700
+
+    Merge pull request #8 from mulia-putra-mandiri-dev/development
+    
+    Development - update realisasi_manangement_rpd
+
+[33mcommit 3344a43de4a34a4387f713df84c6ec9361181db1[m
+Author: milla <millarosianad@gmail.com>
+Date:   Tue Jul 22 17:08:09 2025 +0700
+
+    update realisasi_proses management_rpd
+
+[33mcommit 0c1b49e8ac9d4098454bd4dea48f52ce104bc8ce[m
+Merge: fd9bbfa 1e44d6f
+Author: milla <millarosianad@gmail.com>
+Date:   Tue Jul 22 14:31:57 2025 +0700
+
+    commit error
+
+[33mcommit aecfc583bcfd1864afd405e5102ec4581ffefd37[m
+Merge: e69fb86 1e44d6f
+Author: ilhammsyah <63498788+ilhammsyah@users.noreply.github.com>
+Date:   Tue Jul 22 14:22:22 2025 +0700
+
+    Merge pull request #7 from mulia-putra-mandiri-dev/development
+    
+    second commit
+
+[33mcommit fd9bbfa0bff4672c6b7cb8d014b366264953f020[m
+Author: milla <millarosianad@gmail.com>
+Date:   Tue Jul 22 14:19:01 2025 +0700
+
+    memperbaiki management office
+
+[33mcommit 1e44d6ff2674d184fb30207badb52287e768865e[m
+Author: ilham <ilhammsyah@gmail.com>
+Date:   Tue Jul 22 14:17:32 2025 +0700
+
+    second commit
+
+[33mcommit 2921533b35c5a652a0d5617bbe7e12f338624320[m
+Merge: 639b2b5 20bca43
+Author: milla <millarosianad@gmail.com>
+Date:   Tue Jul 22 14:13:31 2025 +0700
+
+    test
+
+[33mcommit e69fb86e3cf7e897f8f69643b78e797e409fb2f3[m
+Merge: be2ec4c 20bca43
+Author: ilhammsyah <63498788+ilhammsyah@users.noreply.github.com>
+Date:   Tue Jul 22 14:05:59 2025 +0700
+
+    Merge pull request #6 from mulia-putra-mandiri-dev/development
+    
+    Development
+
+[33mcommit 20bca4396a25b264bded1c72c2dc23e6e6161fc7[m
+Author: ilham <ilhammsyah@gmail.com>
+Date:   Tue Jul 22 14:03:10 2025 +0700
+
+    first commit
+
+[33mcommit 462885916fd3375c0b8229b66703a3e6b326cb76[m
+Merge: be2ec4c 56127e6
+Author: ilham <ilhammsyah@gmail.com>
+Date:   Tue Jul 22 14:00:51 2025 +0700
+
+    Merge branch 'development' of https://github.com/mulia-putra-mandiri-dev/web-system-mpm into development
+
+[33mcommit 639b2b54146865aa5ee3010183c0380d57fa2498[m
+Author: milla <millarosianad@gmail.com>
+Date:   Tue Jul 22 13:59:03 2025 +0700
+
+    perubahan baru
+
+[33mcommit b7e46333db31b634d73e80b4ddf3e580010b197c[m
+Author: milla <millarosianad@gmail.com>
+Date:   Tue Jul 22 13:52:22 2025 +0700
+
+    edit test
+
+[33mcommit 56127e6c99fa7329faf679be834da914bf9f4fa0[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Tue Jul 22 09:36:12 2025 +0700
+
+    project helpdesk
+
+[33mcommit be2ec4c7072b7e4cef91154cebbb2e4c319df3d8[m
+Merge: 591016a 6f04d46
+Author: millarosianad <163230583+millarosianad@users.noreply.github.com>
+Date:   Mon Jul 21 11:54:59 2025 +0700
+
+    Merge pull request #5 from mulia-putra-mandiri-dev/development
+    
+    Development
+
+[33mcommit 6f04d46ef3efdf0ed2589f88fb3fb6d6acb59522[m
+Author: milla <millarosianad@gmail.com>
+Date:   Mon Jul 21 11:43:53 2025 +0700
+
+    modif title to raw_data
+
+[33mcommit 28542d7b3f4c555dafe54cb5258e9ba3db154a86[m
+Author: milla <millarosianad@gmail.com>
+Date:   Mon Jul 21 11:37:06 2025 +0700
+
+    title management_office
+
+[33mcommit 591016aa511ecbb282b352d3ee52617a6cf9c148[m
+Merge: 9f3878c e0925af
+Author: millarosianad <163230583+millarosianad@users.noreply.github.com>
+Date:   Mon Jul 21 11:27:21 2025 +0700
+
+    Merge pull request #4 from mulia-putra-mandiri-dev/development
+    
+    Development
+
+[33mcommit e0925afa43fc61b6e1c31b40fac7ca00bc633584[m
+Author: milla <millarosianad@gmail.com>
+Date:   Mon Jul 21 11:21:04 2025 +0700
+
+    update pekanbaru bonus
+
+[33mcommit a0b00f66ca236c2c22811b618d0de72e1bf8425d[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Jul 21 11:19:50 2025 +0700
+
+    modif title ke dev
+
+[33mcommit 165e867fe3d77b053e4f252cceaa7e11a119ac74[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Jul 21 11:12:16 2025 +0700
+
+    modif title ke development
+
+[33mcommit 9f3878cf855e04c221b7ccc04cf3f62a3425348d[m
+Merge: ecaac98 0bdf27d
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Jul 21 10:37:03 2025 +0700
+
+    Merge branch 'development'
+
+[33mcommit 0bdf27dc74b8a92c49cc5e826d521387173d03e9[m
+Author: suffy yanuar <suffy.yanuar@gmail.com>
+Date:   Mon Jul 21 10:34:27 2025 +0700
+
+    modif title
+
+[33mcommit ba45e3d505c1154d8cb4eea65b53426768661a81[m
+Author: suffy.mpm <suffy.mpm@gmail.com>
+Date:   Mon Jul 21 10:12:46 2025 +0700
+
+    first commit by suffy.mpm
+
+[33mcommit ecaac9848941a187b8fc0aa967fbfa67c1e6c7b6[m
+Merge: 25d1bb5 ba45e3d
+Author: suffympm <97493281+suffympm@users.noreply.github.com>
+Date:   Mon Jul 21 10:12:24 2025 +0700
+
+    Merge pull request #3 from suffy/development
+    
+    first commit by suffy.mpm
+
+[33mcommit 25d1bb57e8e19840dd2e2208c431233e42bb0b56[m
+Merge: 1485424 41a71c1
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Mon Jul 21 09:46:05 2025 +0700
+
+    Merge pull request #2 from suffy/development
+    
+    portal raw data tambah fitur pembagian harian dan bulanan
+
+[33mcommit 41a71c1d7e476469c537678a6ee94e2f9b32a2da[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Mon Jul 21 09:44:36 2025 +0700
+
+    portal raw data tambah fitur pembagian harian dan bulanan
+
+[33mcommit 148542423352d966e6b647aa981719da171d78e9[m
+Merge: fdf540b bc6ac23
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Mon Jul 21 09:31:12 2025 +0700
+
+    Merge pull request #1 from suffy/development
+    
+    Development
+
+[33mcommit bc6ac230681eb6de6aa493d64e8efaebb034410a[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Mon Jul 21 09:29:54 2025 +0700
+
+    analisa piutang done
+
+[33mcommit 279e3ac7a58b72f9383e78a118efa2889e85e91d[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Mon Jul 7 14:23:16 2025 +0700
+
+    calendar sudah tampil, namun perlu ditingkatkan untuk responsive nya. input, edit, delete belum di test
+
+[33mcommit fdf540bc99bc047b5e1e0d4a05272d80c6b98fb3[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Mon Jul 7 13:05:59 2025 +0700
+
+    improve spk konfirmasi terima barang delto dan us
+
+[33mcommit 2573a974a37e3dda9ab7d27964a5e1360ed85dce[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Fri Jun 20 08:44:20 2025 +0700
+
+    starting git again heee
+
+[33mcommit d17f57a1af3e3b7f62dae6adfce00877e869e1c7[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Sun Feb 16 10:42:02 2025 +0700
+
+    add feat darkmode di menu menu lainnya
+
+[33mcommit db7a16e19e7376b93bc40a3907595eedf0f7a1e3[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Mon Feb 10 09:05:42 2025 +0700
+
+    add feat darkmode
+
+[33mcommit ec957631a8687da2a608a6e0d60e1d025b118da3[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Sat Jan 11 08:00:44 2025 +0700
+
+    improve sell out product tapi belum selesai
+
+[33mcommit 0e8ddec9a309553827916b9f8bce0bacd55aca1f[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Sun Jan 5 09:40:13 2025 +0700
+
+    add feat moq wajib
+
+[33mcommit f25a0b92f6908254e49325db20ed0c0312cf9941[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Fri Jan 3 20:39:43 2025 +0700
+
+    menambah fitur master account
+
+[33mcommit 19cd462073d0e66446035a23fd8d1be1b950c9b3[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Wed Jan 1 01:11:24 2025 +0700
+
+    perbaikan pengajuan retur & pengajuan retur detail dan bbrp master
+
+[33mcommit e6020fc8e75c6273dae30b37d3153cb81d2c19ff[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Mon Dec 30 19:45:38 2024 +0700
+
+    perubahan minor limit 200 dan lainnya
+
+[33mcommit cdcba06162caf55c07cd6469529774c631b5c885[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Mon Dec 30 16:37:15 2024 +0700
+
+    add feature tahun_folder di beberapa menu
+
+[33mcommit 1bb666d84c568733077ae98eca365b4741428fe4[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Sun Dec 29 22:40:18 2024 +0700
+
+    sebelum kembali ke claim
+
+[33mcommit c409b78561cf2770e0a99c469b6b663afb68dae5[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Sat Dec 28 23:35:53 2024 +0700
+
+    merapihkan kodingan pengajuan retur dan detail
+
+[33mcommit 69fdcfbbd8aa71dc7f7c5c50db059622e7f7dc81[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Sat Dec 28 11:38:51 2024 +0700
+
+    menambah status pending dp di verifikasi mpm
+
+[33mcommit c87ef195abacf91e31d0cd8a21439211390ab2d0[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Sat Dec 28 11:03:16 2024 +0700
+
+    menambah fitur export di monitoring
+
+[33mcommit 814570d6afc2e116b9aad15fcedf9b6ed7cbb8d9[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Fri Dec 27 19:22:27 2024 +0700
+
+    mengubah fitur monitoring
+
+[33mcommit b9a49de0febdcf470bb04001581010027e49def0[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Fri Dec 27 08:22:37 2024 +0700
+
+    copy controller dari whatsapp
+
+[33mcommit edede5a31b2d8bbcd73907c61a05369a4f2dc3db[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Thu Dec 26 03:20:29 2024 +0700
+
+    fix log history, add feature flow dan improve design
+
+[33mcommit fa7314ed511a7b7f733a87873599de4e9f4bbee3[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Wed Dec 25 09:03:53 2024 +0700
+
+    feat/claim/force download ktp npwp
+
+[33mcommit e9bd8acac3979138a229d04d45499b9f4ebde6d5[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Tue Dec 24 21:31:50 2024 +0700
+
+    add feature peserta loyalty
+
+[33mcommit 183847729bf9d262c033e6a6bc9d9e24c6fa4cad[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Sun Dec 8 10:43:17 2024 +0700
+
+    update menu absensi n booking room
+
+[33mcommit 3ff7c9e28f9fe54f7a23d2d2bae588cc51c0dff2[m
+Author: suffy <suffy.yanuar@gmail.com>
+Date:   Sat Nov 23 16:52:11 2024 +0700
+
+    first commit
