@@ -88,7 +88,7 @@ class Management_biop extends MY_Controller
     public function ajuan_biop()
     {
         $data = [
-            'title'         => 'Pengajuan Biop',
+            'title'         => 'Klaim Biop',
             'url'           => 'management_biop/ajuan_biop_save',
             'url_proses'    => 'management_biop/ajuan_biop_proses',
             'url_proses'    => 'management_biop/dashboard_routing',

@@ -1,63 +1,62 @@
 <style>
-    #form {
-        max-height: 0;
-        opacity: 0;
-        overflow: hidden;
-        transition: max-height 0.5s ease, opacity 0.5s ease;
-    }
+  #form {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, opacity 0.5s ease;
+  }
 
-    #form.show {
-        max-height: 100%; /* cukup besar agar semua konten terlihat */
-        opacity: 1;
-        transition: all 0.15s ease-in-out;
-        margin-top: 1rem;
-        margin-bottom: 1rem;
-    }
+  #form.show {
+    max-height: 100%; /* cukup besar agar semua konten terlihat */
+    opacity: 1;
+    transition: all 0.15s ease-in-out;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
 
-    .form-control[readonly] 
-    {
-        background-color: #f8f9fa;
-        background-image: linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0),
-                            linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0);
-        background-size: 20px 20px;
-        background-position: 0 0, 10px 10px;
-        color: #6c757d;
-        cursor: not-allowed;
-        border-color: #ced4da;
-    }
+  .form-control[readonly] 
+  {
+    background-color: #f8f9fa;
+    background-image: linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0),
+                        linear-gradient(45deg, #f0f0f0 25%, transparent 25%, transparent 75%, #f0f0f0 75%, #f0f0f0);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+    color: #6c757d;
+    cursor: not-allowed;
+    border-color: #ced4da;
+  }
 </style>
 
 <div class="container-fluid">
-    <div class="col-md">
-        <div class="row">
-            <div class="col-md-12 az-content-label">
-                <?= $title ?>
-            </div>
-        </div>
+  <div class="row mt-3">
+    <div class="col-md-12">
+      <h3><?= $title ?></h3>
+    </div>
+  </div>
 
-        <div class="row mt-2">
-            <div class="col-md-12 text-center">
-                <?php
-                if ($this->session->flashdata('pesan')) { ?>
-                    <div class="alert alert-danger" role="alert">
-                        <?= $this->session->flashdata('pesan'); ?>
-                    </div>
-                <?php
-                } elseif ($this->session->flashdata('pesan_success')) { ?>
-                    <div class="alert alert-success" role="alert">
-                        <?= $this->session->flashdata('pesan_success'); ?>
-                    </div>
-                <?php
-                }
-                ?>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-2">
-                <button onclick="toggleKonten()" class="btn btn-submit-black" id="button_form">Form Biop</button>
-            </div>
-        </div>
+  <div class="row mt-2">
+      <div class="col-md-12 text-center">
+          <?php
+          if ($this->session->flashdata('pesan')) { ?>
+              <div class="alert alert-danger" role="alert">
+                  <?= $this->session->flashdata('pesan'); ?>
+              </div>
+          <?php
+          } elseif ($this->session->flashdata('pesan_success')) { ?>
+              <div class="alert alert-success" role="alert">
+                  <?= $this->session->flashdata('pesan_success'); ?>
+              </div>
+          <?php
+          }
+          ?>
+      </div>
+  </div>
+  
+  <div class="row">
+      <div class="col-md-2">
+          <button onclick="toggleKonten()" class="btn btn-submit-black" id="button_form">Form Biop</button>
+      </div>
+  </div>
         
         <!-- Form -->
         <div class="row mt-2" id="form">
