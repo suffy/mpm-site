@@ -34,10 +34,6 @@ class Model_penta extends CI_Model
             $penta_token = getenv('PENTA_2026');
         }
 
-        // echo "tipe token : ".$tipe_token;
-        // echo "penta token : ".$penta_token;
-        // die;
-
         $curl = curl_init();
 
         $authorization = "Authorization: Bearer $penta_token";
@@ -1893,4 +1889,1364 @@ class Model_penta extends CI_Model
 
         return $this->db->query($query);
     }
+
+    // =============== palu ===============
+    public function get_mpm_upload($id, $bulan, $tahun)
+    {
+
+        $query = "
+            select *
+            from mpm.upload a 
+            where a.userid = $id and a.bulan = $bulan and a.tahun = $tahun and a.status_closing = 1
+            order by a.id desc
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function get_penta_sales_palu_by_tahun_bulan($tahun, $bulan, $area_id)
+    {
+        
+        $query = "
+            select *
+            from site.penta_sales_palu a
+            where a.tahun = $tahun and bulan = $bulan and a.area_id = $area_id
+        ";
+
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+
+        return $this->db->query($query);
+    }
+
+    public function delete_penta_sales_palu($tahun, $bulan, $area_id)
+    {
+        $query = "
+            delete 
+            from site.penta_sales_palu 
+            where bulan = $bulan and tahun = $tahun and area_id = $area_id
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+
+        return $this->db->query($query);
+    }
+
+    public function get_sum_sales_palu($id_log)
+    {
+        $query = "
+            select sum(a.total_net) as total_net, sum(a.total_gross) as total_gross
+            from site.penta_sales_palu a 
+            where a.id_log = $id_log
+        ";
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    } 
+
+    public function get_temp_sales_palu_by_idlog($id_log)
+    {
+        $query = "
+            select *
+            from site.temp_penta_sales_palu a
+            where a.id_log = $id_log
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+    public function insert_penta_sales_palu($tahun, $bulan, $signature, $id_log)
+    {
+        $query = "
+            INSERT INTO site.penta_sales_palu (id_log, bulan, tahun, principal_id, area_id, nama_area, tanggal_invoice, nomor_invoice, nomor_sales_order,
+            customer_po_number, kode_outlet, kode_outlet_lama, nama_outlet, category_produk, sales_order_line, kode_produk, kode_produk_lama, inventory_item_id,
+            item_id_vend, id_item_sapora, category_product_principal, nama_produk, qty, uom, price, total_disc, total_vat, total_gross, total_net, bonus, 
+            total_discount_value_distributor, total_discount_value_prinsipal, total_discount_value_extra, disc_persen_distributor_val_1, discount_value_distributor_1, 
+            nomor_discount_distributor_val_1, disc_persen_distributor_val_2, discount_value_distributor_2, nomor_discount_distributor_val_2, 
+            disc_persen_distributor_val_3, discount_value_distributor_3, nomor_discount_distributor_val_3, disc_persen_prinsipal_val_1, discount_value_prinsipal_1, 
+            nomor_discount_prinsipal_val_1, disc_persen_prinsipal_val_2, discount_value_prinsipal_2, nomor_discount_prinsipal_val_2, disc_persen_prinsipal_val_3, 
+            discount_value_prinsipal_3, nomor_discount_prinsipal_val_3, disc_persen_extra_val_1, discount_value_extra_1, nomor_discount_extra_val_1, 
+            disc_persen_extra_val_2, discount_value_extra_2, nomor_discount_extra_val_2, disc_persen_extra_val_3, discount_value_extra_3, nomor_discount_extra_val_3, 
+            batch, type_data, nama_sales, type_promo, keterangan_promo, dpl, created_at, created_by, signature)
+
+            SELECT id_log, bulan, tahun, principal_id, area_id, nama_area, tanggal_invoice, nomor_invoice, nomor_sales_order, customer_po_number, kode_outlet, 
+            kode_outlet_lama, nama_outlet, category_produk, sales_order_line, kode_produk, kode_produk_lama, inventory_item_id, item_id_vend, id_item_sapora, 
+            category_product_principal, nama_produk, qty, uom, price, total_disc, total_vat, total_gross, total_net, bonus, total_discount_value_distributor, 
+            total_discount_value_prinsipal, total_discount_value_extra, disc_persen_distributor_val_1, discount_value_distributor_1, nomor_discount_distributor_val_1, 
+            disc_persen_distributor_val_2, discount_value_distributor_2, nomor_discount_distributor_val_2, disc_persen_distributor_val_3, discount_value_distributor_3, 
+            nomor_discount_distributor_val_3, disc_persen_prinsipal_val_1, discount_value_prinsipal_1, nomor_discount_prinsipal_val_1, disc_persen_prinsipal_val_2, 
+            discount_value_prinsipal_2, nomor_discount_prinsipal_val_2, disc_persen_prinsipal_val_3, discount_value_prinsipal_3, nomor_discount_prinsipal_val_3, 
+            disc_persen_extra_val_1, discount_value_extra_1, nomor_discount_extra_val_1, disc_persen_extra_val_2, discount_value_extra_2, nomor_discount_extra_val_2, 
+            disc_persen_extra_val_3, discount_value_extra_3, nomor_discount_extra_val_3, batch, type_data, nama_sales, type_promo, keterangan_promo, dpl, created_at, 
+            created_by, signature
+            FROM site.temp_penta_sales_palu
+            WHERE signature = '$signature' and id_log = $id_log and bulan = $bulan and tahun = $tahun
+        ";
+
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+
+    }
+
+    public function update_log_sales_palu($data, $id_log)
+    {
+        $this->db->where('id', $id_log);
+        $this->db->update('site.penta_log_sales_palu', $data);
+        return true;
+    }
+
+    public function get_penta_customer($token, $signature, $id_log, $area)
+    {
+        $url_penta = getenv('PENTA_API').'list/outlet/'.$area;
+        $curl = curl_init();
+
+        $authorization = "Authorization: Bearer $token";
+
+        curl_setopt($curl, CURLOPT_URL, $url_penta);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($curl, CURLOPT_POSTFIELDS,$post);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);    
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl, CURLOPT_FAILONERROR, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        $result = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+        $array_response = json_decode($result, true);
+
+
+        if (!isset($array_response['data'])) {
+            return false;
+        }
+
+        $this->db->truncate('site.temp_penta_outlet'); //trucate table sebelum insert data baru
+ 
+        foreach ($array_response['data'] as $key)
+        {
+            $org_id             = $key["org_id"];
+            $org_name           = $key["org_name"];
+            $location           = $key["location"];
+            $site_use_id        = $key["site_use_id"];
+            $bill_ship_cust_name= $key["bill_ship_cust_name"];
+            $prefix             = $key["prefix"];
+            $address1           = $key["address1"];
+            $address2           = $key["address2"];
+            $address3           = $key["address3"];
+            $city               = $key["city"];
+            $province           = $key["province"];
+            $primary_salesrep_id= $key["primary_salesrep_id"];
+            $salesman_name      = $key["salesman_name"];
+
+            $data = [
+                "id_log"                => $id_log,
+                "org_id"                => $org_id,
+                "org_name"              => $org_name,
+                "location"              => $location,
+                "site_use_id"           => $site_use_id,
+                "bill_ship_cust_name"   => $bill_ship_cust_name,
+                "prefix"                => $prefix,
+                "address1"              => $address1,
+                "address2"              => $address2,
+                "address3"              => $address3,
+                "city"                  => $city,
+                "province"              => $province,
+                "primary_salesrep_id"   => $primary_salesrep_id,
+                "salesman_name"         => $salesman_name,
+                "created_at"            => $this->created_at,
+                "created_by"            => $this->userid,
+                "signature"             => $signature
+            ];
+            
+            
+            $this->db->insert('site.temp_penta_outlet', $data);
+        }
+        // die;
+        return true;
+        // return $id_log;
+        // return array($id_log, $signature);
+        // echo "success : " . $id_log;
+        // die;
+    }
+
+    public function get_temp_outlet()
+    {
+        $query = "
+                select *
+                from site.temp_penta_outlet
+            ";
+        return $this->db->query($query)->result();
+
+        // return $this->db->get('site.temp_penta_outlet')->result();
+    }
+
+    public function cek_outlet($org_id, $location)
+    {
+        $query = "
+            select *
+            from site.penta_outlet
+            where org_id = $org_id and location = $location
+        ";
+
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        // die;
+        return $this->db->query($query);
+    }
+
+    public function insert_outlet($row, $signature, $userid)
+    {
+        $data = (array)$row;
+
+        unset($data['id']);
+
+        $data['created_at'] = date('Y-m-d H:i:s');
+        $data['created_by'] = $userid;
+        $data['signature']  = $signature;
+
+        $this->db->insert('site.penta_outlet', $data);
+    }
+
+    public function get_log_penta_customer()
+    {
+         $query = "
+            select a.*, b.username
+            from site.penta_log_customer a left join site.master_user b 
+                on a.created_by = b.id
+            ORDER BY a.id desc
+            limit 10
+        ";
+        return $this->db->query($query);
+    }
+    
+
+    public function get_customer()
+    {
+        $query = "
+            select *
+            from site.penta_outlet
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_customer_by_id($id)
+    {
+        $query = "
+            select *
+            from site.penta_outlet a
+            where a.id = '$id'
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";die;
+        return $this->db->query($query);
+    }
+    
+    public function delete_fi_palu($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            delete 
+            from data$tahun.fi
+            where kode_comp = '$kode_comp' and nocab = '$nocab' and thndok = '$tahun' and bulan = '$bulan'
+            ";
+
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+        
+    }
+
+    public function delete_ri_palu($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            delete 
+            from data$tahun.ri
+            where kode_comp = '$kode_comp' and nocab = '$nocab' and thndok = '$tahun' and bulan = '$bulan'
+        ";
+        return $this->db->query($query);
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";die;
+    }
+
+    public function insert_fi_palu($kode_comp, $nocab, $tahun, $bulan)
+    {
+
+        $query = "
+            insert into data$tahun.fi
+            select 	'07' as kddokjdi, 
+                a.nomor_invoice as nodokjdi, 
+                a.nomor_invoice as nodokacu, 
+                a.tanggal_invoice as tgldokjdi,
+                a.sales_id as kodesales,
+                '$kode_comp' as kode_comp, 
+                '' as kode_kota, 
+                b.typeid as kode_type,
+                b.location as kode_lang, 
+                '' as koderayon, 
+                a.item_id_vend as kodeprod, 
+                c.supp, 
+                DATE_FORMAT(a.tanggal_invoice, '%d') as hrdok,
+                DATE_FORMAT(a.tanggal_invoice, '%m') as blndok, 
+                year(a.tanggal_invoice) as thndok, 
+                c.namaprod, 
+                c.grupprod as groupprod,
+                a.qty as banyak, 
+                round(a.total_gross*1.11/a.qty,2) as harga, 
+                round(a.total_disc*1.11,2) as potongan,
+                round(a.total_gross*1.11,2) as tot1,
+                '' as jum_promo, 
+                '' as keterangan, 
+                '' as user_isi, 
+                '' as jam_isi, 
+                '' as tgl_isi,
+                '' as  user_edit, '' as jam_edit, '' as tgl_edit, 
+                '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, 
+                b.classid as kodesalur, 
+                '' as kodebonus, '' as namabonus, '' as grupbonus, 
+                '' as unitbonus, 
+                a.sales_name as lampiran,
+                '' as h_beli, 
+                '' as kodearea, 
+                b.address1 as namaarea,
+                '' as pinjam, 
+                '' as jualbanyak, 
+                '' as jualpinjam, 
+                '' as harga_excl, 
+                '' as tot1_excl, 
+                b.bill_ship_cust_name as namalang, 
+                '$nocab' as nocab, 
+                '$bulan' as bulan,
+                '' as siteid, 
+                '' as qty1, 
+                '' as qty2, 
+                '' as qty3, 
+                '' as qty_bonus, 
+                '' as flag_bonus, 
+                '' as disc_persen,
+                '' as disc_rp, 
+                '' as disc_value, 
+                a.disc_persen_extra_val_1 as disc_cabang, 
+                a.disc_persen_prinsipal_val_1 as disc_prinsipal, 
+                a.disc_persen_prinsipal_val_2 as disc_xtra,
+                round(a.discount_value_extra_1*1.11,2) as rp_cabang, 
+                round(a.discount_value_prinsipal_1*1.11,2) as rp_prinsipal, 
+                round(a.discount_value_prinsipal_2*1.11,2) as rp_xtra, 
+                '' as bonus, 
+                concat('11', c.supp) as principalid,
+                '' as ex_no_sales, 
+                '' as status_retur, 
+                '' as ref,
+                '' as term_payment, 
+                '' as tipe_kl, a.disc_persen_prinsipal_val_3 as disc_cod, round(a.discount_value_prinsipal_3*1.11,2) as rp_cod, '' as beban_bonus, 
+                '' as disc_add_percent, '' as subarea_id
+        from site.penta_sales_palu a left join (
+            select a.location, a.bill_ship_cust_name, a.address1, a.primary_salesrep_id, a.salesman_name, a.typeid, a.classid, a.spot
+            from site.penta_outlet a
+            where a.org_id = 485
+        )b on a.kode_outlet = b.location left join (
+            select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+            from site.master_product_with_harga a 
+        )c on a.item_id_vend = c.kodeprod
+        where a.type_data = 'sales' and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1 and a.is_valid_customer = 1 and is_valid_type = 1 and is_valid_class = 1 
+        and is_valid_spot = 1 and bulan = $bulan and tahun = $tahun and a.area_id = 485
+        ";
+
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>"; 
+        // echo "<br>";
+        return $this->db->query($query);
+    }
+
+    public function insert_fi_palu_bonus($kode_comp, $nocab, $tahun, $bulan)
+    {
+
+        $query = "
+            insert into data$tahun.fi
+            select 	'07' as kddokjdi, 
+                a.nomor_invoice as nodokjdi, 
+                a.nomor_invoice as nodokacu, 
+                a.tanggal_invoice as tgldokjdi,
+                a.sales_id as kodesales,
+                '$kode_comp' as kode_comp, 
+                '' as kode_kota, 
+                b.typeid as kode_type,
+                b.location as kode_lang, 
+                '' as koderayon, 
+                a.item_id_vend as kodeprod, 
+                c.supp, 
+                DATE_FORMAT(a.tanggal_invoice, '%d') as hrdok,
+                DATE_FORMAT(a.tanggal_invoice, '%m') as blndok, 
+                year(a.tanggal_invoice) as thndok, 
+                c.namaprod, 
+                c.grupprod as groupprod,
+                '' as banyak, 
+                (a.total_gross/a.qty) as harga, 
+                '' as potongan, 
+                '' as tot1, 
+                '' as jum_promo, 
+                '' as keterangan, 
+                '' as user_isi, 
+                '' as jam_isi, 
+                '' as tgl_isi,
+                '' as  user_edit, '' as jam_edit, '' as tgl_edit, 
+                '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, 
+                b.classid as kodesalur, 
+                '' as kodebonus, '' as namabonus, '' as grupbonus, 
+                'a.bonus' as unitbonus, 
+                a.sales_name as lampiran,
+                '' as h_beli, 
+                '' as kodearea, 
+                b.address1 as namaarea,
+                '' as pinjam, 
+                '' as jualbanyak, 
+                '' as jualpinjam, 
+                '' as harga_excl, 
+                '' as tot1_excl, 
+                b.bill_ship_cust_name as namalang, 
+                '$nocab' as nocab, 
+                '$bulan' as bulan,
+                '' as siteid, 
+                '' as qty1, 
+                '' as qty2, 
+                '' as qty3, 
+                a.bonus as qty_bonus, 
+                '1' as flag_bonus, 
+                '' as disc_persen,
+                '' as disc_rp, 
+                '' as disc_value, 
+                '' as disc_cabang, 
+                '' as disc_prinsipal, 
+                '' as disc_xtra,
+                '' as rp_cabang, 
+                '' as rp_prinsipal, 
+                '' as rp_xtra, 
+                '' as bonus, 
+                concat('11', c.supp) as principalid,
+                '' as ex_no_sales, 
+                '' as status_retur, 
+                '' as ref,
+                '' as term_payment, 
+                '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
+                '' as disc_add_percent, '' as subarea_id
+        from site.penta_sales_palu a left join (
+            select a.location, a.bill_ship_cust_name, a.address1, a.primary_salesrep_id, a.salesman_name, a.typeid, a.classid, a.spot
+            from site.penta_outlet a
+            where a.org_id = 485
+        )b on a.kode_outlet = b.location left join (
+            select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+            from site.master_product_with_harga a 
+        )c on a.item_id_vend = c.kodeprod
+        where a.type_data = 'sales' and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1 and a.is_valid_customer = 1 and is_valid_type = 1 and is_valid_class = 1 
+        and is_valid_spot = 1 and bulan = $bulan and tahun = $tahun and a.area_id = 485 and a.bonus > 0
+        ";
+
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        // echo "<br>";
+        return $this->db->query($query);
+    }
+
+    public function insert_ri_palu($kode_comp, $nocab, $tahun, $bulan)
+    {
+
+        $query = "
+            insert into data$tahun.ri
+            select 	'07' as kddokjdi, 
+                a.nomor_invoice as nodokjdi, 
+                a.nomor_invoice as nodokacu, 
+                a.tanggal_invoice as tgldokjdi,
+                a.sales_id as kodesales,
+                '$kode_comp' as kode_comp, 
+                '' as kode_kota, 
+                b.typeid as kode_type,
+                b.location as kode_lang, 
+                '' as koderayon, 
+                a.item_id_vend as kodeprod, 
+                c.supp, 
+                DATE_FORMAT(a.tanggal_invoice, '%d') as hrdok,
+                DATE_FORMAT(a.tanggal_invoice, '%m') as blndok, 
+                year(a.tanggal_invoice) as thndok, 
+                c.namaprod, 
+                c.grupprod as groupprod,
+                a.qty as banyak, 
+                (a.total_gross/a.qty) as harga, 
+                a.total_disc*1.11 as potongan, 
+                a.total_gross*1.11 as tot1, 
+                '' as jum_promo, 
+                '' as keterangan, 
+                '' as user_isi, 
+                '' as jam_isi, 
+                '' as tgl_isi,
+                '' as  user_edit, '' as jam_edit, '' as tgl_edit, 
+                '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, 
+                b.classid as kodesalur, 
+                '' as kodebonus, '' as namabonus, '' as grupbonus, 
+                '' as unitbonus, 
+                a.sales_name as lampiran,
+                '' as h_beli, 
+                '' as kodearea, 
+                b.address1 as namaarea,
+                '' as pinjam, 
+                '' as jualbanyak, 
+                '' as jualpinjam, 
+                '' as harga_excl,
+                b.bill_ship_cust_name as namalang, 
+                '$nocab' as nocab, 
+                '$bulan' as bulan,
+                '' as siteid, 
+                '' as qty1, 
+                '' as qty2, 
+                '' as qty3, 
+                '' as qty_bonus, 
+                '' as flag_bonus, 
+                '' as disc_persen,
+                '' as disc_rp, 
+                '' as disc_value, 
+                a.disc_persen_extra_val_1 as disc_cabang, 
+                a.disc_persen_prinsipal_val_1 as disc_prinsipal, 
+                a.disc_persen_prinsipal_val_2 as disc_xtra,
+                a.discount_value_extra_1*1.11 as rp_cabang, 
+                a.discount_value_prinsipal_1*1.11 as rp_prinsipal, 
+                a.discount_value_prinsipal_2*1.11 as rp_xtra, 
+                '' as bonus, 
+                concat('11', c.supp) as principalid,
+                '' as ex_no_sales, 
+                '' as status_retur, 
+                '' as ref,
+                '' as term_payment, 
+                '' as tipe_kl, a.disc_persen_prinsipal_val_3 as disc_cod, a.discount_value_prinsipal_3*1.11 as rp_cod, '' as beban_bonus, 
+                '' as disc_add_percent, '' as subarea_id
+        from site.penta_sales_palu a left join (
+            select a.location, a.bill_ship_cust_name, a.address1, a.primary_salesrep_id, a.salesman_name, a.typeid, a.classid, a.spot
+            from site.penta_outlet a
+            where a.org_id = 485
+        )b on a.kode_outlet = b.location left join (
+            select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+            from site.master_product_with_harga a 
+        )c on a.item_id_vend = c.kodeprod
+        where a.type_data = 'Return' and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1 and a.is_valid_customer = 1 and is_valid_type = 1 and is_valid_class = 1 
+        and is_valid_spot = 1 and bulan = $bulan and tahun = $tahun and a.area_id = 485
+        ";
+
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        // echo "<br>";
+        return $this->db->query($query);
+    }
+
+    public function insert_ri_palu_bonus($kode_comp, $nocab, $tahun, $bulan)
+    {
+
+        $query = "
+            insert into data$tahun.ri
+            select 	'07' as kddokjdi, 
+                a.nomor_invoice as nodokjdi, 
+                a.nomor_invoice as nodokacu, 
+                a.tanggal_invoice as tgldokjdi,
+                a.sales_id as kodesales,
+                '$kode_comp' as kode_comp, 
+                '' as kode_kota, 
+                b.typeid as kode_type,
+                b.location as kode_lang, 
+                '' as koderayon, 
+                a.item_id_vend as kodeprod, 
+                c.supp, 
+                DATE_FORMAT(a.tanggal_invoice, '%d') as hrdok,
+                DATE_FORMAT(a.tanggal_invoice, '%m') as blndok, 
+                year(a.tanggal_invoice) as thndok, 
+                c.namaprod, 
+                c.grupprod as groupprod,
+                '' as banyak, 
+                (a.total_gross/a.qty) as harga, 
+                '' as potongan, 
+                '' as tot1, 
+                '' as jum_promo, 
+                '' as keterangan, 
+                '' as user_isi, 
+                '' as jam_isi, 
+                '' as tgl_isi,
+                '' as  user_edit, '' as jam_edit, '' as tgl_edit, 
+                '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, 
+                b.classid as kodesalur, 
+                '' as kodebonus, '' as namabonus, '' as grupbonus, 
+                'a.bonus' as unitbonus, 
+                a.sales_name as lampiran,
+                '' as h_beli, 
+                '' as kodearea, 
+                b.address1 as namaarea,
+                '' as pinjam, 
+                '' as jualbanyak, 
+                '' as jualpinjam, 
+                '' as harga_excl,
+                b.bill_ship_cust_name as namalang, 
+                '$nocab' as nocab, 
+                '$bulan' as bulan,
+                '' as siteid, 
+                '' as qty1, 
+                '' as qty2, 
+                '' as qty3, 
+                a.bonus as qty_bonus, 
+                '1' as flag_bonus, 
+                '' as disc_persen,
+                '' as disc_rp, 
+                '' as disc_value, 
+                '' as disc_cabang, 
+                '' as disc_prinsipal, 
+                '' as disc_xtra,
+                '' as rp_cabang, 
+                '' as rp_prinsipal, 
+                '' as rp_xtra, 
+                '' as bonus, 
+                concat('11', c.supp) as principalid,
+                '' as ex_no_sales, 
+                '' as status_retur, 
+                '' as ref,
+                '' as term_payment, 
+                '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
+                '' as disc_add_percent, '' as subarea_id
+        from site.penta_sales_palu a left join (
+            select a.location, a.bill_ship_cust_name, a.address1, a.primary_salesrep_id, a.salesman_name, a.typeid, a.classid, a.spot
+            from site.penta_outlet a
+            where a.org_id = 485
+        )b on a.kode_outlet = b.location left join (
+            select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+            from site.master_product_with_harga a 
+        )c on a.item_id_vend = c.kodeprod
+        where a.type_data = 'Return' and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1 and a.is_valid_customer = 1 and is_valid_type = 1 and is_valid_class = 1 
+        and is_valid_spot = 1 and bulan = $bulan and tahun = $tahun and a.area_id = 485 and a.bonus < 0
+        ";
+
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        // echo "<br>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tblang_palu($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tblang where nocab='$nocab' ;
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tabsales_palu($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tabsales where nocab='$nocab' ;
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_tblang($tahun, $site_code)
+    {
+        $query = "
+            insert into data$tahun.tblang
+            select * from(				
+                SELECT				
+                KODE_COMP,				
+                KODE_KOTA,				
+                KODE_TYPE,				
+                KODE_LANG,				
+                KODERAYON,				
+                NAMA_LANG,				
+                NAMAAREA as ALAMAT1,				
+                '' as ALAMAT2,				
+                '' as TELP,				
+                '' as KODEPOS,				
+                '' as TGL,				
+                '' as NPWP,				
+                '0' as BTS_UTANG,				
+                '0' as SALES01,				
+                '0' as SALES02,				
+                '0' as SALES03,				
+                '0' as SALES04,				
+                '0' as SALES05,				
+                '0' as SALES06,				
+                '0' as SALES07,				
+                '0' as SALES08,				
+                '0' as SALES09,				
+                '0' as SALES10,				
+                '0' as SALES11,				
+                '0' as SALES12,				
+                '0' as KET,				
+                '0' as DEBIT,				
+                '0' as KREDIT,				
+                KODESALUR as KODESALUR,				
+                '0' as TOP,				
+                'Y' as AKTIF,				
+                '' as TGL_AKTIF,				
+                'T' as PPN,				
+                '0' as KODE_LAMA,				
+                '1' as JUM_DOK,				
+                '0' as STATJUAL,				
+                '0' as LIMIT1,				
+                '' as TGLNAKTIF,				
+                '' as ALAMAT_WP,				
+                '' as NILAI_PPN,				
+                '' as NAMA_WP,				
+                '' as NEWFLD,				
+                nocab as NOCAB,				
+                '' as kodelang_copy,				
+                '' as id_provinsi,				
+                '' as nama_provinsi,				
+                '' as id_kota,				
+                '' as nama_kota,				
+                '' as id_kecamatan,				
+                '' as nama_kecamatan,				
+                '' as id_kelurahan,				
+                '' as nama_kelurahan,				
+                '' as phone,				
+                '' as tipe_bayar,				
+                '' as credit_limit,				
+                '' AS last_updated,				
+                '' as status_blacklist,				
+                '' as status_payment,				
+                '' as CUSTID,				
+                '' as COMPID,				
+                '' as LATITUDE,				
+                '' as LONGITUDE,				
+                '' as FOTO_DISP,				
+                '' as FOTO_TOKO,
+                '' as KODE_SPOT,
+                '' as subarea_id
+                FROM(				
+                    SELECT CONCAT(KODE_COMP,KODE_LANG,max(BULAN)) as mapp				
+                    FROM data$tahun.fi 
+                    WHERE concat(kode_comp, nocab) = '$site_code' 				
+                    GROUP BY kode_comp,KODE_LANG 				
+                )A				
+                LEFT JOIN 				
+                (				
+                SELECT * FROM(				
+                    SELECT *, CONCAT(KODE_COMP, KODE_LANG,BULAN) as mapp			
+                    FROM data$tahun.fi   				
+                    WHERE concat(kode_comp, nocab) = '$site_code'				
+                    GROUP BY MAPP 				
+                    )A				
+                )C USING(MAPP)				
+                union ALL				
+                SELECT				
+                KODE_COMP,				
+                KODE_KOTA,				
+                KODE_TYPE,				
+                KODE_LANG,				
+                KODERAYON,				
+                NAMA_LANG,				
+                NAMAAREA as ALAMAT1,				
+                '' as ALAMAT2,				
+                '' as TELP,				
+                '' as KODEPOS,				
+                '' as TGL,				
+                '' as NPWP,				
+                '0' as BTS_UTANG,				
+                '0' as SALES01,				
+                '0' as SALES02,				
+                '0' as SALES03,				
+                '0' as SALES04,				
+                '0' as SALES05,				
+                '0' as SALES06,				
+                '0' as SALES07,				
+                '0' as SALES08,				
+                '0' as SALES09,				
+                '0' as SALES10,				
+                '0' as SALES11,				
+                '0' as SALES12,				
+                '0' as KET,				
+                '0' as DEBIT,				
+                '0' as KREDIT,				
+                KODESALUR as KODESALUR,				
+                '0' as TOP,				
+                'Y' as AKTIF,				
+                '' as TGL_AKTIF,				
+                'T' as PPN,				
+                '0' as KODE_LAMA,				
+                '1' as JUM_DOK,				
+                '0' as STATJUAL,				
+                '0' as LIMIT1,				
+                '' as TGLNAKTIF,				
+                '' as ALAMAT_WP,				
+                '' as NILAI_PPN,				
+                '' as NAMA_WP,				
+                '' as NEWFLD,				
+                nocab as NOCAB,				
+                '' as kodelang_copy,				
+                '' as id_provinsi,				
+                '' as nama_provinsi,				
+                '' as id_kota,				
+                '' as nama_kota,				
+                '' as id_kecamatan,				
+                '' as nama_kecamatan,				
+                '' as id_kelurahan,				
+                '' as nama_kelurahan,				
+                '' as phone,				
+                '' as tipe_bayar,				
+                '' as credit_limit,				
+                '' AS last_updated,				
+                '' as status_blacklist,				
+                '' as status_payment,				
+                '' as CUSTID,				
+                '' as COMPID,				
+                '' as LATITUDE,				
+                '' as LONGITUDE,				
+                '' as FOTO_DISP,				
+                '' as FOTO_TOKO,
+                '' as KODE_SPOT,
+                '' as subarea_id
+                FROM(				
+                    SELECT CONCAT(KODE_COMP,KODE_LANG,max(BULAN)) as mapp				
+                    FROM data$tahun.ri  				
+                    WHERE concat(kode_comp, nocab) = '$site_code'				
+                    GROUP BY kode_comp,KODE_LANG 				
+                )A				
+                LEFT JOIN 				
+                (				
+                SELECT * FROM(SELECT *,CONCAT(KODE_COMP,KODE_LANG,BULAN) as mapp
+                    FROM data$tahun.ri  				
+                    WHERE concat(kode_comp, nocab) = '$site_code' 				
+                    GROUP BY MAPP 				
+                    )A				
+                )C USING(MAPP)				
+                )a group by kode_comp,kode_lang
+        ";
+
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";die;
+
+        return $this->db->query($query);
+    }
+
+    public function update_spot_tblang($tahun, $site_code)
+    {   
+        $query = "
+            update data$tahun.tblang a 
+            inner join site.penta_outlet b 
+            on a.kode_lang = b.location
+            set a.KODE_SPOT = b.spot
+            WHERE concat(a.kode_comp, a.nocab) = '$site_code' and b.org_id = 485
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_tabsales($tahun, $site_code)
+    {
+        $query = "
+            insert into data$tahun.tabsales
+            SELECT	a.KODESALES,				
+                    a.lampiran as NAMASALES,				
+                    '' AS KODERAYON,				
+                    'S'AS `STATUS`,				
+                    '' AS ALAMAT1,				
+                    '' AS ALAMAT2,				
+                    ''AS NO_TELP,				
+                    '' AS KODEPOS,				
+                    '' AS PROPINSI,				
+                    '' AS DATA1,				
+                    '' AS TAHAP,				
+                    '' AS FILEID,				
+                    '' AS NAMA_DEPO,				
+                    KODE_KOTA,				
+                    '' AS KODE_GDG,				
+                    '' AS NAMA_GDG,				
+                    'Y' AS AKTIF,				
+                    NOCAB 				
+            FROM data$tahun.fi a inner JOIN 				
+            (				
+                SELECT kodesales, MAX(concat(kodesales,bulan)) times 				
+                FROM data$tahun.fi 				
+                where concat(kode_comp, nocab) = '$site_code'				
+                GROUP BY KODESALES				
+            )b ON b.times=concat(a.KODESALES,a.BULAN)				
+            where concat(kode_comp, nocab) = '$site_code'				
+            GROUP BY kodesales
+        ";
+
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+
+        return $this->db->query($query);
+    }
+
+    public function get_master_product_penta_by_kodeprod($kodeprod)
+    {
+        $query = "
+            select *
+            from site.penta_master_produk_sales a
+            where a.kode_produk_penta = '$kodeprod'
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_master_outlet_penta_by_kodeoutlet($kodeoutlet)
+    {
+        $query = "
+            select *
+            from site.penta_outlet a
+            where a.location = '$kodeoutlet'
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_penta_sales_palu_where_is_valid_false($tahun, $bulan, $area_id)
+    {
+        $query = "
+            select 	*
+            from site.penta_sales_palu a
+            where a.is_valid_kodeprod = 0 or a.is_valid_tanggal = 0 or a.is_valid_customer = 0  or a.is_valid_class = 0 or a.is_valid_type = 0 or a.is_valid_spot = 0
+            and a.tahun = $tahun and a.bulan = $bulan and a.area_id = $area_id
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function get_penta_customer_summary($area_id)
+    {
+        $query = "
+            select a.org_name, a.location, a.bill_ship_cust_name, a.address1, a.typeid, a.classid, a.spot
+            from site.penta_outlet a
+            WHERE a.org_id = $area_id and (a.typeid IS NULL OR a.typeid = '' OR a.classid IS NULL OR a.classid = '' OR a.spot IS NULL OR a.spot = '')
+
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_result($site_code, $tahun, $bulan)
+    {
+        $query = "
+            select sum(a.total_unit) as total_unit, sum(a.total_value) as total_value
+            from 
+            (
+                select sum(a.banyak) as total_unit, sum(a.tot1) as total_value
+                from data$tahun.fi a 
+                where concat(a.kode_comp, a.nocab) = '$site_code' and a.bulan = $bulan
+                union all 
+                select sum(a.banyak) as total_unit, sum(a.tot1) as total_value
+                from data$tahun.ri a 
+                where concat(a.kode_comp, a.nocab) = '$site_code' and a.bulan = $bulan
+            )a
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_upload($data)
+    {
+        $proses = $this->db->insert('mpm.upload', $data);
+        return $this->db->insert_id();
+    }
+
+    public function get_log_sales($site_code)
+    {
+        $query = "
+            select a.*, b.status_closing
+            from site.penta_log_sales_palu a
+            left join mpm.upload b 
+            on a.id_upload = b.id
+            where a.site_code = '$site_code'
+            order by a.id desc
+            limit 100
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function get_log_sales_bysignature($signature = "")
+    {
+        if($signature)
+        {
+            $params_signature = "where signature = '$signature'";
+        }else{
+            $params_signature = "";
+        }
+        $query = "
+            select a.*, b.status_closing
+            from site.penta_log_sales_palu a
+            left join mpm.upload b 
+            on a.id_upload = b.id
+            $params_signature
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function get_master_product()
+    {
+        $query = "
+            select *
+            from site.penta_master_produk_sales a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_master_product_summary()
+    {
+        $query = "
+            select *
+            from site.penta_master_produk_sales a 
+            where a.qty is null or a.qty = '' or a.kode_produk_mpm is null or a.kode_produk_mpm = ''
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_product_by_id($id)
+    {
+        $query = "
+            select *
+            from site.penta_master_produk_sales a
+            where a.id = '$id'
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";die;
+        return $this->db->query($query);
+    }
+
+    public function get_product_by_kodeprod($kodeprod)
+    {
+        $query = "
+            select *
+            from site.master_product a
+            where a.kodeprod = '$kodeprod'
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";die;
+        return $this->db->query($query);
+    }
+
+    public function get_penta_sales_detail_palu($token, $tahun, $bulan, $signature, $id_log, $area)
+    {
+        // echo 'disini';die;
+        $url_penta = getenv('PENTA_API').'list/sales_detail_discount/'.$tahun.'/'.$bulan.'/'.$area;
+        $curl = curl_init();
+
+        $authorization = "Authorization: Bearer $token";
+
+        curl_setopt($curl, CURLOPT_URL, $url_penta);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($curl, CURLOPT_POSTFIELDS,$post);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);    
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl, CURLOPT_FAILONERROR, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        $result = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+        $array_response = json_decode($result, true);
+
+
+        if (isset($array_response['data'])) 
+        {
+            $this->db->truncate('site.temp_penta_sales_palu'); // truncate table sebelum insert data baru
+
+            foreach ($array_response['data'] as $key) 
+            {
+                $bulan = $key["bulan"];
+                $tahun = $key["tahun"];
+                $principal_id = $key["principal_id"];
+                $area_id = $key["area_id"];
+                $nama_area = $key["nama_area"];
+                $tanggal_invoice = $key["tanggal_invoice"];
+                $nomor_invoice = $key["nomor_invoice"];
+                $nomor_sales_order = $key["nomor_sales_order"];
+                $customer_po_number = $key["customer_po_number"];
+                $kode_outlet = $key["kode_outlet"];
+                $kode_outlet_lama = $key["kode_outlet_lama"];
+                $nama_outlet = $key["nama_outlet"];
+                $category_produk = $key["category_produk"];
+                $sales_order_line = $key["sales_order_line"];
+                $kode_produk = $key["kode_produk"];
+                $kode_produk_lama = $key["kode_produk_lama"];
+                $inventory_item_id = $key["inventory_item_id"];
+                $item_id_vend = $key["item_id_vend"];
+                $id_item_sapora = $key["id_item_sapora"];
+                $category_product_principal = $key["category_product_principal"];
+                $nama_produk = $key["nama_produk"];
+                $qty = $key["qty"];
+                $uom = $key["uom"];
+                $price = $key["price"];
+                $total_disc = $key["total_disc"];
+                $total_vat = $key["total_vat"];
+                $total_gross = $key["total_gross"];
+                $total_net = $key["total_net"];
+                $bonus = $key["bonus"];
+
+                $total_discount_value_distributor = $key["total_discount_value_distributor"];
+                $total_discount_value_prinsipal = $key["total_discount_value_prinsipal"];
+                $total_discount_value_extra = $key["total_discount_value_extra"];
+
+                // distributor
+                $disc_persen_distributor_val_1 = $key["disc_persen_distributor_val_1"];
+                $discount_value_distributor_1 = $key["discount_value_distributor_1"];
+                $nomor_discount_distributor_val_1 = $key["nomor_discount_distributor_val_1"];
+
+                $disc_persen_distributor_val_2 = $key["disc_persen_distributor_val_2"];
+                $discount_value_distributor_2 = $key["discount_value_distributor_2"];
+                $nomor_discount_distributor_val_2 = $key["nomor_discount_distributor_val_2"];
+
+                $disc_persen_distributor_val_3 = $key["disc_persen_distributor_val_3"];
+                $discount_value_distributor_3 = $key["discount_value_distributor_3"];
+                $nomor_discount_distributor_val_3 = $key["nomor_discount_distributor_val_3"];
+
+                // prinsipal
+                $disc_persen_prinsipal_val_1 = $key["disc_persen_prinsipal_val_1"];
+                $discount_value_prinsipal_1 = $key["discount_value_prinsipal_1"];
+                $nomor_discount_prinsipal_val_1 = $key["nomor_discount_prinsipal_val_1"];
+
+                $disc_persen_prinsipal_val_2 = $key["disc_persen_prinsipal_val_2"];
+                $discount_value_prinsipal_2 = $key["discount_value_prinsipal_2"];
+                $nomor_discount_prinsipal_val_2 = $key["nomor_discount_prinsipal_val_2"];
+
+                $disc_persen_prinsipal_val_3 = $key["disc_persen_prinsipal_val_3"];
+                $discount_value_prinsipal_3 = $key["discount_value_prinsipal_3"];
+                $nomor_discount_prinsipal_val_3 = $key["nomor_discount_prinsipal_val_3"];
+
+                // extra
+                $disc_persen_extra_val_1 = $key["disc_persen_extra_val_1"];
+                $discount_value_extra_1 = $key["discount_value_extra_1"];
+                $nomor_discount_extra_val_1 = $key["nomor_discount_extra_val_1"];
+
+                $disc_persen_extra_val_2 = $key["disc_persen_extra_val_2"];
+                $discount_value_extra_2 = $key["discount_value_extra_2"];
+                $nomor_discount_extra_val_2 = $key["nomor_discount_extra_val_2"];
+
+                $disc_persen_extra_val_3 = $key["disc_persen_extra_val_3"];
+                $discount_value_extra_3 = $key["discount_value_extra_3"];
+                $nomor_discount_extra_val_3 = $key["nomor_discount_extra_val_3"];
+
+                $batch = $key["batch"];
+                $type_data = $key["type_data"];
+                $nama_sales = $key["nama_sales"];
+                $type_promo = $key["type_promo"];
+                $keterangan_promo = $key["keterangan_promo"];
+                $dpl = $key["dpl"];
+
+                $sales_id = $key["sales_id"];
+                $sales_name = $key["sales_name"];
+
+                $data = [
+                    "id_log" => $id_log,
+                    "bulan" => $bulan,
+                    "tahun" => $tahun,
+                    "principal_id" => $principal_id,
+                    "area_id" => $area_id,
+                    "nama_area" => $nama_area,
+                    "tanggal_invoice" => $tanggal_invoice,
+                    "nomor_invoice" => $nomor_invoice,
+                    "nomor_sales_order" => $nomor_sales_order,
+                    "customer_po_number" => $customer_po_number,
+                    "kode_outlet" => $kode_outlet,
+                    "kode_outlet_lama" => $kode_outlet_lama,
+                    "nama_outlet" => $nama_outlet,
+                    "category_produk" => $category_produk,
+                    "sales_order_line" => $sales_order_line,
+                    "kode_produk" => $kode_produk,
+                    "kode_produk_lama" => $kode_produk_lama,
+                    "inventory_item_id" => $inventory_item_id,
+                    "item_id_vend" => $item_id_vend,
+                    "id_item_sapora" => $id_item_sapora,
+                    "category_product_principal" => $category_product_principal,
+                    "nama_produk" => $nama_produk,
+                    "qty" => $qty,
+                    "uom" => $uom,
+                    "price" => $price,
+                    "total_disc" => $total_disc,
+                    "total_vat" => $total_vat,
+                    "total_gross" => $total_gross,
+                    "total_net" => $total_net,
+                    "bonus" => $bonus,
+
+                    "total_discount_value_distributor" => $total_discount_value_distributor,
+                    "total_discount_value_prinsipal" => $total_discount_value_prinsipal,
+                    "total_discount_value_extra" => $total_discount_value_extra,
+
+                    "disc_persen_distributor_val_1" => $disc_persen_distributor_val_1,
+                    "discount_value_distributor_1" => $discount_value_distributor_1,
+                    "nomor_discount_distributor_val_1" => $nomor_discount_distributor_val_1,
+                    "disc_persen_distributor_val_2" => $disc_persen_distributor_val_2,
+                    "discount_value_distributor_2" => $discount_value_distributor_2,
+                    "nomor_discount_distributor_val_2" => $nomor_discount_distributor_val_2,
+                    "disc_persen_distributor_val_3" => $disc_persen_distributor_val_3,
+                    "discount_value_distributor_3" => $discount_value_distributor_3,
+                    "nomor_discount_distributor_val_3" => $nomor_discount_distributor_val_3,
+
+                    "disc_persen_prinsipal_val_1" => $disc_persen_prinsipal_val_1,
+                    "discount_value_prinsipal_1" => $discount_value_prinsipal_1,
+                    "nomor_discount_prinsipal_val_1" => $nomor_discount_prinsipal_val_1,
+                    "disc_persen_prinsipal_val_2" => $disc_persen_prinsipal_val_2,
+                    "discount_value_prinsipal_2" => $discount_value_prinsipal_2,
+                    "nomor_discount_prinsipal_val_2" => $nomor_discount_prinsipal_val_2,
+                    "disc_persen_prinsipal_val_3" => $disc_persen_prinsipal_val_3,
+                    "discount_value_prinsipal_3" => $discount_value_prinsipal_3,
+                    "nomor_discount_prinsipal_val_3" => $nomor_discount_prinsipal_val_3,
+
+                    "disc_persen_extra_val_1" => $disc_persen_extra_val_1,
+                    "discount_value_extra_1" => $discount_value_extra_1,
+                    "nomor_discount_extra_val_1" => $nomor_discount_extra_val_1,
+                    "disc_persen_extra_val_2" => $disc_persen_extra_val_2,
+                    "discount_value_extra_2" => $discount_value_extra_2,
+                    "nomor_discount_extra_val_2" => $nomor_discount_extra_val_2,
+                    "disc_persen_extra_val_3" => $disc_persen_extra_val_3,
+                    "discount_value_extra_3" => $discount_value_extra_3,
+                    "nomor_discount_extra_val_3" => $nomor_discount_extra_val_3,
+
+                    "batch" => $batch,
+                    "type_data" => $type_data,
+                    "nama_sales" => $nama_sales,
+                    "type_promo" => $type_promo,
+                    "keterangan_promo" => $keterangan_promo,
+                    "dpl" => $dpl,
+
+                    "sales_id" => $sales_id,
+                    "sales_name" => $sales_name,
+
+                    "created_at" => $this->created_at,
+                    "created_by" => $this->userid,
+                    "signature" => $signature
+                ];
+
+                $this->db->insert('site.temp_penta_sales_palu', $data);
+            }
+
+            // die;
+            
+            // return $id_log;
+            return array($id_log, $signature);
+            // echo "success : " . $id_log;
+            // die;
+
+        }else{
+            echo "error : " . $err;
+            die;
+        }
+    }
+
+    public function cek_product_penta_from_sales($id_log, $bulan, $area_id)
+    {
+        $query = "
+            select b.*, a.id_log, a.bulan, a.tahun, a.item_id_vend, a.kode_produk, a.nama_produk,  a.uom, c.kodeprod, c.NAMAPROD
+            from site.penta_sales_palu a
+            left join (
+                select a.kode_produk_penta, a.kode_produk_mpm, a.nama_produk_penta as nama_produk_penta
+                from site.penta_master_produk_sales a
+            )b on a.kode_produk = b.kode_produk_penta
+            left join mpm.tabprod c 
+            on if(LENGTH(a.item_id_vend) = 5, concat('0',a.item_id_vend), a.item_id_vend) = c.kodeprod
+            where a.id_log = $id_log and a.bulan = $bulan and area_id = $area_id
+            group by a.kode_produk
+        ";
+
+        $proses =  $this->db->query($query);
+
+        foreach ($proses->result() as $a)
+        {
+            $kode_produk_penta = $a->kode_produk;
+            $item_id_vend_penta = $a->item_id_vend;
+            $nama_produk_penta = $a->nama_produk;
+            $uom               = $a->uom;
+            $kode_produk_mpm   = $a->kodeprod;
+            $nama_produk_mpm   = $a->NAMAPROD;
+
+            // CEK: kalau belum ada di master
+            if (empty($a->kode_produk_penta))
+            {
+                $data = [
+                    "kode_produk_penta" => $kode_produk_penta,
+                    "item_id_vend_penta" => $item_id_vend_penta,
+                    "nama_produk_penta" => $nama_produk_penta,
+                    "uom"               => $uom,
+                    "kode_produk_mpm"   => $kode_produk_mpm,
+                    "nama_produk_mpm"   => $nama_produk_mpm,
+                    "tabel"             => 'penta_sales_palu',
+                    "created_at"        => date('Y-m-d H:i:s'),
+                    "created_by"        => $this->userid,
+                ];
+
+                $this->db->insert('site.penta_master_produk_sales', $data);
+            }
+        }
+
+    }
+
+    public function get_spot()
+    {
+        $query = "
+            select *
+            from site.master_spot a
+            group by a.kode_spot_mapping
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_class()
+    {
+        $query = "
+            select *
+            from mpm.tbl_tabsalur a
+            where a.active = 1
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_type()
+    {
+        $query = "
+            select *
+            from mpm.tbl_bantu_type a
+            where a.active = 1
+        ";
+        return $this->db->query($query);
+    }
+
 }
