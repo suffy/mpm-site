@@ -30,7 +30,7 @@
 <div class="container-fluid">
   <div class="row mt-3">
     <div class="col-md-12">
-      <h3><?= $title ?></h3>
+      <h2><?= $title ?></h2>
     </div>
   </div>
 
