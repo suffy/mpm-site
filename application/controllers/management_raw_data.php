@@ -102,7 +102,7 @@ class Management_raw_data extends MY_Controller
         }
 
         $data = [
-            "title" => "Portal Raw Data",
+            "title" => "Portal Raw Data - UPDATE",
             'url'   => 'management_raw_data/dashboard',
             'url_upload' => 'management_raw_data/attachment_config',
             'list_data_harian' => $this->model_management_raw_data->get_list_raw($params_status_principal, $supp, "Harian")->result(),
