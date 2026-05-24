@@ -8478,4 +8478,387 @@ class Model_master_data extends CI_Model
     echo "</pre>";
     return $this->db->query($query);
   }
+
+    public function get_penta_sales_detail_palu($token, $tahun, $bulan, $signature, $id_log, $area)
+    {
+        // echo 'disini';die;
+        $url_penta = getenv('PENTA_API').'list/sales_detail_discount/'.$tahun.'/'.$bulan.'/'.$area;
+        $curl = curl_init();
+
+        $authorization = "Authorization: Bearer $token";
+
+        curl_setopt($curl, CURLOPT_URL, $url_penta);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($curl, CURLOPT_POSTFIELDS,$post);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);    
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl, CURLOPT_FAILONERROR, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        $result = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+        $array_response = json_decode($result, true);
+
+
+        if (isset($array_response['data'])) 
+        {
+            $this->db->truncate('site.temp_penta_sales_palu'); // truncate table sebelum insert data baru
+
+            foreach ($array_response['data'] as $key) 
+            {
+                $bulan = $key["bulan"];
+                $tahun = $key["tahun"];
+                $principal_id = $key["principal_id"];
+                $area_id = $key["area_id"];
+                $nama_area = $key["nama_area"];
+                $tanggal_invoice = $key["tanggal_invoice"];
+                $nomor_invoice = $key["nomor_invoice"];
+                $nomor_sales_order = $key["nomor_sales_order"];
+                $customer_po_number = $key["customer_po_number"];
+                $kode_outlet = $key["kode_outlet"];
+                $kode_outlet_lama = $key["kode_outlet_lama"];
+                $nama_outlet = $key["nama_outlet"];
+                $category_produk = $key["category_produk"];
+                $sales_order_line = $key["sales_order_line"];
+                $kode_produk = $key["kode_produk"];
+                $kode_produk_lama = $key["kode_produk_lama"];
+                $inventory_item_id = $key["inventory_item_id"];
+                $item_id_vend = $key["item_id_vend"];
+                $id_item_sapora = $key["id_item_sapora"];
+                $category_product_principal = $key["category_product_principal"];
+                $nama_produk = $key["nama_produk"];
+                $qty = $key["qty"];
+                $uom = $key["uom"];
+                $price = $key["price"];
+                $total_disc = $key["total_disc"];
+                $total_vat = $key["total_vat"];
+                $total_gross = $key["total_gross"];
+                $total_net = $key["total_net"];
+                $bonus = $key["bonus"];
+
+                $total_discount_value_distributor = $key["total_discount_value_distributor"];
+                $total_discount_value_prinsipal = $key["total_discount_value_prinsipal"];
+                $total_discount_value_extra = $key["total_discount_value_extra"];
+
+                // distributor
+                $disc_persen_distributor_val_1 = $key["disc_persen_distributor_val_1"];
+                $discount_value_distributor_1 = $key["discount_value_distributor_1"];
+                $nomor_discount_distributor_val_1 = $key["nomor_discount_distributor_val_1"];
+
+                $disc_persen_distributor_val_2 = $key["disc_persen_distributor_val_2"];
+                $discount_value_distributor_2 = $key["discount_value_distributor_2"];
+                $nomor_discount_distributor_val_2 = $key["nomor_discount_distributor_val_2"];
+
+                $disc_persen_distributor_val_3 = $key["disc_persen_distributor_val_3"];
+                $discount_value_distributor_3 = $key["discount_value_distributor_3"];
+                $nomor_discount_distributor_val_3 = $key["nomor_discount_distributor_val_3"];
+
+                // prinsipal
+                $disc_persen_prinsipal_val_1 = $key["disc_persen_prinsipal_val_1"];
+                $discount_value_prinsipal_1 = $key["discount_value_prinsipal_1"];
+                $nomor_discount_prinsipal_val_1 = $key["nomor_discount_prinsipal_val_1"];
+
+                $disc_persen_prinsipal_val_2 = $key["disc_persen_prinsipal_val_2"];
+                $discount_value_prinsipal_2 = $key["discount_value_prinsipal_2"];
+                $nomor_discount_prinsipal_val_2 = $key["nomor_discount_prinsipal_val_2"];
+
+                $disc_persen_prinsipal_val_3 = $key["disc_persen_prinsipal_val_3"];
+                $discount_value_prinsipal_3 = $key["discount_value_prinsipal_3"];
+                $nomor_discount_prinsipal_val_3 = $key["nomor_discount_prinsipal_val_3"];
+
+                // extra
+                $disc_persen_extra_val_1 = $key["disc_persen_extra_val_1"];
+                $discount_value_extra_1 = $key["discount_value_extra_1"];
+                $nomor_discount_extra_val_1 = $key["nomor_discount_extra_val_1"];
+
+                $disc_persen_extra_val_2 = $key["disc_persen_extra_val_2"];
+                $discount_value_extra_2 = $key["discount_value_extra_2"];
+                $nomor_discount_extra_val_2 = $key["nomor_discount_extra_val_2"];
+
+                $disc_persen_extra_val_3 = $key["disc_persen_extra_val_3"];
+                $discount_value_extra_3 = $key["discount_value_extra_3"];
+                $nomor_discount_extra_val_3 = $key["nomor_discount_extra_val_3"];
+
+                $batch = $key["batch"];
+                $type_data = $key["type_data"];
+                $nama_sales = $key["nama_sales"];
+                $type_promo = $key["type_promo"];
+                $keterangan_promo = $key["keterangan_promo"];
+                $dpl = $key["dpl"];
+
+                $sales_id = $key["sales_id"];
+                $sales_name = $key["sales_name"];
+
+                $data = [
+                    "id_log" => $id_log,
+                    "bulan" => $bulan,
+                    "tahun" => $tahun,
+                    "principal_id" => $principal_id,
+                    "area_id" => $area_id,
+                    "nama_area" => $nama_area,
+                    "tanggal_invoice" => $tanggal_invoice,
+                    "nomor_invoice" => $nomor_invoice,
+                    "nomor_sales_order" => $nomor_sales_order,
+                    "customer_po_number" => $customer_po_number,
+                    "kode_outlet" => $kode_outlet,
+                    "kode_outlet_lama" => $kode_outlet_lama,
+                    "nama_outlet" => $nama_outlet,
+                    "category_produk" => $category_produk,
+                    "sales_order_line" => $sales_order_line,
+                    "kode_produk" => $kode_produk,
+                    "kode_produk_lama" => $kode_produk_lama,
+                    "inventory_item_id" => $inventory_item_id,
+                    "item_id_vend" => $item_id_vend,
+                    "id_item_sapora" => $id_item_sapora,
+                    "category_product_principal" => $category_product_principal,
+                    "nama_produk" => $nama_produk,
+                    "qty" => $qty,
+                    "uom" => $uom,
+                    "price" => $price,
+                    "total_disc" => $total_disc,
+                    "total_vat" => $total_vat,
+                    "total_gross" => $total_gross,
+                    "total_net" => $total_net,
+                    "bonus" => $bonus,
+
+                    "total_discount_value_distributor" => $total_discount_value_distributor,
+                    "total_discount_value_prinsipal" => $total_discount_value_prinsipal,
+                    "total_discount_value_extra" => $total_discount_value_extra,
+
+                    "disc_persen_distributor_val_1" => $disc_persen_distributor_val_1,
+                    "discount_value_distributor_1" => $discount_value_distributor_1,
+                    "nomor_discount_distributor_val_1" => $nomor_discount_distributor_val_1,
+                    "disc_persen_distributor_val_2" => $disc_persen_distributor_val_2,
+                    "discount_value_distributor_2" => $discount_value_distributor_2,
+                    "nomor_discount_distributor_val_2" => $nomor_discount_distributor_val_2,
+                    "disc_persen_distributor_val_3" => $disc_persen_distributor_val_3,
+                    "discount_value_distributor_3" => $discount_value_distributor_3,
+                    "nomor_discount_distributor_val_3" => $nomor_discount_distributor_val_3,
+
+                    "disc_persen_prinsipal_val_1" => $disc_persen_prinsipal_val_1,
+                    "discount_value_prinsipal_1" => $discount_value_prinsipal_1,
+                    "nomor_discount_prinsipal_val_1" => $nomor_discount_prinsipal_val_1,
+                    "disc_persen_prinsipal_val_2" => $disc_persen_prinsipal_val_2,
+                    "discount_value_prinsipal_2" => $discount_value_prinsipal_2,
+                    "nomor_discount_prinsipal_val_2" => $nomor_discount_prinsipal_val_2,
+                    "disc_persen_prinsipal_val_3" => $disc_persen_prinsipal_val_3,
+                    "discount_value_prinsipal_3" => $discount_value_prinsipal_3,
+                    "nomor_discount_prinsipal_val_3" => $nomor_discount_prinsipal_val_3,
+
+                    "disc_persen_extra_val_1" => $disc_persen_extra_val_1,
+                    "discount_value_extra_1" => $discount_value_extra_1,
+                    "nomor_discount_extra_val_1" => $nomor_discount_extra_val_1,
+                    "disc_persen_extra_val_2" => $disc_persen_extra_val_2,
+                    "discount_value_extra_2" => $discount_value_extra_2,
+                    "nomor_discount_extra_val_2" => $nomor_discount_extra_val_2,
+                    "disc_persen_extra_val_3" => $disc_persen_extra_val_3,
+                    "discount_value_extra_3" => $discount_value_extra_3,
+                    "nomor_discount_extra_val_3" => $nomor_discount_extra_val_3,
+
+                    "batch" => $batch,
+                    "type_data" => $type_data,
+                    "nama_sales" => $nama_sales,
+                    "type_promo" => $type_promo,
+                    "keterangan_promo" => $keterangan_promo,
+                    "dpl" => $dpl,
+
+                    "sales_id" => $sales_id,
+                    "sales_name" => $sales_name,
+                    
+                    "created_at" => $this->created_at,
+                    "created_by" => $this->userid,
+                    "signature" => $signature
+                ];
+
+                $this->db->insert('site.temp_penta_sales_palu', $data);
+            }
+
+            // die;
+            
+            // return $id_log;
+            return array($id_log, $signature);
+            // echo "success : " . $id_log;
+            // die;
+
+        }else{
+            echo "error : " . $err;
+            die;
+        }
+    }
+
+    public function get_penta_customer($token, $signature, $id_log, $area)
+    {
+        $url_penta = getenv('PENTA_API').'list/outlet/'.$area;
+        $curl = curl_init();
+
+        $authorization = "Authorization: Bearer $token";
+
+        curl_setopt($curl, CURLOPT_URL, $url_penta);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($curl, CURLOPT_POSTFIELDS,$post);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);    
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($curl, CURLOPT_FAILONERROR, 1);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+        $result = curl_exec($curl);
+        $err = curl_error($curl);
+        curl_close($curl);
+        $array_response = json_decode($result, true);
+
+
+        if (!isset($array_response['data'])) {
+            return false;
+        }
+
+        $this->db->truncate('site.temp_penta_outlet'); //trucate table sebelum insert data baru
+ 
+        foreach ($array_response['data'] as $key)
+        {
+            $org_id             = $key["org_id"];
+            $org_name           = $key["org_name"];
+            $location           = $key["location"];
+            $site_use_id        = $key["site_use_id"];
+            $bill_ship_cust_name= $key["bill_ship_cust_name"];
+            $prefix             = $key["prefix"];
+            $address1           = $key["address1"];
+            $address2           = $key["address2"];
+            $address3           = $key["address3"];
+            $city               = $key["city"];
+            $province           = $key["province"];
+            $primary_salesrep_id= $key["primary_salesrep_id"];
+            $salesman_name      = $key["salesman_name"];
+
+            $data = [
+                "id_log"                => $id_log,
+                "org_id"                => $org_id,
+                "org_name"              => $org_name,
+                "location"              => $location,
+                "site_use_id"           => $site_use_id,
+                "bill_ship_cust_name"   => $bill_ship_cust_name,
+                "prefix"                => $prefix,
+                "address1"              => $address1,
+                "address2"              => $address2,
+                "address3"              => $address3,
+                "city"                  => $city,
+                "province"              => $province,
+                "primary_salesrep_id"   => $primary_salesrep_id,
+                "salesman_name"         => $salesman_name,
+                "created_at"            => $this->created_at,
+                "created_by"            => $this->userid,
+                "signature"             => $signature
+            ];
+            
+            
+            $this->db->insert('site.temp_penta_outlet', $data);
+        }
+        // die;
+        return true;
+        // return $id_log;
+        // return array($id_log, $signature);
+        // echo "success : " . $id_log;
+        // die;
+    }
+
+    public function get_temp_outlet()
+    {
+        $query = "
+                select *
+                from site.temp_penta_outlet
+            ";
+        return $this->db->query($query)->result();
+
+        // return $this->db->get('site.temp_penta_outlet')->result();
+    }
+
+    public function cek_outlet($org_id, $location)
+    {
+        $query = "
+            select *
+            from site.penta_outlet
+            where org_id = '$org_id' and location = '$location'
+        ";
+
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query)->row();
+        // return $this->db
+        //     ->where('org_id', $org_id)
+        //     ->where('site_use_id', $site_use_id)
+        //     ->get('site.penta_outlet')
+        //     ->row();
+    }
+
+    public function insert_outlet($row, $signature, $userid)
+    {
+        $data = (array)$row;
+
+        unset($data['id']);
+
+        $data['created_at'] = date('Y-m-d H:i:s');
+        $data['created_by'] = $userid;
+        $data['signature']  = $signature;
+
+        $this->db->insert('site.penta_outlet', $data);
+    }
+
+    public function cek_product_penta_from_sales($id_log, $bulan, $area_id)
+    {
+        $query = "
+            select b.*, a.id_log, a.bulan, a.tahun, a.item_id_vend, a.kode_produk, a.nama_produk,  a.uom, c.kodeprod, c.NAMAPROD
+            from site.penta_sales_palu a
+            left join (
+                select a.kode_produk_penta, a.kode_produk_mpm, a.nama_produk_penta as nama_produk_penta
+                from site.penta_master_produk a
+            )b on a.kode_produk = b.kode_produk_penta
+            left join mpm.tabprod c 
+            on if(LENGTH(a.item_id_vend) = 5, concat('0',a.item_id_vend), a.item_id_vend) = c.kodeprod
+            where a.id_log = $id_log and a.bulan = $bulan and area_id = $area_id
+            group by a.kode_produk
+        ";
+
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>"; 
+        $proses =  $this->db->query($query);
+
+        foreach ($proses->result() as $a)
+        {
+            $kode_produk_penta = $a->kode_produk;
+            $item_id_vend_penta = $a->item_id_vend;
+            $nama_produk_penta = $a->nama_produk;
+            $uom               = $a->uom;
+            $kode_produk_mpm   = $a->kodeprod;
+            $nama_produk_mpm   = $a->NAMAPROD;
+
+            // CEK: kalau belum ada di master
+            if (empty($a->kode_produk_penta))
+            {
+                $data = [
+                    "kode_produk_penta" => $kode_produk_penta,
+                    "item_id_vend_penta" => $item_id_vend_penta,
+                    "nama_produk_penta" => $nama_produk_penta,
+                    "uom"               => $uom,
+                    "kode_produk_mpm"   => $kode_produk_mpm,
+                    "nama_produk_mpm"   => $nama_produk_mpm,
+                    "tabel"             => 'penta_sales_palu',
+                    "created_at"        => date('Y-m-d H:i:s'),
+                    "created_by"        => $this->userid,
+                ];
+
+                $this->db->insert('site.penta_master_produk', $data);
+                var_dump($data);
+            }
+        }
+
+    }
+
 }
