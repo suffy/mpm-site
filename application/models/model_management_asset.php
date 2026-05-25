@@ -426,10 +426,6 @@ class Model_management_asset extends CI_Model
             order by a.id desc
         ";
 
-        // echo "<pre>";
-        // print_r($sql);
-        // echo "</pre>";
-
 
         return $this->db->query($sql);
     }
@@ -516,14 +512,19 @@ class Model_management_asset extends CI_Model
         $created_at = $kode['created_at'];
         
         $serverName = "backup.muliaputramandiri.com"; //serverName\instanceName, portNumber (default is 1433)
-        $connectionInfo = array("Database" => "", "UID" => "sa", "PWD" => "mpm12345");
+        $connectionInfo = array("Database" => "", "UID" => "sa", "PWD" => "obherbal12!@");
         $conn = sqlsrv_connect($serverName, $connectionInfo);
+        // if ($conn === false) {
+        //     die(print_r(sqlsrv_errors(), true));
+        // }
 
         // echo "<pre><br><br><br><br><br>";
-        // print_r($nv);
+        // print_r($conn);
+        // echo "<pre><br><br><br><br><br>";
         // print_r($from);
+        // echo "<pre><br><br><br><br><br>";
         // print_r($to);
-        // echo "</pre>";
+        // echo "</pre>";die;
         if ($conn) {
             echo "<script>
             alert('Koneksi dengan Server SDS Berhasil');
@@ -565,6 +566,74 @@ class Model_management_asset extends CI_Model
             }
         }
     }
+
+    // public function getAssets_sds($kode)
+    // {   
+    //     $userid = $this->session->userdata('id');
+    //     $from = $kode['from'];
+    //     $to = $kode['to'];
+    //     $created_at = $kode['created_at'];
+
+    //     $serverName = "backup.muliaputramandiri.com";
+    //     $connectionInfo = [
+    //         "Database" => "",
+    //         "UID" => "sa",
+    //         "PWD" => "obherbal12!@"
+    //     ];
+
+    //     $conn = sqlsrv_connect($serverName, $connectionInfo);
+
+    //     if (!$conn) {
+    //         // LOG ERROR, JANGAN echo
+    //         log_message('error', print_r(sqlsrv_errors(), true));
+    //         return false;
+    //     }
+
+    //     $sql1 = "
+    //             SELECT	a.*
+    //             FROM    dbsls.dbo.t_gl_jurnal a
+    //             WHERE   a.coa_id in ('1120000110','1120000120','1120000130','1120000140','1120000150','1120000160', '1120000170') and  (a.tgl_entry >= '$from' and a.tgl_entry <= '$to')
+    //     ";
+
+    //     $query = sqlsrv_query($conn, $sql1, [$from, $to]);
+
+    //     if (!$query) {
+    //         log_message('error', print_r(sqlsrv_errors(), true));
+    //         return false;
+    //     }
+
+    //     // bersihkan data lama
+    //     $this->db->where('created_by', $userid);
+    //     $this->db->delete('management_asset.temp_asset_sds_jurnal');
+
+    //     while ($row = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC)) {
+
+    //         $data = [
+    //             'siteid' => $row['siteid'],
+    //             'nojurnal' => $row['nojurnal'],
+    //             'coa_id' => $row['coa_id'],
+    //             'nourut' => $row['nourut'],
+    //             'description' => $row['description'],
+    //             'tgl_trans' => $row['tgl_trans']->format('Y-m-d H:i:s'),
+    //             'debet' => $row['debet'],
+    //             'kredit' => $row['kredit'],
+    //             'keterangan' => $row['keterangan'],
+    //             'currency_id' => $row['currency_id'],
+    //             'rate_currency' => $row['rate_currency'],
+    //             'group_saldo' => $row['group_saldo'],
+    //             'tgl_entry' => $row['tgl_entry']->format('Y-m-d H:i:s'),
+    //             'userid' => $row['userid'],
+    //             'flag_jurnal' => $row['flag_jurnal'],
+    //             'created_by' => $userid,
+    //             'created_at' => $created_at
+    //         ];
+
+    //         $this->db->insert('management_asset.temp_asset_sds_jurnal', $data);
+    //     }
+
+    //     return true; // 🔥 INI PENTING
+    // }
+
 
     public function getAssets_temp($userid)
     {

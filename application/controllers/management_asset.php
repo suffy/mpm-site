@@ -3,8 +3,9 @@
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Management_asset extends MY_Controller
 {
-    function management_asset()
-    {       
+    function __construct()
+    {
+        parent::__construct();
         $logged_in= $this->session->userdata('logged_in');
         if(!isset($logged_in) || $logged_in != TRUE)
         {
@@ -15,6 +16,18 @@ class Management_asset extends MY_Controller
         $this->load->helper(array('url', 'csv'));
         $this->load->model(array('model_outlet_transaksi','model_management_asset'));
     }
+    // function management_asset()
+    // {       
+    //     $logged_in= $this->session->userdata('logged_in');
+    //     if(!isset($logged_in) || $logged_in != TRUE)
+    //     {
+    //         redirect('login_sistem/management_asset','refresh');
+    //     }
+    //     set_time_limit(0);
+    //     $this->load->library(array('table', 'template', 'Excel_generator', 'form_validation', 'email', 'zip'));
+    //     $this->load->helper(array('url', 'csv'));
+    //     $this->load->model(array('model_outlet_transaksi','model_management_asset'));
+    // }
     
     function index()
     {
@@ -29,10 +42,11 @@ class Management_asset extends MY_Controller
             'asset'     => $this->model_management_asset->my_asset($userid),
         ];
         
-        $this->load->view('management_office/top_header', $data);
-        $this->load->view('kalimantan/header_full_width', $data);
-        $this->load->view('management_asset/my_asset',$data);
-        $this->load->view('kalimantan/footer');
+        // $this->load->view('management_office/top_header', $data);
+        // $this->load->view('kalimantan/header_full_width', $data);
+        // $this->load->view('management_asset/my_asset',$data);
+        // $this->load->view('kalimantan/footer');
+        $this->render('management_asset/my_asset', $data);
     }
 
     // ======================== pengajuan asset ===========================
@@ -58,10 +72,11 @@ class Management_asset extends MY_Controller
             'userid'    => $userid
         ];
         
-        $this->load->view('management_office/top_header', $data);
-        $this->load->view('kalimantan/header_full_width', $data);
-        $this->load->view('management_asset/pengajuan_asset',$data);
-        $this->load->view('kalimantan/footer');
+        // $this->load->view('management_office/top_header', $data);
+        // $this->load->view('kalimantan/header_full_width', $data);
+        // $this->load->view('management_asset/pengajuan_asset',$data);
+        // $this->load->view('kalimantan/footer');
+        $this->render('management_asset/pengajuan_asset', $data);
     }
 
     public function pengajuan_asset_tambah()
@@ -168,11 +183,12 @@ class Management_asset extends MY_Controller
             $view = 'management_asset/pengajuan_asset_detail';
         }
 
-        $this->load->view('management_office/top_header', $data);  
-        $this->load->view('template_claim/top_header_signature');
-        $this->load->view('kalimantan/header_full_width', $data);
-        $this->load->view($view,$data);
-        $this->load->view('kalimantan/footer');
+        // $this->load->view('management_office/top_header', $data);  
+        // $this->load->view('template_claim/top_header_signature');
+        // $this->load->view('kalimantan/header_full_width', $data);
+        // $this->load->view($view,$data);
+        // $this->load->view('kalimantan/footer');
+        $this->render($view, $data);
     }
 
     public function pengajuan_asset_konfirm_atasan()
@@ -821,11 +837,41 @@ class Management_asset extends MY_Controller
         $kode = [
             'from'          => $_POST['from'],
             'to'            => $_POST['to'],
+            // 'from'  => '2026-01-01',
+            // 'to'    => '2026-01-31',
             'created_at'    => $this->model_outlet_transaksi->timezone()
         ];
         
         $this->model_management_asset->getAssets_sds($kode);
     }
+
+    // public function get_asset_sds()
+    // {
+    //     $from = $this->input->post('from');
+    //     $to = $this->input->post('to');
+
+    //     // contoh validasi sederhana
+    //     if (!$from || !$to) {
+    //         echo json_encode(['status' => false, 'msg' => 'Tanggal tidak boleh kosong']);
+    //         return;
+    //     }
+
+    //     $kode = [
+    //         'from' => $from,
+    //         'to' => $to,
+    //         'created_at' => date('Y-m-d H:i:s') // atau timezone() jika ada
+    //     ];
+
+    //     $result = $this->model_management_asset->getAssets_sds($kode);
+
+    //     if ($result) {
+    //         echo json_encode(['status' => true, 'msg' => 'Berhasil Mengambil Data Dari SDS']);
+    //     } else {
+    //         echo json_encode(['status' => false, 'msg' => 'Gagal Mengambil Data Dari SDS']);
+    //     }
+    // }
+
+
 
     function get_asset()
     {
@@ -851,10 +897,11 @@ class Management_asset extends MY_Controller
             'grup_asset'    => $this->model_management_asset->grup_asset()->result(),
         ];
         
-        $this->load->view('management_office/top_header', $data);
-        $this->load->view('kalimantan/header_full_width', $data);
-        $this->load->view('management_asset/data_asset',$data);
-        $this->load->view('kalimantan/footer');
+        // $this->load->view('management_office/top_header', $data);
+        // $this->load->view('kalimantan/header_full_width', $data);
+        // $this->load->view('management_asset/data_asset',$data);
+        // $this->load->view('kalimantan/footer');
+        $this->render('management_asset/data_asset', $data);
     }
 
     public function data_asset_tambah()
@@ -889,10 +936,11 @@ class Management_asset extends MY_Controller
             'id'                    => $id,
             
         ];
-        $this->load->view('management_office/top_header', $data);
-        $this->load->view('kalimantan/header_full_width', $data);
-        $this->load->view('management_asset/data_asset_detail',$data);
-        $this->load->view('kalimantan/footer');
+        // $this->load->view('management_office/top_header', $data);
+        // $this->load->view('kalimantan/header_full_width', $data);
+        // $this->load->view('management_asset/data_asset_detail',$data);
+        // $this->load->view('kalimantan/footer');
+        $this->render('management_asset/data_asset_detail', $data);
     }
 
     public function data_asset_update()
