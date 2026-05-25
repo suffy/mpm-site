@@ -242,6 +242,11 @@
             $('input#keperluan').val('');
             $('input#tgl_pembelian').val('');
 
+            var from = document.getElementById("from").value;
+            var to = document.getElementById("to").value;
+
+            console.log('from: ' + from + ', to: ' + to);
+
             $.ajax({
                 url: "<?= base_url().'management_asset/get_asset_sds'; ?>",
                 method: "POST",
@@ -250,6 +255,7 @@
                     to: document.getElementById("to").value,
                 },
                 success: function () {
+
                     alert('Berhasil Mengambil Data Dari SDS');
                     $('form').show();
                     $.ajax({
@@ -307,6 +313,75 @@
         });
     });
 </script>
+
+<!-- <script>
+    $(document).ready(function () {
+        $('form').hide();
+
+        $('button#search').click(function (e) {
+            e.preventDefault();
+            console.log('Search button clicked');
+
+            // ambil tanggal from & to dari input
+            var from = $('#from').val();
+            var to = $('#to').val();
+
+            if (!from || !to) {
+                alert('Tanggal From dan To harus diisi!');
+                return;
+            }
+
+            $('button#search').attr('disabled', true);
+            $('textarea#barang').val('');
+            $('input#nilai_perolehan').val('');
+            $('input#keperluan').val('');
+            $('input#tgl_pembelian').val('');
+
+            $.ajax({
+                url: "<?= base_url('management_asset/get_asset_sds'); ?>",
+                method: "POST",
+                data: {
+                    from: from,
+                    to: to,
+                    // Jika CSRF aktif, tambahkan token di sini:
+                    // '<?= $this->security->get_csrf_token_name(); ?>': '<?= $this->security->get_csrf_hash(); ?>'
+                },
+                dataType: "json",
+                success: function (response) {
+                    if(response.status) {
+                        alert(response.msg);
+                        $('form').show();
+
+                        // panggil ajax kedua untuk ambil data kode sds
+                        $.ajax({
+                            url: "<?= base_url('management_asset/get_asset'); ?>",
+                            method: "POST",
+                            dataType: "json",
+                            success: function (data) {
+                                $('button#search').attr('disabled', false);
+                                var html = "<option value=''>Pilih Kode Sds</option>";
+                                for (var i = 0; i < data.length; i++) {
+                                    html += '<option value="' + data[i].nojurnal + '-' + data[i].nourut + '">' + data[i].nojurnal + ' - ' + data[i].nourut + '</option>';
+                                }
+                                $('#kode_sds').html(html);
+                            }
+                        });
+                    } else {
+                        alert('Error: ' + response.msg);
+                        $('button#search').attr('disabled', false);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('AJAX Error get_asset_sds');
+                    $('button#search').attr('disabled', false);
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+    });
+</script> -->
+
+
 
 <!-- history table -->
 <script>
