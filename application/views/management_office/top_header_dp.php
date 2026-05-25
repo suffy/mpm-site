@@ -57,7 +57,9 @@
               <a href="<?= base_url() ?>pareto/rank_mti" class="dropdown-item d-flex align-items-center">Pareto MTI</a>
               <?php } ?> -->
               <a href="<?= base_url() ?>pareto" class="dropdown-item d-flex align-items-center">Pareto Account Management Area</a>
-
+              <?php if ($this->session->userdata('username') == 'PV4') { ?>
+                <a href="<?= base_url() ?>penta/log_sales" class="dropdown-item d-flex align-items-center">Penta & MPI</a>
+              <?php } ?>
             </li>                              
           </ul>
         </li>

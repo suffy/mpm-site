@@ -3924,7 +3924,8 @@ class Master_data extends MY_Controller
         $this->db->insert('site.penta_log_stock', $data);
         $id_log = $this->db->insert_id();
 
-        $array_type = ['penta_sales','batam','gt'];
+        // $array_type = ['penta_sales','batam','gt'];
+            $array_type = ['penta_sales'];
 
         foreach ($array_type as $key => $value) {
             $token_data = $this->model_penta->get_token($value);
@@ -3978,7 +3979,8 @@ class Master_data extends MY_Controller
 
         $this->model_penta->delete_penta_stock_all($bulan, $tahun);
         
-        $array_type = ['penta_sales','batam','gt'];
+        // $array_type = ['penta_sales','batam','gt'];
+            $array_type = ['penta_sales'];
 
         foreach ($array_type as $key => $value) {
             $token_data = $this->model_penta->get_token($value);
