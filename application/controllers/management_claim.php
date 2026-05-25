@@ -3175,8 +3175,8 @@ class Management_claim extends MY_Controller
 
       if (!$is_exist->num_rows() > 0){
           $nomor_ajuan = $this->model_management_claim->generate($site_code, $this->created_at);
-          // echo "nomor_ajuan : ".$nomor_ajuan;
-          // die;            
+          echo "nomor_ajuan : ".$nomor_ajuan;
+          die;            
 
           $data = [
               "nomor_ajuan"   => $nomor_ajuan,
@@ -3360,7 +3360,7 @@ class Management_claim extends MY_Controller
         $this->email->cc($cc);
         $this->email->subject($subject);
         $this->email->message($message);
-        $send = $this->email->send();    
+        // $send = $this->email->send();    
         if ($send) 
         {
             $this->session->set_flashdata("pesan_success", "Send Email Berhasil");
@@ -4154,7 +4154,7 @@ class Management_claim extends MY_Controller
                         'email_pengirim'           => $email,
                         'ajuan_excel'              => $filename_excel,
                         'ajuan_zip'                => $filename_zip,
-                        'status_data_final'        => $status_data_final,
+                        'status_data_final'        => 1,
                         'id_header'                => $insert_header,
                         'tahun_folder'             => $this->tahun_folder
                     ];
@@ -4245,7 +4245,8 @@ class Management_claim extends MY_Controller
             'insert_header'         => $insert_header
         ];
 
-        $this->view($data, false, "preview_import_bonus_barang");
+        // $this->view($data, false, "preview_import_bonus_barang");
+        $this->render('management_claim/preview_import_bonus_barang', $data);
     }
 
     public function proses_pengajuan()
@@ -12388,7 +12389,7 @@ class Management_claim extends MY_Controller
     $this->email->cc($email['email_cc']);
     $this->email->subject($email['subject']);
     $this->email->message($email['message']);
-    // $send = $this->email->send();
+    $send = $this->email->send();
 
     // echo "<pre>";
     // print_r($this->email->print_debugger());

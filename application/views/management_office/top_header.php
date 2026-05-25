@@ -145,6 +145,7 @@
               <a href="<?= base_url() ?>management_karyawan" class="dropdown-item d-flex align-items-center">Personalia</a>
               <a href="<?= base_url() ?>afiliasi/monthly_planning" class="dropdown-item d-flex align-items-center">Monthly Planning</a>
               <a href="<?= base_url() ?>afiliasi" class="dropdown-item d-flex align-items-center">Checklist Activity</a>
+              <a href="<?= base_url() ?>step" class="dropdown-item d-flex align-items-center">Dashboard Step Counter</a>
             </li>                              
           </ul>
         </li>

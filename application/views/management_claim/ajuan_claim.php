@@ -68,7 +68,7 @@
                   <option value="557" <?= $this->input->get('pic') == '557' ? 'selected' : '' ?>> Rani </option>
                   <option value="99" <?= $this->input->get('pic') == '99' ? 'selected' : '' ?>> Yuli </option>
                   <option value="812" <?= $this->input->get('pic') == '812' ? 'selected' : '' ?>> Dea </option>
-                  <option value="297" <?= $this->input->get('pic') == '297' ? 'selected' : '' ?>> Suffy </option>
+                  <option value="1069" <?= $this->input->get('pic') == '1069' ? 'selected' : '' ?>> Rima </option>
               </select>
           </div>
       </div>
