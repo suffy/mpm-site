@@ -130,6 +130,7 @@ Terima kasih.
                     <a href="<?= base_url().'penta/get_penta_sales_palu' ?>" class="btn btn-info">
                         Get Data Sales
                     </a>
+                    <a href="<?= base_url('penta/download_master_produk') ?>" class="btn btn-success" style="border: 1px solid black; display: inline-flex;">Download Master Produk</a>
                 </div>
             </div>
 
@@ -137,7 +138,7 @@ Terima kasih.
             <div class="card-body mt-4 mb-3">
                 <button class="btn btn-submit-black active" id="btn-berjalan">History Sales</button>
                 <button class="btn btn-submit-black" id="btn-closing">Master Produk Penta</button>
-            </div>
+                </div>
 
             <!-- HISTORY -->
             <div id="tabel-berjalan">

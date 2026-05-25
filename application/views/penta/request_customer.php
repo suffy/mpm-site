@@ -130,6 +130,7 @@ Terima kasih.
                     <a href="<?= base_url().'penta/get_penta_customer' ?>" class="btn btn-info">
                         Get Data Customer
                     </a>
+                    <a href="<?= base_url('penta/download_master_outlet') ?>" class="btn btn-success" style="border: 1px solid black; display: inline-flex;">Download Master Outlet</a>
                 </div>
             </div>
 
@@ -137,7 +138,7 @@ Terima kasih.
             <div class="card-body mt-4 mb-3">
                 <button class="btn btn-submit-black active" id="btn-berjalan">History</button>
                 <button class="btn btn-submit-black" id="btn-closing">Data Customer</button>
-            </div>
+                </div>
 
             <!-- HISTORY -->
             <div id="tabel-berjalan">
