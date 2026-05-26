@@ -359,7 +359,7 @@
               } elseif ($selisih_persen > 10 && $selisih_persen <= 20) {
                 echo '<span class="badge bg-warning text-dark" style="border-radius: 20px; padding: 5px 12px;">over weight</span>';
               } else {
-                echo '<span class="badge bg-danger" style="border-radius: 20px; padding: 5px 12px;">obesitas</span>';
+                echo '<span class="badge bg-danger" style="border-radius: 20px; padding: 5px 12px;">obese</span>';
               }
               echo '<div class="mt-1"><small class="text-muted">' . $ideal . ' kg</small></div>';
             } else {
