@@ -6,12 +6,15 @@ class Model_step extends CI_Model
   public function get_step_employee()
   {
     $query = "
-      select a.*, b.username, c.username as validate_username, d.username as created_username, e.username as updated_username
+      select  a.*, b.username, c.username as validate_username, 
+              d.username as created_username, e.username as updated_username,
+              f.departement, f.divisi, f.jenis_kelamin
       from site.step_employee a left join site.master_user b 
         on a.userid = b.id left join site.master_user c
         on a.validate_by = c.id left join site.master_user d 
         on a.created_by = d.id left join site.master_user e 
-        on a.updated_by = e.id 
+        on a.updated_by = e.id left join site.karyawan f 
+        on b.username = f.username_web
     ";
 
     return $this->db->query($query);
@@ -23,112 +26,117 @@ class Model_step extends CI_Model
     $cek = $this->db->get_where('site.step_employee', ['userid' => $data['userid'], 'month' => $data['month']])->row_array();
 
     if ($cek) {
-      // echo "update";
-      // die;
       $this->db->where('userid', $data['userid']);
       $this->db->where('month', $data['month']);
       $this->db->update('site.step_employee', $data);
       return;
-    }else{
-      // echo "insert";
-      // die;
+    } else {
       $this->db->insert('site.step_employee', $data);
       return;
     }
   }
 
-  // Tambahkan method ini di model_step Anda
   public function get_step_statistics()
   {
-      $query = "
-          SELECT 
-              SUM(steps) as total_steps, 
-              AVG(steps) as avg_steps, 
-              MAX(steps) as max_steps, 
-              COUNT(DISTINCT month) as total_months 
-          FROM site.step_employee
-      ";
+    $query = "
+      SELECT 
+        SUM(steps) as total_steps, 
+        AVG(steps) as avg_steps, 
+        MAX(steps) as max_steps, 
+        COUNT(DISTINCT month) as total_months 
+      FROM site.step_employee
+    ";
 
-      return $this->db->query($query)->row();
+    return $this->db->query($query)->row();
   }
 
   public function get_step_ranking_by_month()
   {
-      $query = "
-          SELECT 
-              month, 
-              SUM(steps) as total_steps 
-          FROM site.step_employee 
-          GROUP BY month 
-          ORDER BY total_steps DESC
-      ";
+    $query = "
+      SELECT 
+        month, 
+        SUM(steps) as total_steps 
+      FROM site.step_employee 
+      GROUP BY month 
+      ORDER BY month ASC
+    ";
 
-      $result = $this->db->query($query);
-      
-      $labels = array();
-      $values = array();
-      
-      foreach ($result->result() as $row) {
-          $labels[] = $row->month;
-          $values[] = (int)$row->total_steps;
-      }
-      
-      return array(
-          'labels' => $labels,
-          'values' => $values
-      );
+    $result = $this->db->query($query);
+    
+    $labels = array();
+    $values = array();
+    
+    foreach ($result->result() as $row) {
+      $labels[] = $row->month;
+      $values[] = (int)$row->total_steps;
+    }
+    
+    return array(
+      'labels' => $labels,
+      'values' => $values
+    );
   }
 
-  public function get_top_users_by_month()
-{
+  public function get_top3_by_month($month = null)
+  {
+    if ($month == null) {
+      $query_month = "
+        SELECT DISTINCT month 
+        FROM site.step_employee 
+        ORDER BY month DESC 
+        LIMIT 1
+      ";
+      $month_result = $this->db->query($query_month)->row();
+      $month = isset($month_result->month) ? $month_result->month : date('Y-m');
+    }
+    
     $query = "
-        SELECT 
-            b.username,
-            a.month,
-            SUM(a.steps) as total_steps
-        FROM site.step_employee a 
-        LEFT JOIN site.master_user b ON a.userid = b.id
-        GROUP BY b.username, a.month
-        ORDER BY a.month DESC, total_steps DESC
+      SELECT 
+        b.username,
+        a.month,
+        SUM(a.steps) as total_steps,              
+        a.capture
+      FROM site.step_employee a 
+      LEFT JOIN site.master_user b ON a.userid = b.id
+      WHERE a.month = '$month'
+      GROUP BY b.username, a.month
+      ORDER BY total_steps DESC
+      LIMIT 3
     ";
 
     return $this->db->query($query);
-}
+  }
 
-  // Method untuk mendapatkan top 3 per bulan tertentu (misal bulan terbaru)
-  public function get_top3_by_month($month = null)
+  public function get_top3_divisi_by_average($month = null)
   {
-      if ($month == null) {
-          // Ambil bulan terbaru dari data
-          $query_month = "
-              SELECT DISTINCT month 
-              FROM site.step_employee 
-              ORDER BY month DESC 
-              LIMIT 1
-          ";
-          $month_result = $this->db->query($query_month)->row();
-          $month = isset($month_result->month) ? $month_result->month : date('Y-m');
-      }
-      
-      $query = "
-          SELECT 
-              b.username,
-              a.month,
-              SUM(a.steps) as total_steps,              
-              a.capture
-          FROM site.step_employee a 
-          LEFT JOIN site.master_user b ON a.userid = b.id
-          WHERE a.month = '$month'
-          GROUP BY b.username, a.month
-          ORDER BY total_steps DESC
-          LIMIT 3
+    if ($month == null) {
+      $query_month = "
+        SELECT DISTINCT month 
+        FROM site.step_employee 
+        ORDER BY month DESC 
+        LIMIT 1
       ";
+      $month_result = $this->db->query($query_month)->row();
+      $month = isset($month_result->month) ? $month_result->month : date('Y-m');
+    }
 
-      // echo "<pre>";
-      // echo $query;
-      // echo "</pre>";
+    $query = "
+      SELECT 
+        f.divisi,
+        AVG(a.steps) as avg_steps,
+        COUNT(DISTINCT a.userid) as total_member,
+        SUM(a.steps) as total_steps
+      FROM site.step_employee a 
+      LEFT JOIN site.master_user b ON a.userid = b.id
+      LEFT JOIN site.karyawan f ON b.username = f.username_web
+      WHERE f.divisi IS NOT NULL AND f.divisi != ''
+        AND a.month = '$month'
+      GROUP BY f.divisi
+      ORDER BY avg_steps DESC
+      LIMIT 3
+    ";
 
-      return $this->db->query($query);
+    return $this->db->query($query);
   }
 
   public function get_karyawan_by_username($username)
@@ -140,6 +148,5 @@ class Model_step extends CI_Model
     ";
     return $this->db->query($query);
   }
-
 
 }
