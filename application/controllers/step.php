@@ -40,14 +40,23 @@ class Step extends MY_Controller
     // Ambil data top 3 divisi berdasarkan average steps
     $top_divisi = $this->model_step->get_top3_divisi_by_average();
 
+    // ambil data master karyawan
+    $data_karyawan = $this->model_step->get_karyawan_by_username($this->session->userdata('username'));
+    if ($data_karyawan->num_rows() > 0) {
+      $nama_lengkap = $data_karyawan->row()->nama_lengkap;
+      $departement = $data_karyawan->row()->departement;
+      $divisi = $data_karyawan->row()->divisi;
+      $jenis_kelamin = $data_karyawan->row()->jenis_kelamin;
+    }
+
     $data = [
       'title' => 'Step Form',
       'url' => 'step/form_save',
       'get_data' => $this->model_step->get_step_employee(),
-      'nama_lengkap' => $this->session->userdata('nama_lengkap'),
-      'jenis_kelamin' => $this->session->userdata('jenis_kelamin'),
-      'departement' => $this->session->userdata('departement'),
-      'divisi' => $this->session->userdata('divisi'),
+      'nama_lengkap' => $nama_lengkap,
+      'jenis_kelamin' => $jenis_kelamin,
+      'departement' => $departement,
+      'divisi' => $divisi,
       'total_steps' => isset($stats->total_steps) ? $stats->total_steps : 0,
       'avg_steps' => isset($stats->avg_steps) ? round($stats->avg_steps) : 0,
       'max_steps' => isset($stats->max_steps) ? $stats->max_steps : 0,

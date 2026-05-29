@@ -63,12 +63,6 @@ class Model_afiliasi extends CI_Model
 
   public function get_master_karyawan_by_nama($nama)
   {
-    // $query = "
-    //     select a.id, a.nama, a.id_jabatan
-    //     from site.afiliasi_master_karyawan a 
-    //     where a.nama = '$nama'
-    // ";
-
     $query = "
       select a.id, a.nama, a.id_jabatan, b.nama_jabatan, b.id_divisi, c.nama_divisi
       from site.afiliasi_master_karyawan a left join site.afiliasi_master_jabatan b 
@@ -87,28 +81,32 @@ class Model_afiliasi extends CI_Model
 
   public function get_activity_plan_by_date_for_calendar($date, $id_karyawan)
   {
-      $query = "
-          SELECT 
-              ap.id,
-              ap.activity_id,
-              ap.keterangan,
-              ap.created_at,
-              ma.nama_activity as title,
-              mk.nama,
-              md.nama as nama_divisi,
-              mj.nama as nama_jabatan
-          FROM site.afiliasi_activity_plan ap
-          JOIN site.afiliasi_master_activity ma ON ma.id = ap.activity_id AND ma.deleted_at IS NULL
-          JOIN site.master_karyawan mk ON mk.id = ap.created_by
-          JOIN site.master_divisi md ON md.id = mk.id_divisi
-          JOIN site.master_jabatan mj ON mj.id = mk.id_jabatan
-          WHERE ap.deleted_at IS NULL 
-              AND ap.date = '$date'
-              AND ap.created_by = $id_karyawan
-          ORDER BY ap.created_at DESC
-      ";
-      
-      return $this->db->query($query)->result_array();
+    $query = "
+        SELECT 
+            ap.id,
+            ap.activity_id,
+            ap.keterangan,
+            ap.created_at,
+            ma.nama_activity as title,
+            mk.nama,
+            md.nama as nama_divisi,
+            mj.nama as nama_jabatan
+        FROM site.afiliasi_activity_plan ap
+        JOIN site.afiliasi_master_activity ma ON ma.id = ap.activity_id AND ma.deleted_at IS NULL
+        JOIN site.master_karyawan mk ON mk.id = ap.created_by
+        JOIN site.master_divisi md ON md.id = mk.id_divisi
+        JOIN site.master_jabatan mj ON mj.id = mk.id_jabatan
+        WHERE ap.deleted_at IS NULL 
+            AND ap.date = '$date'
+            AND ap.created_by = $id_karyawan
+        ORDER BY ap.created_at DESC
+    ";
+
+    // echo "<pre>";
+    // print_r($query);
+    // echo "</pre>";
+    
+    return $this->db->query($query)->result_array();
   }
 
   public function insert_to_table($table, $data)
@@ -291,9 +289,27 @@ class Model_afiliasi extends CI_Model
       )b on a.id_karyawan = b.id
       WHERE a.date = '$date' and a.deleted_at is null
     ";
-    // echo "<pre>"; print_r($query); echo "</pre>";
+    // echo "<pre>";
+    // print_r($query);
+    // echo "</pre>";
     return $this->db->query($query)->result_array();
   }
+
+  // Cek duplicate activity
+  public function check_duplicate_activity($id_karyawan, $id_activity, $date)
+  {
+      $this->db->where('id_karyawan', $id_karyawan);
+      $this->db->where('id_activity', $id_activity);
+      $this->db->where('date', $date);
+      $this->db->where('deleted_at is null', null, false);
+      $query = $this->db->get('site.afiliasi_activity_plan');
+      
+      return $query->num_rows() > 0;
+  }
+
+
+
+  
 
   public function get_activity_plan_group_by_month($month)
   {
@@ -303,7 +319,9 @@ class Model_afiliasi extends CI_Model
       WHERE a.deleted_at is null and month(a.date) = $month
       GROUP BY a.date
     ";
-    // echo "<pre>"; print_r($query); echo "</pre>";
+    // echo "<pre>";
+    // print_r($query);
+    // echo "</pre>";
     return $this->db->query($query)->result_array();
   }
 
@@ -332,7 +350,12 @@ class Model_afiliasi extends CI_Model
   }
 
   public function update_to_table($table, $data, $id) {
-    $this->db->where('id', $id);
+    // Cek tabel untuk menentukan field id yang digunakan
+    if($table == 'site.afiliasi_activity_plan') {
+        $this->db->where('id_activity', $id);
+    } else {
+        $this->db->where('id', $id);
+    }
     $this->db->update($table, $data);
     return $this->db->affected_rows();
   }
@@ -420,19 +443,20 @@ class Model_afiliasi extends CI_Model
     }
   }
 
-    public function get_activity_by_pelaksana_jabatan($id_jabatan)
-    {
-      // echo "id_jabatan : ".$id_jabatan;
-      $query = "
-          select  a.id, 
-                  a.nama_activity, 
-                  a.pelaksana
-          from site.afiliasi_master_activity a
-          where FIND_IN_SET($id_jabatan, a.pelaksana) > 0
-      ";
-      // echo "<pre>"; print_r($query); echo "</pre";
-      return $this->db->query($query)->result();
-    }
+  public function get_activity_by_pelaksana_jabatan($id_jabatan)
+  {
+    $query = "
+      select  a.id, 
+              a.nama_activity, 
+              a.pelaksana
+      from site.afiliasi_master_activity a
+      where FIND_IN_SET($id_jabatan, a.pelaksana) > 0
+    ";
+    // echo "<pre>";
+    // print_r($query);
+    // echo "</pre>";
+    return $this->db->query($query)->result();
+  }
 
 
     public function get_activity_by_id($id)
