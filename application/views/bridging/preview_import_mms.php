@@ -19,6 +19,7 @@
     
     .group-header {
         cursor: pointer;
+        font-size: 16px;
         font-weight: bold;
         /* margin-top: 20px; */
         /* background: #eee; */
@@ -62,13 +63,13 @@
     }
 
     /* Sedikit jarak antar baris */
-    .table-clean tbody tr {
-        border-bottom: 8px solid transparent; /* jarak antar baris */
-    }
+    /* .table-clean tbody tr {
+        border-bottom: 8px solid transparent; jarak antar baris
+    } */
 
     .table-clean th, 
     .table-clean td {
-        padding: 8px 10px;
+        /* padding: 8px 10px; */
         text-align: left;
         border: none;
         color: black;
@@ -84,6 +85,19 @@
     .card{
         border: 1px solid #e0e0e0;
     }
+
+    /* Dark mode khusus tombol export-btn*/
+    [data-bs-theme="dark"] .table-clean tbody tr:nth-child(even),
+    [data-bs-theme="dark"] .table-clean tbody tr:nth-child(odd) {
+        background: linear-gradient(135deg, #444 0%, #666 100%);
+    }
+
+    [data-bs-theme="dark"] .table-clean tbody td,
+    [data-bs-theme="dark"] .table-clean thead th,
+    [data-bs-theme="dark"] .table-clean tfoot th {
+        color: #fff;
+    }
+
 
 </style>
 
@@ -142,10 +156,10 @@
                                     <?php endif; ?>
                                 </td>
                                 <td><?= $a->namaprod ?></td>
-                                <td class="text-right"><?= $a->qty_kecil ?></td>
+                                <td class="text-right"><?= $a->total_qty3 ?></td>
                                 <td class="text-right"><?= number_format($a->harga, 2)?></td>
-                                <td class="text-right"><?= $a->qty_besar ?></td>
-                                <td><?= $a->satuan_besar ?></td>
+                                <td class="text-right"><?= $a->total_qty1 ?></td>
+                                <td><?= $a->m_satuan_besar ?></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>

@@ -12,9 +12,9 @@ class Model_bridging extends CI_Model
     {
         if($signature)
         {
-            $params_signature = " where a.signature = '$signature' ";
+            $params_signature = " where a.signature = '$signature' and a.deleted_by is null";
         }else{
-            $params_signature = "";
+            $params_signature = "where a.deleted_by is null";
         }
 
         $query = "
@@ -346,8 +346,14 @@ class Model_bridging extends CI_Model
         $query = "
             select a.kode, a.jenis, a.group
             from mpm.tbl_tabsalur a
-            where a.kode in ('RT','SW','WS','SO') and a.kode = '$kode'
+            where a.kode = '$kode'
         ";
+
+        // $query = "
+        //     select a.kode, a.jenis, a.group
+        //     from mpm.tbl_tabsalur a
+        //     where a.kode in ('RT','SW','WS','SO') and a.kode = '$kode'
+        // ";
         // echo "<pre>";
         // print_r($query);
         // echo "</pre>";
@@ -360,7 +366,8 @@ class Model_bridging extends CI_Model
             insert into data$tahun.fi
             select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
                     a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
-                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, day(a.tanggal) as hrdok,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
                     a.qtysoldtotalpcs as banyak, (a.grossamount * 1.11) / a.qtysoldtotalpcs as harga, '' as potongan, 
                     (a.grossamount * 1.11) as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
@@ -373,11 +380,13 @@ class Model_bridging extends CI_Model
                     '' as pinjam, '' as jualbanyak, '' as jualpinjam, '' as harga_excl, '' as tot1_excl, 
                     b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
                     '' as siteid, '' as qty1, '' as qty2, '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen,
-                    '' as disc_rp, '' as disc_value, '' as disc_cabang, '' as disc_prinsipal, '' as disc_xtra,
-                    a.linediscount5 * 1.11 as rp_cabang, a.linediscount1 * 1.11 as rp_principal, '' as rp_xtra, '' as bonus, concat('11', c.supp) as principalid,
+                    '' as disc_rp, '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT2/(a.GROSSAMOUNT-a.LINEDISCOUNT1))*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT3/(a.GROSSAMOUNT-a.LINEDISCOUNT1-a.LINEDISCOUNT2))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 * 1.11 as rp_cabang, a.LINEDISCOUNT2 * 1.11 as rp_prinsipal, a.LINEDISCOUNT3 * 1.11 as rp_xtra, '' as bonus, concat('11', c.supp) as principalid,
                     '' as ex_no_sales, '' as status_retur, '' as ref,
-                    '' as term_payment, '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as term_payment, '' as tipe_kl, a.LINEDISCOUNT4 as disc_cod, '' as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_bontang_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_bontang_import_customer a
@@ -387,9 +396,9 @@ class Model_bridging extends CI_Model
             )c on a.kodeprodukprincipal = c.kodeprod
             where a.tipetrans = 'sales' and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1
         ";
-        echo "<pre>";
-        print_r($query);
-        echo "</pre>";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
         return $this->db->query($query);
     }
 
@@ -399,7 +408,8 @@ class Model_bridging extends CI_Model
             insert into data$tahun.fi
             select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
                     a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
-                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, day(a.tanggal) as hrdok,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
                     0 as banyak, (a.grossamount * 1.11) / a.qtysoldtotalpcs as harga, '' as potongan, 
                     '' as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
@@ -413,10 +423,10 @@ class Model_bridging extends CI_Model
                     b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
                     '' as siteid, '' as qty1, '' as qty2, '' as qty3, a.freegoodtotalpcs as qty_bonus, '1' as flag_bonus, '' as disc_persen,
                     '' as disc_rp, '' as disc_value, '' as disc_cabang, '' as disc_prinsipal, '' as disc_xtra,
-                    '' as rp_cabang, '' as rp_principal, '' as rp_xtra, '' as bonus, concat('11', c.supp) as principalid,
+                    '' as rp_cabang, '' as rp_prinsipal, '' as rp_xtra, '' as bonus, concat('11', c.supp) as principalid,
                     '' as ex_no_sales, '' as status_retur, '' as ref,
                     '' as term_payment, '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_bontang_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_bontang_import_customer a
@@ -439,7 +449,7 @@ class Model_bridging extends CI_Model
             select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
                     a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
                     b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
-                    day(a.tanggal) as hrdok,
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
                     a.qtysoldtotalpcs as banyak, (a.grossamount * 1.11)/a.qtysoldtotalpcs as harga, '' as potongan, 
                     (a.grossamount * 1.11) as tot1, '' as jum_promo, 
@@ -452,9 +462,12 @@ class Model_bridging extends CI_Model
                     '$nocab' as nocab, '$bulan' as bulan, '' as siteid, '' as qty1, 
                     '' as qty2, 
                     '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen, '' as disc_rp,  
-                    '' as disc_value, '' as disc_cabang, '' as disc_prinsipal, '' as disc_xtra, '' as rp_cabang, '' as rp_prinsipal, 
-                    '' as rp_xtra, '' as bonus, concat('11',c.supp) as prinsipalid, '' as ex_no_sales, '' as status_retur, '' as ref, 
-                    '' as term_payment, '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, '' as disc_add_percen  
+                    '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT2/(a.GROSSAMOUNT-a.LINEDISCOUNT1))*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT3/(a.GROSSAMOUNT-a.LINEDISCOUNT1-a.LINEDISCOUNT2))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 * 1.11 as rp_cabang, a.LINEDISCOUNT2 * 1.11 as rp_prinsipal, a.LINEDISCOUNT3 * 1.11 as rp_xtra,
+                    '' as bonus, concat('11',c.supp) as prinsipalid, '' as ex_no_sales, '' as status_retur, '' as ref, 
+                    '' as term_payment, '' as tipe_kl, a.LINEDISCOUNT4 as disc_cod, '' as rp_cod, '' as beban_bonus, '' as disc_add_percen, '' as subarea_id  
             from site.bridging_bontang_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_bontang_import_customer a
@@ -478,9 +491,9 @@ class Model_bridging extends CI_Model
             where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
         ";
         
-        echo "<pre>";
-        print_r($query);
-        echo "</pre>";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
         return $this->db->query($query);
     }
 
@@ -491,9 +504,9 @@ class Model_bridging extends CI_Model
             where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
         ";
         
-        echo "<pre>";
-        print_r($query);
-        echo "</pre>";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
         return $this->db->query($query);
     }
 
@@ -644,8 +657,9 @@ class Model_bridging extends CI_Model
                 '' as LATITUDE,				
                 '' as LONGITUDE,				
                 '' as FOTO_DISP,				
-                '' as FOTO_TOKO				
-                                
+                '' as FOTO_TOKO,
+                '' as KODE_SPOT,
+                '' as subarea_id
                 FROM(				
                     SELECT CONCAT(KODE_COMP,KODE_LANG,max(BULAN)) as mapp				
                     FROM data$tahun.fi 
@@ -726,8 +740,9 @@ class Model_bridging extends CI_Model
                 '' as LATITUDE,				
                 '' as LONGITUDE,				
                 '' as FOTO_DISP,				
-                '' as FOTO_TOKO				
-                                
+                '' as FOTO_TOKO,
+                '' as KODE_SPOT,
+                '' as subarea_id
                 FROM(				
                     SELECT CONCAT(KODE_COMP,KODE_LANG,max(BULAN)) as mapp				
                     FROM data$tahun.ri  				
@@ -1022,6 +1037,8 @@ class Model_bridging extends CI_Model
     {
         $query = "
             select 	count(*) as count, sum(a.grossamount) as sumgrossamount, 
+                    FORMAT(sum(a.qtysoldtotalpcs),0) as sumqty, 
+                    format(sum(a.freegoodtotalpcs),0) as sumfreegood,
                     sum(if(a.is_valid_kodeprod = 0, 1, 0)) as invalid_kodeprod,
                     sum(if(a.is_valid_kodeprod = 1, 1, 0)) as valid_kodeprod,
                     sum(if(a.is_valid_tanggal = 0, 1, 0)) as invalid_tanggal,
@@ -1201,7 +1218,8 @@ class Model_bridging extends CI_Model
             insert into data$tahun.fi
             select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
                     a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
-                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, day(a.tanggal) as hrdok,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
                     a.qtysoldtotalpcs as banyak, (a.grossamount * 1.11) / a.qtysoldtotalpcs as harga, '' as potongan, 
                     (a.grossamount * 1.11) as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
@@ -1214,11 +1232,13 @@ class Model_bridging extends CI_Model
                     '' as pinjam, '' as jualbanyak, '' as jualpinjam, '' as harga_excl, '' as tot1_excl, 
                     b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
                     '' as siteid, '' as qty1, '' as qty2, '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen,
-                    '' as disc_rp, '' as disc_value, '' as disc_cabang, '' as disc_prinsipal, '' as disc_xtra,
-                    a.linediscount5 * 1.11 as rp_cabang, a.linediscount1 * 1.11 as rp_principal, '' as rp_xtra, '' as bonus, concat('11', c.supp) as principalid,
-                    '' as ex_no_sales, '' as status_retur, '' as ref,
-                    '' as term_payment, '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_rp, '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT2/(a.GROSSAMOUNT-a.LINEDISCOUNT1))*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT3/(a.GROSSAMOUNT-a.LINEDISCOUNT1-a.LINEDISCOUNT2))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 * 1.11 as rp_cabang, a.LINEDISCOUNT2 * 1.11 as rp_prinsipal, a.LINEDISCOUNT3 * 1.11 as rp_xtra,
+                    '' as bonus, concat('11', c.supp) as principalid,'' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, a.LINEDISCOUNT4 as disc_cod, '' as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen,  '' as subarea_id
             from site.bridging_samarinda_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_samarinda_import_customer a
@@ -1240,7 +1260,8 @@ class Model_bridging extends CI_Model
             insert into data$tahun.fi
             select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
                     a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
-                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, day(a.tanggal) as hrdok,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
                     0 as banyak, (a.grossamount * 1.11) / a.qtysoldtotalpcs as harga, '' as potongan, 
                     '' as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
@@ -1254,10 +1275,10 @@ class Model_bridging extends CI_Model
                     b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
                     '' as siteid, '' as qty1, '' as qty2, '' as qty3, a.freegoodtotalpcs as qty_bonus, '1' as flag_bonus, '' as disc_persen,
                     '' as disc_rp, '' as disc_value, '' as disc_cabang, '' as disc_prinsipal, '' as disc_xtra,
-                    '' as rp_cabang, '' as rp_principal, '' as rp_xtra, '' as bonus, concat('11', c.supp) as principalid,
+                    '' as rp_cabang, '' as rp_prinsipal, '' as rp_xtra, '' as bonus, concat('11', c.supp) as principalid,
                     '' as ex_no_sales, '' as status_retur, '' as ref,
                     '' as term_payment, '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_samarinda_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_samarinda_import_customer a
@@ -1280,7 +1301,7 @@ class Model_bridging extends CI_Model
             select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
                     a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
                     b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
-                    day(a.tanggal) as hrdok,
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
                     a.qtysoldtotalpcs as banyak, (a.grossamount * 1.11)/a.qtysoldtotalpcs as harga, '' as potongan, 
                     (a.grossamount * 1.11) as tot1, '' as jum_promo, 
@@ -1293,9 +1314,11 @@ class Model_bridging extends CI_Model
                     '$nocab' as nocab, '$bulan' as bulan, '' as siteid, '' as qty1, 
                     '' as qty2, 
                     '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen, '' as disc_rp,  
-                    '' as disc_value, '' as disc_cabang, '' as disc_prinsipal, '' as disc_xtra, '' as rp_cabang, '' as rp_prinsipal, 
-                    '' as rp_xtra, '' as bonus, concat('11',c.supp) as prinsipalid, '' as ex_no_sales, '' as status_retur, '' as ref, 
-                    '' as term_payment, '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, '' as disc_add_percen  
+                    '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT2/(a.GROSSAMOUNT-a.LINEDISCOUNT1))*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT3/(a.GROSSAMOUNT-a.LINEDISCOUNT1-a.LINEDISCOUNT2))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 * 1.11 as rp_cabang, a.LINEDISCOUNT2 * 1.11 as rp_prinsipal, a.LINEDISCOUNT3 * 1.11 as rp_xtra, '' as bonus, concat('11',c.supp) as prinsipalid, '' as ex_no_sales, '' as status_retur, '' as ref, 
+                    '' as term_payment, '' as tipe_kl, a.LINEDISCOUNT4 as disc_cod, '' as rp_cod, '' as beban_bonus, '' as disc_add_percen, '' as subarea_id
             from site.bridging_samarinda_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_samarinda_import_customer a
@@ -1319,9 +1342,9 @@ class Model_bridging extends CI_Model
             where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
         ";
         
-        echo "<pre>";
-        print_r($query);
-        echo "</pre>";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
         return $this->db->query($query);
     }
 
@@ -1332,9 +1355,9 @@ class Model_bridging extends CI_Model
             where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
         ";
         
-        echo "<pre>";
-        print_r($query);
-        echo "</pre>";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
         return $this->db->query($query);
     }
 
@@ -1652,7 +1675,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.productid as kodeprod, 
                     c.supp, 
-                    day(a.tanggal_sales) as hrdok,
+                    DATE_FORMAT(a.tanggal_sales, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal_sales, '%m') as blndok, 
                     year(a.tanggal_sales) as thndok, 
                     c.namaprod, 
@@ -1697,7 +1720,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -1706,7 +1729,7 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, disc_cash as disc_cod, rp_cash as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_kolaka_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_kolaka_import_customer a
@@ -1740,7 +1763,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.productid as kodeprod, 
                     c.supp, 
-                    day(a.tanggal_sales) as hrdok,
+                    DATE_FORMAT(a.tanggal_sales, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal_sales, '%m') as blndok, 
                     year(a.tanggal_sales) as thndok, 
                     c.namaprod, 
@@ -1784,7 +1807,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -1793,7 +1816,7 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_kolaka_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_kolaka_import_customer a
@@ -2128,7 +2151,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.productid as kodeprod, 
                     c.supp, 
-                    day(a.tanggal_sales) as hrdok,
+                    DATE_FORMAT(a.tanggal_sales, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal_sales, '%m') as blndok, 
                     year(a.tanggal_sales) as thndok, 
                     c.namaprod, 
@@ -2173,7 +2196,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -2182,7 +2205,7 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, disc_cash as disc_cod, rp_cash as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_kendari_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_kendari_import_customer a
@@ -2216,7 +2239,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.productid as kodeprod, 
                     c.supp, 
-                    day(a.tanggal_sales) as hrdok,
+                    DATE_FORMAT(a.tanggal_sales, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal_sales, '%m') as blndok, 
                     year(a.tanggal_sales) as thndok, 
                     c.namaprod, 
@@ -2260,7 +2283,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -2269,7 +2292,7 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_kendari_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_kendari_import_customer a
@@ -2409,7 +2432,7 @@ class Model_bridging extends CI_Model
     public function get_baubau_import_summary()
     {
         $query = "
-            select 	count(*) as count, sum(a.bruto) as sum_bruto, 
+            select 	count(*) as count, SUM(IF(a.flag_bonus = 0, a.bruto, 0)) AS sum_bruto, 
                     sum(if(a.is_valid_kodeprod = 0, 1, 0)) as invalid_kodeprod,
                     sum(if(a.is_valid_kodeprod = 1, 1, 0)) as valid_kodeprod,
                     sum(if(a.is_valid_tanggal = 0, 1, 0)) as invalid_tanggal,
@@ -2464,7 +2487,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.productid as kodeprod, 
                     c.supp, 
-                    day(a.tanggal_sales) as hrdok,
+                    DATE_FORMAT(a.tanggal_sales, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal_sales, '%m') as blndok, 
                     year(a.tanggal_sales) as thndok, 
                     c.namaprod, 
@@ -2509,7 +2532,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -2518,7 +2541,7 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, disc_cash as disc_cod, rp_cash as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_baubau_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_baubau_import_customer a
@@ -2552,7 +2575,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.productid as kodeprod, 
                     c.supp, 
-                    day(a.tanggal_sales) as hrdok,
+                    DATE_FORMAT(a.tanggal_sales, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal_sales, '%m') as blndok, 
                     year(a.tanggal_sales) as thndok, 
                     c.namaprod, 
@@ -2596,7 +2619,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -2605,7 +2628,7 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_baubau_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_baubau_import_customer a
@@ -2958,7 +2981,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.kode_barang as kodeprod, 
                     c.supp, 
-                    day(a.tanggal) as hrdok,
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal, '%m') as blndok, 
                     year(a.tanggal) as thndok, 
                     c.namaprod, 
@@ -3003,7 +3026,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -3012,7 +3035,7 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_mms_makasar_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_mms_makasar_import_customer a
@@ -3045,7 +3068,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.kode_barang as kodeprod, 
                     c.supp, 
-                    day(a.tanggal) as hrdok,
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal, '%m') as blndok, 
                     year(a.tanggal) as thndok, 
                     c.namaprod, 
@@ -3089,7 +3112,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -3098,7 +3121,7 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_mms_makasar_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_mms_makasar_import_customer a
@@ -3427,7 +3450,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.kode_barang as kodeprod, 
                     c.supp, 
-                    day(a.tanggal) as hrdok,
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal, '%m') as blndok, 
                     year(a.tanggal) as thndok, 
                     c.namaprod, 
@@ -3472,7 +3495,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -3481,7 +3504,7 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_mms_bone_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_mms_bone_import_customer a
@@ -3514,7 +3537,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.kode_barang as kodeprod, 
                     c.supp, 
-                    day(a.tanggal) as hrdok,
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal, '%m') as blndok, 
                     year(a.tanggal) as thndok, 
                     c.namaprod, 
@@ -3558,7 +3581,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -3567,7 +3590,7 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_mms_bone_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_mms_bone_import_customer a
@@ -3883,7 +3906,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.kode_barang as kodeprod, 
                     c.supp, 
-                    day(a.tanggal) as hrdok,
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal, '%m') as blndok, 
                     year(a.tanggal) as thndok, 
                     c.namaprod, 
@@ -3928,7 +3951,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -3937,7 +3960,7 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_mms_parepare_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_mms_parepare_import_customer a
@@ -3970,7 +3993,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.kode_barang as kodeprod, 
                     c.supp, 
-                    day(a.tanggal) as hrdok,
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal, '%m') as blndok, 
                     year(a.tanggal) as thndok, 
                     c.namaprod, 
@@ -4014,7 +4037,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -4023,7 +4046,7 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_mms_parepare_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_mms_parepare_import_customer a
@@ -4333,6 +4356,8 @@ class Model_bridging extends CI_Model
                 barkode varchar(255),
                 namapof varchar(255),
                 jalur varchar(255),
+                DISCISI1_RP varchar(255),
+                DISCISI2_RP varchar(255),
                 is_valid_kodeprod int(1),
                 is_valid_tanggal int(1),
                 is_valid_customer int(1),
@@ -4424,9 +4449,9 @@ class Model_bridging extends CI_Model
             where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
         ";
         
-        echo "<pre>";
-        print_r($query);
-        echo "</pre>";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
         return $this->db->query($query);
     }
 
@@ -4437,9 +4462,9 @@ class Model_bridging extends CI_Model
             where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
         ";
         
-        echo "<pre>";
-        print_r($query);
-        echo "</pre>";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
         return $this->db->query($query);
     }
 
@@ -4460,7 +4485,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.productid as kodeprod, 
                     c.supp, 
-                    day(a.tanggal_sales) as hrdok,
+                    DATE_FORMAT(a.tanggal_sales, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal_sales, '%m') as blndok, 
                     year(a.tanggal_sales) as thndok, 
                     c.namaprod, 
@@ -4505,7 +4530,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -4548,7 +4573,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.productid as kodeprod, 
                     c.supp, 
-                    day(a.tanggal_sales) as hrdok,
+                    DATE_FORMAT(a.tanggal_sales, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal_sales, '%m') as blndok, 
                     year(a.tanggal_sales) as thndok, 
                     c.namaprod, 
@@ -4593,7 +4618,7 @@ class Model_bridging extends CI_Model
                     '' as disc_prinsipal, 
                     '' as disc_xtra,
                     '' as rp_cabang, 
-                    '' as rp_principal, 
+                    '' as rp_prinsipal, 
                     '' as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -4681,7 +4706,7 @@ class Model_bridging extends CI_Model
     //                 a.DISCISI2 as disc_prinsipal, 
     //                 '' as disc_xtra,
     //                 '' as rp_cabang, 
-    //                 a.DISCNOM as rp_principal, 
+    //                 a.DISCNOM as rp_prinsipal, 
     //                 '' as rp_xtra, 
     //                 '' as bonus, 
     //                 concat('11', c.supp) as principalid,
@@ -4769,7 +4794,7 @@ class Model_bridging extends CI_Model
     //                 '' as disc_prinsipal, 
     //                 '' as disc_xtra,
     //                 '' as rp_cabang, 
-    //                 '' as rp_principal, 
+    //                 '' as rp_prinsipal, 
     //                 '' as rp_xtra, 
     //                 '' as bonus, 
     //                 concat('11', c.supp) as principalid,
@@ -4812,7 +4837,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.kodebara as kodeprod, 
                     c.supp, 
-                    day(a.tgl) as hrdok,
+                    DATE_FORMAT(a.tgl, '%d') as hrdok,
                     DATE_FORMAT(a.tgl, '%m') as blndok, 
                     year(a.tgl) as thndok, 
                     c.namaprod, 
@@ -4856,9 +4881,9 @@ class Model_bridging extends CI_Model
                     a.DISCISI1 as disc_cabang, 
                     a.DISCISI2 as disc_prinsipal, 
                     '' as disc_xtra,
-                    '' as rp_cabang, 
-                    a.DISCNOM as rp_principal, 
-                    '' as rp_xtra, 
+                    (a.DISCISI1_RP*1.11) as rp_cabang, 
+                    (a.DISCISI2_RP*1.11) as rp_prinsipal, 
+                    (a.DISCNOM*1.11) as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
                     '' as ex_no_sales, 
@@ -4866,7 +4891,8 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen,
+                    '' as subarea_id
             from site.bridging_pekanbaru_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_pekanbaru_import_customer a
@@ -4900,7 +4926,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.kodebara as kodeprod, 
                     c.supp, 
-                    day(a.tgl) as hrdok,
+                    DATE_FORMAT(a.tgl, '%d') as hrdok,
                     DATE_FORMAT(a.tgl, '%m') as blndok, 
                     year(a.tgl) as thndok, 
                     c.namaprod, 
@@ -4945,7 +4971,7 @@ class Model_bridging extends CI_Model
                     '' as disc_prinsipal, 
                     '' as disc_xtra,
                     '' as rp_cabang, 
-                    '' as rp_principal, 
+                    '' as rp_prinsipal, 
                     '' as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -4954,7 +4980,8 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen,
+                    '' as subarea_id
             from site.bridging_pekanbaru_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_pekanbaru_import_customer a
@@ -5163,7 +5190,7 @@ class Model_bridging extends CI_Model
         ";
         // echo "<pre>";
         // print_r($query);
-        // echo "</pre>";
+        // echo "</pre>";die;
         return $this->db->query($query);
     }
 
@@ -5551,7 +5578,7 @@ class Model_bridging extends CI_Model
             ' ' as status_retur,			
             ' ' as ref,			
             ' ' as term_payment,			
-            ' ' as tipe_kl, disc_cash as disc_cod, rp_cash as rp_cod, ' ' as beban_bonus, ' ' as disc_add_percen			
+            ' ' as tipe_kl, disc_cash as disc_cod, rp_cash as rp_cod, ' ' as beban_bonus, ' ' as disc_add_percen, '' as subarea_id			
 
             from site.bridging_sup_makasar_import a	left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
@@ -5647,7 +5674,7 @@ class Model_bridging extends CI_Model
             ' ' as status_retur,			
             ' ' as ref,			
             ' ' as term_payment,			
-            ' ' as tipe_kl, disc_cash as disc_cod, rp_cash as rp_cod, ' ' as beban_bonus, ' ' as disc_add_percen			
+            ' ' as tipe_kl, disc_cash as disc_cod, rp_cash as rp_cod, ' ' as beban_bonus, ' ' as disc_add_percen, '' as subarea_id			
 
             from site.bridging_sup_makasar_import a	left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
@@ -6045,7 +6072,7 @@ class Model_bridging extends CI_Model
             ' ' as status_retur,			
             ' ' as ref,			
             ' ' as term_payment,			
-            ' ' as tipe_kl, disc_cash as disc_cod, rp_cash as rp_cod, ' ' as beban_bonus, ' ' as disc_add_percen			
+            ' ' as tipe_kl, disc_cash as disc_cod, rp_cash as rp_cod, ' ' as beban_bonus, ' ' as disc_add_percen, '' as subarea_id			
 
             from site.bridging_tarakan_import a	left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
@@ -6141,7 +6168,7 @@ class Model_bridging extends CI_Model
             ' ' as status_retur,			
             ' ' as ref,			
             ' ' as term_payment,			
-            ' ' as tipe_kl, disc_cash as disc_cod, rp_cash as rp_cod, ' ' as beban_bonus, ' ' as disc_add_percen			
+            ' ' as tipe_kl, disc_cash as disc_cod, rp_cash as rp_cod, ' ' as beban_bonus, ' ' as disc_add_percen, '' as subarea_id			
 
             from site.bridging_tarakan_import a	left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
@@ -6522,7 +6549,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -6531,7 +6558,7 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, disc_cash as disc_cod, rp_cash as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_berau_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_berau_import_customer a
@@ -6565,7 +6592,7 @@ class Model_bridging extends CI_Model
                     '' as koderayon, 
                     a.productid as kodeprod, 
                     c.supp, 
-                    day(a.tanggal_sales) as hrdok,
+                    DATE_FORMAT(a.tanggal_sales, '%d') as hrdok,
                     DATE_FORMAT(a.tanggal_sales, '%m') as blndok, 
                     year(a.tanggal_sales) as thndok, 
                     c.namaprod, 
@@ -6609,7 +6636,7 @@ class Model_bridging extends CI_Model
                     a.disc_prinsipal as disc_prinsipal, 
                     a.disc_xtra as disc_xtra,
                     a.rp_cabang as rp_cabang, 
-                    a.rp_prinsipal as rp_principal, 
+                    a.rp_prinsipal as rp_prinsipal, 
                     a.rp_xtra as rp_xtra, 
                     '' as bonus, 
                     concat('11', c.supp) as principalid,
@@ -6618,7 +6645,7 @@ class Model_bridging extends CI_Model
                     '' as ref,
                     '' as term_payment, 
                     '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
-                    '' as disc_add_percen
+                    '' as disc_add_percen, '' as subarea_id
             from site.bridging_berau_import a left join (
                 select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
                 from site.bridging_berau_import_customer a
@@ -6680,11 +6707,12 @@ class Model_bridging extends CI_Model
             left join site.master_site b 
             on a.site_code = b.site_code
             WHERE a.site_code = '$site_code'
+            order by a.id desc
         ";
         
-        echo "<pre>";
-        print_r($query);
-        echo "</pre>";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
         // die;
 
         return $this->db->query($query);
@@ -6722,7 +6750,11 @@ class Model_bridging extends CI_Model
             select *
             from site.stock_import_detail a
             where a.signature = '$signature'
+            order by a.kodeprod asc
         ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
         return $this->db->query($query);
     }
 
@@ -6797,6 +6829,24 @@ class Model_bridging extends CI_Model
             from site.stock_import_detail a
             where a.id_history = '$id_history'
         ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>"; 
+        // die;
+        return $this->db->query($query);
+    }
+
+    public function get_stock_import_detail_mms_by_id_history($id_history)
+    {
+        $query = "
+            select *
+            from site.stock_import_detail_mms a
+            where a.id_history = '$id_history'
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>"; 
+        // die;
         return $this->db->query($query);
     }
 
@@ -6810,4 +6860,3097 @@ class Model_bridging extends CI_Model
         $this->db->insert('data'.$tahun.'.st', $data);
         return $this->db->affected_rows();
     }
+
+    public function get_history_import_by_site_code($site_code) 
+    {
+        $query = "
+            select *
+            from site.stock_history_import a
+            where a.site_code = '$site_code' and a.deleted_by is null
+            order by concat(a.tahun, a.bulan) desc
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";die;
+        return $this->db->query($query);
+    }
+
+    public function get_temp_portal_akses()
+    {
+        $sql = "
+            SELECT *
+            FROM site.temp_portal_akses a
+            ORDER BY a.id DESC
+        "; 
+        return $this->db->query($sql);
+    }
+
+    public function get_result_stock($site_code, $tahun, $bulan)
+    {
+        $query = "
+            select sum(a.stok_akhir) as total_unit
+            from data$tahun.st a 
+            where concat(a.nick_site, a.nocab) = '$site_code' and a.bulan = $bulan
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";die;
+        return $this->db->query($query);
+    }
+
+    public function update_history_import($data, $id)
+    {
+        $this->db->where('id', $id);
+        return $this->db->update('site.stock_history_import', $data);
+        // echo $this->db->last_query();die;
+        // return $this->db->affected_rows();
+    }
+
+    public function total_value($signature)
+    {
+        $query = "
+            select supp, round(sum(a.qty_kecil),2) as total_value_kecil, SUM(a.qty_besar) as total_value_besar
+            from site.stock_import_detail a 
+            where a.signature = '$signature'
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_master_product_harga_by_kodeprod($kodeprod)
+    {
+        $query = "
+            select a.*
+            from site.master_product_with_harga a
+            where a.kodeprod = '$kodeprod' 
+        ";
+
+        return $this->db->query($query);
+    }
+
+    public function get_master_product_harga_by_kodeprod_in($kodeprod_list)
+    {
+        if (empty($kodeprod_list)) return [];
+
+        $kodeprod_in = implode("','", $kodeprod_list);
+        $query = "
+            select a.kodeprod, a.kode_prc, a.namaprod, a.supp, a.besar, a.sedang, a.kecil, a.h_dp, a.qty1, a.qty2, a.qty3
+            from site.master_product_with_harga a
+            where a.kodeprod in ('$kodeprod_in')
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";die;
+        return $this->db->query($query)->result_array();
+    }
+
+    public function insert_stock_import_detail_batch($data)
+    {
+        if (!empty($data)) {
+            $this->db->insert_batch('site.stock_import_detail', $data);
+        }
+    }
+
+
+    public function get_supplier()
+    {
+        $query = "
+            select a.supp, a.namasupp
+            from site.master_supplier a
+            order by a.supp 
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_total_omzet_stock($signature)
+    {
+        $query = "
+            select sum(a.qty_kecil*harga) as total_value
+            from site.stock_import_detail a
+            where a.signature = '$signature'
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_value_group_by_supp($signature)
+    {
+        $query = "
+            select a.supp, round(sum(a.qty_kecil),2) as total_value_kecil, round(sum(a.qty_besar),2) as total_value_besar
+            from site.stock_import_detail a
+            where a.signature = '$signature'
+            group by a.supp
+        ";
+
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";die;
+        return $this->db->query($query);
+    }
+
+    public function update_spot_tblang($tahun, $site_code)
+    {
+        if ($site_code == 'SMB2C') {
+            $params_site_code = "bridging_bontang_import_customer"; 
+        }elseif ($site_code == 'SAM2A') {
+            $params_site_code = "bridging_samarinda_import_customer"; 
+        }elseif ($site_code == 'KLK1V') {
+            $params_site_code = "bridging_kolaka_import_customer"; 
+        }elseif ($site_code == 'PUM1N') {
+            $params_site_code = "bridging_kendari_import_customer";
+        }elseif ($site_code == 'BBU1W') {
+            $params_site_code = "bridging_baubau_import_customer"; 
+        }elseif ($site_code == 'MMS1O') {
+            $params_site_code = "bridging_mms_makasar_import_customer"; 
+        }elseif ($site_code == 'BNE1T') {
+            $params_site_code = "bridging_mms_bone_import_customer";
+        }elseif ($site_code == 'PRE1U') {
+            $params_site_code = "bridging_mms_parepare_import_customer"; 
+        }elseif ($site_code == 'PKB51') {
+            $params_site_code = "bridging_pekanbaru_import_customer"; 
+        }elseif ($site_code == 'SUP2G') {
+            $params_site_code = "bridging_sup_makasar_import_customer";
+        }elseif ($site_code == 'KBT1E') {
+            $params_site_code = "bridging_tarakan_import_customer"; 
+        }elseif ($site_code == 'KBB1F') {
+            $params_site_code = "bridging_berau_import_customer"; 
+        }elseif ($site_code == 'AJP2V') {
+            $params_site_code = "bridging_palu_import_customer";  
+        }elseif ($site_code == 'MMRE1') {
+            $params_site_code = "bridging_mmm_makassar_import_customer"; 
+        }elseif ($site_code == 'MMBE2') {
+            $params_site_code = "bridging_mmm_bone_import_customer"; 
+        }elseif ($site_code == 'PAME3') {
+            $params_site_code = "bridging_mmm_palopo_import_customer"; 
+        }elseif ($site_code == 'MMPE4') {
+            $params_site_code = "bridging_mmm_pare_import_customer"; 
+        }elseif ($site_code == 'BULE5') {   
+             $params_site_code = "bridging_mmm_bulukumba_import_customer";          
+        }
+        
+        $query = "
+            update data$tahun.tblang a 
+            inner join site.$params_site_code b 
+            on a.kode_lang = b.customer_id
+            set a.KODE_SPOT = b.spot_id
+            WHERE concat(a.kode_comp, a.nocab) = '$site_code'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_stock_import_detail_mms_batch($data)
+    {
+        if (!empty($data)) {
+            $this->db->insert_batch('site.stock_import_detail_mms', $data);
+        }
+    }
+
+    public function get_stock_import_detail_mms($signature)
+    {
+        $query = "
+            select *
+            from site.stock_import_detail_mms a
+            where a.signature = '$signature'
+            order by a.kodeprod asc
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function get_stock_import_where_is_valid_false_mms($signature)
+    {
+        $query = "
+            select 	*
+            from site.stock_import_detail_mms a
+            where a.is_valid_kodeprod = 0 and a.signature = '$signature'
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function total_value_mms($signature)
+    {
+        $query = "
+            select supp, round(sum(a.total_qty3),2) as total_value_kecil, SUM(a.total_qty1) as total_value_besar
+            from site.stock_import_detail_mms a 
+            where a.signature = '$signature' and a.is_valid_kodeprod = 1
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_value_group_by_supp_mms($signature)
+    {
+        $query = "
+            select a.supp, round(sum(a.total_qty3),2) as total_value_kecil, round(sum(a.total_qty1),2) as total_value_besar
+            from site.stock_import_detail_mms a
+            where a.signature = '$signature'
+            group by a.supp
+        ";
+
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";die;
+        return $this->db->query($query);
+    }
+
+    public function get_stock_import_detail_summary_mms($signature)
+    {
+        $query = "
+            select 	count(*) as count,
+                    sum(if(a.is_valid_kodeprod = 0, 1, 0)) as invalid_kodeprod,
+                    sum(if(a.is_valid_kodeprod = 1, 1, 0)) as valid_kodeprod
+            from site.stock_import_detail_mms a
+            where a.signature = '$signature'
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_total_omzet_stock_mms($signature)
+    {
+        $query = "
+            select sum(a.qty_kecil*harga) as total_value
+            from site.stock_import_detail_mms a
+            where a.signature = '$signature'
+        ";
+        return $this->db->query($query);
+    }
+
+    public function create_table_palu_import()
+    {
+        $this->db->query("drop table if exists site.bridging_palu_import");
+
+        $create_table = "
+            create table if not exists site.bridging_palu_import(
+            id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            distributor varchar(255),
+            cabang varchar(255),
+            tipetrans varchar(255),
+            divisi varchar(255),
+            principal varchar(255),
+            productgroup1 varchar(255),
+            productgroup2 varchar(255),
+            productgroup3 varchar(255),
+            brand varchar(255),
+            kodeproduk varchar(255),
+            kodevarian varchar(255),
+            kodeprodukprincipal varchar(255),
+            namaproduk varchar(255),
+            packaging varchar(255),
+            productclass varchar(255),
+            kodecustomer varchar(255),
+            namacustomer varchar(255),
+            alamatcustomer text,
+            area varchar(255),
+            subarea varchar(255),
+            channel varchar(255),
+            subchannel varchar(255),
+            customergroup varchar(255),
+            keyaccount varchar(255),
+            kodesalesman varchar(255),
+            namasalesman varchar(255),
+            kodesalesco varchar(255),
+            namasalesco varchar(255),
+            kodespv varchar(255),
+            namaspv varchar(255),
+            tahunbulan varchar(255),
+            bulan varchar(255),
+            tanggal varchar(255),
+            weekno varchar(255),
+            nomornota varchar(255),
+            salesmethod varchar(255),
+            sellingtype varchar(255),
+            qtysold varchar(255),
+            kartonutuh varchar(255),
+            qtysoldpcs varchar(255),
+            freegoodpcs varchar(255),
+            tonnage varchar(255),
+            volume_ltr varchar(255),
+            grossamount varchar(255),
+            linediscount1 varchar(255),
+            linediscount2 varchar(255),
+            linediscount3 varchar(255),
+            linediscount4 varchar(255),
+            linediscount5 varchar(255),
+            totallinediscount varchar(255),
+            discountnota1 varchar(255),
+            discountnota2 varchar(255),
+            discountnota3 varchar(255),
+            totaldiscountnota varchar(255),
+            dpp varchar(255),
+            ppn varchar(255),
+            ppnbm varchar(255),
+            tax3 varchar(255),
+            netamount varchar(255),
+            warehouse varchar(255),
+            customerpo varchar(255),
+            customerjoindate varchar(255),
+            nofakturpajak varchar(255),
+            tanggalfakturpajak varchar(255),
+            nomorfakturproforma varchar(255),
+            tanggalfakturproforma varchar(255),
+            cogs varchar(255),
+            case_weight_kg varchar(255),
+            tslqtysoldnfg varchar(255),
+            tslconvpcstoctn varchar(255),
+            tsltonnagesoldfg varchar(255),
+            `end` varchar(255),
+            is_valid_kodeprod int(1),
+            is_valid_tanggal int(1),
+            is_valid_customer int(1),
+            id_bridging_log int(11)
+            );
+        ";
+        // echo "<pre>";
+        // print_r($create_table);
+        // echo "</pre>";
+        $create_table = $this->db->query($create_table);
+        return $create_table;
+    }
+
+    public function insert_palu_import($data)
+    {
+        $this->db->insert('site.bridging_palu_import', $data);
+        return $this->db->affected_rows();
+    }
+
+    public function get_palu_import()
+    {
+        $query = "
+            select *
+            from site.bridging_palu_import a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_palu_import_summary()
+    {
+        $query = "
+            select 	count(*) as count, sum(a.grossamount) as sumgrossamount, 
+                    sum(if(a.is_valid_kodeprod = 0, 1, 0)) as invalid_kodeprod,
+                    sum(if(a.is_valid_kodeprod = 1, 1, 0)) as valid_kodeprod,
+                    sum(if(a.is_valid_tanggal = 0, 1, 0)) as invalid_tanggal,
+                    sum(if(a.is_valid_customer = 0, 1, 0)) as invalid_customer,
+                    sum(if(a.is_valid_customer = 1, 1, 0)) as valid_customer,
+                    sum(if(a.is_valid_tanggal = 1, 1, 0)) as valid_tanggal
+            from site.bridging_palu_import a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_palu_import_where_is_valid_false()
+    {
+        $query = "
+            select 	*
+            from site.bridging_palu_import a
+            where a.is_valid_kodeprod = 0 or a.is_valid_tanggal = 0 or a.is_valid_customer = 0 
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function create_table_palu_import_customer()
+    {
+        $this->db->query("drop table if exists site.bridging_palu_import_customer");
+
+        $create_table = "
+            create table if not exists site.bridging_palu_import_customer(
+                id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                kategori varchar(255),
+                nama_site varchar(255),
+                regional varchar(255),
+                customer_id varchar(255),
+                mapping_uli varchar(255),
+                mapping_nd6 varchar(255),
+                mapping_warung_pintar varchar(255),
+                mapping_pbf varchar(255),
+                prefix varchar(255),
+                nama_customer varchar(255),
+                alamat varchar(255),
+                tipe_bayar varchar(255),
+                top varchar(255),
+                status_konsinyasi varchar(255),
+                status_fuguh varchar(255),
+                kelurahan_id varchar(255),
+                nama_kelurahan varchar(255),
+                kecamatan_id varchar(255),
+                nama_kecamatan varchar(255),
+                kota_id varchar(255),
+                nama_kota varchar(255),
+                propinsi_id varchar(255),
+                nama_propinsi varchar(255),
+                kode_pos varchar(255),
+                telp varchar(255),
+                fax varchar(255),
+                email varchar(255),
+                head_office_id varchar(255),
+                nama_head_office varchar(255),
+                company_id varchar(255),
+                nama_company varchar(255),
+                branch_id varchar(255),
+                nama_branch_office varchar(255),
+                site_id varchar(255),
+                segment_id varchar(255),
+                nama_segment varchar(255),
+                type_id varchar(255),
+                nama_type varchar(255),
+                class_id varchar(255),
+                `class` varchar(255),
+                spot_id varchar(255),
+                no_ktp varchar(255),
+                kartu_keluarga varchar(255),
+                pln varchar(255),
+                nama_penghubung varchar(255),
+                alamat_penghubung varchar(255),
+                telp_penghubung varchar(255),
+                hubungan varchar(255),
+                latitude varchar(255),
+                longitude varchar(255),
+                member varchar(255),
+                black_list varchar(255),
+                aktif varchar(255),
+                show_alamat_pkp varchar(255),
+                data_create varchar(255),
+                pbf_izin_no_tdp_tgl varchar(255),
+                pbf_izin_no_tdp varchar(255),
+                pbf_izin_no_siup_tgl varchar(255),
+                pbf_izin_no_siup varchar(255),
+                pbf_izin_no_sito_tgl varchar(255),
+                pbf_izin_no_sito varchar(255),
+                pbf_izin_no_sipa_tgl varchar(255),
+                pbf_izin_no_sipa varchar(255),
+                pbf_izin_no_sia_tgl varchar(255),
+                pbf_izin_no_sia varchar(255),
+                pbf_izin_no_nib_tgl varchar(255),
+                pbf_izin_no_nib varchar(255),
+                pbf_izin_no_cdob_tgl varchar(255),
+                pbf_izin_no_cdob varchar(255),
+                pbf_asis_apoteker_tgl_sipa varchar(255),
+                pbf_asis_apoteker_tgl_lahir varchar(255),
+                pbf_asis_apoteker_telpon varchar(255),
+                pbf_asis_apoteker_no_sipa varchar(255),
+                pbf_asis_apoteker_no_ktp varchar(255),
+                pbf_asis_apoteker_email varchar(255),
+                pbf_asis_apoteker_nama varchar(255),
+                pbf_asis_apoteker_alamat varchar(255),
+                pbf_apoteker_tgl_sipa varchar(255),
+                pbf_apoteker_tgl_lahir varchar(255),
+                pbf_apoteker_telpon varchar(255),
+                pbf_apoteker_no_sipa varchar(255),
+                pbf_apoteker_no_ktp varchar(255),
+                pbf_apoteker_nama varchar(255),
+                pbf_apoteker_alamat varchar(255),
+                pbf_apoteker_email varchar(255),
+                is_valid_type_id int(1),
+                is_valid_class_id int(1)
+            )
+        ";
+        // echo "<pre>";
+        // print_r($create_table);
+        // echo "</pre>";
+        $create_table = $this->db->query($create_table);
+        return $create_table;
+    }
+
+    public function add_unique_palu_import_customer($column)
+    {
+        $query = "
+            ALTER TABLE site.bridging_palu_import_customer
+            ADD UNIQUE ($column);
+        ";
+        $add_unique = $this->db->query($query);
+        return $add_unique;
+    }
+
+    public function insert_palu_import_customer($data)
+    {
+        $this->db->insert('site.bridging_palu_import_customer', $data);
+        return $this->db->affected_rows();
+    }
+
+    public function get_palu_import_customer()
+    {
+        $query = "
+            select *
+            from site.bridging_palu_import_customer a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_palu_import_customer_summary()
+    {
+        $query = "
+            select 	count(*) as count, 
+                    sum(if(a.is_valid_type_id = 0, 1, 0)) as invalid_type_id,
+                    sum(if(a.is_valid_class_id = 0, 1, 0)) as invalid_class_id
+            from site.bridging_palu_import_customer a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_palu_customer($customer)
+    {
+        $query = "
+            select a.customer_id, a.mapping_uli, a.nama_customer
+            from site.bridging_palu_import_customer a 
+            where a.mapping_uli = '$customer'
+        ";
+        return $this->db->query($query);
+    }
+
+    public function insert_fi_palu($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.fi
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    (a.qtysoldpcs-freegoodpcs) as banyak, (a.grossamount * 1.11) / a.qtysoldpcs as harga, '' as potongan, 
+                    (qtysoldpcs-freegoodpcs) * (a.grossamount / a.qtysoldpcs)*1.11 as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, '0' as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount * 1.11)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam, '' as harga_excl, '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT2/(a.GROSSAMOUNT-a.LINEDISCOUNT1))*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT3/(a.GROSSAMOUNT-a.LINEDISCOUNT2))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 * 1.11 as rp_cabang, a.LINEDISCOUNT2 * 1.11 as rp_prinsipal, a.LINEDISCOUNT3 * 1.11 as rp_xtra,
+                    '' as bonus, concat('11', c.supp) as principalid,'' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, round((a.LINEDISCOUNT5/(a.GROSSAMOUNT-a.LINEDISCOUNT1))*100,1) as disc_cod, LINEDISCOUNT5 * 1.11 as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen,  '' as subarea_id
+            from site.bridging_palu_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_palu_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans = 'sales' and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_fi_palu_bonus($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.fi
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    0 as banyak, (a.grossamount * 1.11) / a.qtysoldpcs as harga, '' as potongan, 
+                    '' as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, a.FREEGOODPCS as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount * 1.11)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam, '' as harga_excl, '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, a.FREEGOODPCS as qty_bonus, '1' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, '' as disc_cabang, '' as disc_prinsipal, '' as disc_xtra,
+                    '' as rp_cabang, '' as rp_prinsipal, '' as rp_xtra, '' as bonus, concat('11', c.supp) as principalid,
+                    '' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen, '' as subarea_id
+            from site.bridging_palu_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_palu_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans = 'sales' and a.FREEGOODPCS >=1 and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_ri_palu($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.ri
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    (a.qtysoldpcs-freegoodpcs) as banyak, (a.grossamount * 1.11) / a.qtysoldpcs as harga, '' as potongan, 
+                    (qtysoldpcs-freegoodpcs) * (a.grossamount / a.qtysoldpcs)*1.11 as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, '0' as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount * 1.11)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam,  '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT2/(a.GROSSAMOUNT-a.LINEDISCOUNT1))*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT3/(a.GROSSAMOUNT-a.LINEDISCOUNT2))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 * 1.11 as rp_cabang, a.LINEDISCOUNT2 * 1.11 as rp_prinsipal, a.LINEDISCOUNT3 * 1.11 as rp_xtra,
+                    '' as bonus, concat('11', c.supp) as principalid,'' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, round((a.LINEDISCOUNT5/(a.GROSSAMOUNT-a.LINEDISCOUNT1))*100,1) as disc_cod, LINEDISCOUNT5 * 1.11 as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen,  '' as subarea_id
+            from site.bridging_palu_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_palu_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans != 'sales'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_fi_palu($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            delete from data$tahun.fi
+            where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_ri_palu($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            delete from data$tahun.ri
+            where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tblang_palu($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tblang where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tabsales_palu($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tabsales where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tbkota_palu($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tbkota where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    //MAKASSAR//
+    public function create_table_mmm_makassar_import()
+    {
+        $this->db->query("drop table if exists site.bridging_mmm_makassar_import");
+
+        $create_table = "
+            create table if not exists site.bridging_mmm_makassar_import(
+            id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            distributor varchar(255),
+            cabang varchar(255),
+            tipetrans varchar(255),
+            divisi varchar(255),
+            principal varchar(255),
+            productgroup1 varchar(255),
+            productgroup2 varchar(255),
+            productgroup3 varchar(255),
+            brand varchar(255),
+            kodeproduk varchar(255),
+            kodevarian varchar(255),
+            kodeprodukprincipal varchar(255),
+            namaproduk varchar(255),
+            packaging varchar(255),
+            productclass varchar(255),
+            kodecustomer varchar(255),
+            namacustomer varchar(255),
+            alamatcustomer text,
+            area varchar(255),
+            subarea varchar(255),
+            channel varchar(255),
+            subchannel varchar(255),
+            customergroup varchar(255),
+            keyaccount varchar(255),
+            kodesalesman varchar(255),
+            namasalesman varchar(255),
+            kodesalesco varchar(255),
+            namasalesco varchar(255),
+            kodespv varchar(255),
+            namaspv varchar(255),
+            tahunbulan varchar(255),
+            bulan varchar(255),
+            tanggal varchar(255),
+            weekno varchar(255),
+            nomornota varchar(255),
+            salesmethod varchar(255),
+            sellingtype varchar(255),
+            qtysold varchar(255),
+            kartonutuh varchar(255),
+            qtysoldpcs varchar(255),
+            freegoodpcs varchar(255),
+            tonnage varchar(255),
+            volume_ltr varchar(255),
+            grossamount varchar(255),
+            linediscount1 varchar(255),
+            linediscount2 varchar(255),
+            linediscount3 varchar(255),
+            linediscount4 varchar(255),
+            linediscount5 varchar(255),
+            totallinediscount varchar(255),
+            discountnota1 varchar(255),
+            discountnota2 varchar(255),
+            discountnota3 varchar(255),
+            totaldiscountnota varchar(255),
+            dpp varchar(255),
+            ppn varchar(255),
+            ppnbm varchar(255),
+            tax3 varchar(255),
+            netamount varchar(255),
+            warehouse varchar(255),
+            customerpo varchar(255),
+            customerjoindate varchar(255),
+            nofakturpajak varchar(255),
+            tanggalfakturpajak varchar(255),
+            nomorfakturproforma varchar(255),
+            tanggalfakturproforma varchar(255),
+            cogs varchar(255),
+            case_weight_kg varchar(255),
+            tslqtysoldnfg varchar(255),
+            tslconvpcstoctn varchar(255),
+            tsltonnagesoldfg varchar(255),
+            `end` varchar(255),
+            is_valid_kodeprod int(1),
+            is_valid_tanggal int(1),
+            is_valid_customer int(1),
+            id_bridging_log int(11)
+            );
+        ";
+        // echo "<pre>";
+        // print_r($create_table);
+        // echo "</pre>";
+        $create_table = $this->db->query($create_table);
+        return $create_table;
+    }
+
+    public function insert_mmm_makassar_import($data)
+    {
+        $this->db->insert('site.bridging_mmm_makassar_import', $data);
+        return $this->db->affected_rows();
+    }
+
+    public function get_mmm_makassar_import()
+    {
+        $query = "
+            select *
+            from site.bridging_mmm_makassar_import a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_makassar_import_summary()
+    {
+        $query = "
+            select 	count(*) as count, sum(a.grossamount) as sumgrossamount, 
+                    sum(if(a.is_valid_kodeprod = 0, 1, 0)) as invalid_kodeprod,
+                    sum(if(a.is_valid_kodeprod = 1, 1, 0)) as valid_kodeprod,
+                    sum(if(a.is_valid_tanggal = 0, 1, 0)) as invalid_tanggal,
+                    sum(if(a.is_valid_customer = 0, 1, 0)) as invalid_customer,
+                    sum(if(a.is_valid_customer = 1, 1, 0)) as valid_customer,
+                    sum(if(a.is_valid_tanggal = 1, 1, 0)) as valid_tanggal
+            from site.bridging_mmm_makassar_import a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_makassar_import_where_is_valid_false()
+    {
+        $query = "
+            select 	*
+            from site.bridging_mmm_makassar_import a
+            where a.is_valid_kodeprod = 0 or a.is_valid_tanggal = 0 or a.is_valid_customer = 0 
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function create_table_mmm_makassar_import_customer()
+    {
+        $this->db->query("drop table if exists site.bridging_mmm_makassar_import_customer");
+
+        $create_table = "
+            create table if not exists site.bridging_mmm_makassar_import_customer(
+                id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                kategori varchar(255),
+                nama_site varchar(255),
+                regional varchar(255),
+                customer_id varchar(255),
+                mapping_uli varchar(255),
+                mapping_nd6 varchar(255),
+                mapping_warung_pintar varchar(255),
+                mapping_pbf varchar(255),
+                prefix varchar(255),
+                nama_customer varchar(255),
+                alamat varchar(255),
+                tipe_bayar varchar(255),
+                top varchar(255),
+                status_konsinyasi varchar(255),
+                status_fuguh varchar(255),
+                kelurahan_id varchar(255),
+                nama_kelurahan varchar(255),
+                kecamatan_id varchar(255),
+                nama_kecamatan varchar(255),
+                kota_id varchar(255),
+                nama_kota varchar(255),
+                propinsi_id varchar(255),
+                nama_propinsi varchar(255),
+                kode_pos varchar(255),
+                telp varchar(255),
+                fax varchar(255),
+                email varchar(255),
+                head_office_id varchar(255),
+                nama_head_office varchar(255),
+                company_id varchar(255),
+                nama_company varchar(255),
+                branch_id varchar(255),
+                nama_branch_office varchar(255),
+                site_id varchar(255),
+                segment_id varchar(255),
+                nama_segment varchar(255),
+                type_id varchar(255),
+                nama_type varchar(255),
+                class_id varchar(255),
+                `class` varchar(255),
+                spot_id varchar(255),
+                no_ktp varchar(255),
+                kartu_keluarga varchar(255),
+                pln varchar(255),
+                nama_penghubung varchar(255),
+                alamat_penghubung varchar(255),
+                telp_penghubung varchar(255),
+                hubungan varchar(255),
+                latitude varchar(255),
+                longitude varchar(255),
+                member varchar(255),
+                black_list varchar(255),
+                aktif varchar(255),
+                show_alamat_pkp varchar(255),
+                data_create varchar(255),
+                pbf_izin_no_tdp_tgl varchar(255),
+                pbf_izin_no_tdp varchar(255),
+                pbf_izin_no_siup_tgl varchar(255),
+                pbf_izin_no_siup varchar(255),
+                pbf_izin_no_sito_tgl varchar(255),
+                pbf_izin_no_sito varchar(255),
+                pbf_izin_no_sipa_tgl varchar(255),
+                pbf_izin_no_sipa varchar(255),
+                pbf_izin_no_sia_tgl varchar(255),
+                pbf_izin_no_sia varchar(255),
+                pbf_izin_no_nib_tgl varchar(255),
+                pbf_izin_no_nib varchar(255),
+                pbf_izin_no_cdob_tgl varchar(255),
+                pbf_izin_no_cdob varchar(255),
+                pbf_asis_apoteker_tgl_sipa varchar(255),
+                pbf_asis_apoteker_tgl_lahir varchar(255),
+                pbf_asis_apoteker_telpon varchar(255),
+                pbf_asis_apoteker_no_sipa varchar(255),
+                pbf_asis_apoteker_no_ktp varchar(255),
+                pbf_asis_apoteker_email varchar(255),
+                pbf_asis_apoteker_nama varchar(255),
+                pbf_asis_apoteker_alamat varchar(255),
+                pbf_apoteker_tgl_sipa varchar(255),
+                pbf_apoteker_tgl_lahir varchar(255),
+                pbf_apoteker_telpon varchar(255),
+                pbf_apoteker_no_sipa varchar(255),
+                pbf_apoteker_no_ktp varchar(255),
+                pbf_apoteker_nama varchar(255),
+                pbf_apoteker_alamat varchar(255),
+                pbf_apoteker_email varchar(255),
+                is_valid_type_id int(1),
+                is_valid_class_id int(1)
+            )
+        ";
+        // echo "<pre>";
+        // print_r($create_table);
+        // echo "</pre>";
+        $create_table = $this->db->query($create_table);
+        return $create_table;
+    }
+
+    public function add_unique_mmm_makassar_import_customer($column)
+    {
+        $query = "
+            ALTER TABLE site.bridging_mmm_makassar_import_customer
+            ADD UNIQUE ($column);
+        ";
+        $add_unique = $this->db->query($query);
+        return $add_unique;
+    }
+
+    public function insert_mmm_makassar_import_customer($data)
+    {
+        $this->db->insert('site.bridging_mmm_makassar_import_customer', $data);
+        return $this->db->affected_rows();
+    }
+
+    public function get_mmm_makassar_import_customer()
+    {
+        $query = "
+            select *
+            from site.bridging_mmm_makassar_import_customer a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_makassar_import_customer_summary()
+    {
+        $query = "
+            select 	count(*) as count, 
+                    sum(if(a.is_valid_type_id = 0, 1, 0)) as invalid_type_id,
+                    sum(if(a.is_valid_class_id = 0, 1, 0)) as invalid_class_id
+            from site.bridging_mmm_makassar_import_customer a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_makassar_customer($customer)
+    {
+        $query = "
+            select a.customer_id, a.mapping_uli, a.nama_customer
+            from site.bridging_mmm_makassar_import_customer a 
+            where a.mapping_uli = '$customer'
+        ";
+        return $this->db->query($query);
+    }
+
+    public function insert_fi_mmm_makassar($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.fi
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    a.qtysoldpcs as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    a.grossamount as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, '0' as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam, '' as harga_excl, '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT3/a.GROSSAMOUNT)*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT4/(a.GROSSAMOUNT-a.LINEDISCOUNT3))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 as rp_cabang, a.LINEDISCOUNT3 as rp_prinsipal, a.LINEDISCOUNT4 as rp_xtra,
+                    '' as bonus, concat('11', c.supp) as principalid,'' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, round((a.LINEDISCOUNT5/(a.GROSSAMOUNT-a.LINEDISCOUNT3-a.LINEDISCOUNT4))*100,1) as disc_cod, LINEDISCOUNT5 as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen,  '' as subarea_id
+            from site.bridging_mmm_makassar_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_makassar_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans = 'sales' and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_fi_mmm_makassar_bonus($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.fi
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    0 as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    '' as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, a.FREEGOODPCS as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam, '' as harga_excl, '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, a.FREEGOODPCS as qty_bonus, '1' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, '' as disc_cabang, '' as disc_prinsipal, '' as disc_xtra,
+                    '' as rp_cabang, '' as rp_prinsipal, '' as rp_xtra, '' as bonus, concat('11', c.supp) as principalid,
+                    '' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen, '' as subarea_id
+            from site.bridging_mmm_makassar_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_makassar_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans = 'sales' and a.FREEGOODPCS >=1 and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_ri_mmm_makassar($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.ri
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    (a.qtysoldpcs) as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    (a.grossamount) as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, '0' as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam,  '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT3/a.GROSSAMOUNT)*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT4/(a.GROSSAMOUNT-a.LINEDISCOUNT3))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 as rp_cabang, a.LINEDISCOUNT3 as rp_prinsipal, a.LINEDISCOUNT4 as rp_xtra,
+                    '' as bonus, concat('11', c.supp) as principalid,'' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, round((a.LINEDISCOUNT5/(a.GROSSAMOUNT-a.LINEDISCOUNT3-a.LINEDISCOUNT4))*100,1) as disc_cod, LINEDISCOUNT5 as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen,  '' as subarea_id
+            from site.bridging_mmm_makassar_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_makassar_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans != 'sales'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_fi_mmm_makassar($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            delete from data$tahun.fi
+            where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_ri_mmm_makassar($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            delete from data$tahun.ri
+            where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tblang_mmm_makassar($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tblang where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tabsales_mmm_makassar($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tabsales where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tbkota_mmm_makassar($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tbkota where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    ///BONE///
+        //MAKASSAR//
+    public function create_table_mmm_bone_import()
+    {
+        $this->db->query("drop table if exists site.bridging_mmm_bone_import");
+
+        $create_table = "
+            create table if not exists site.bridging_mmm_bone_import(
+            id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            distributor varchar(255),
+            cabang varchar(255),
+            tipetrans varchar(255),
+            divisi varchar(255),
+            principal varchar(255),
+            productgroup1 varchar(255),
+            productgroup2 varchar(255),
+            productgroup3 varchar(255),
+            brand varchar(255),
+            kodeproduk varchar(255),
+            kodevarian varchar(255),
+            kodeprodukprincipal varchar(255),
+            namaproduk varchar(255),
+            packaging varchar(255),
+            productclass varchar(255),
+            kodecustomer varchar(255),
+            namacustomer varchar(255),
+            alamatcustomer text,
+            area varchar(255),
+            subarea varchar(255),
+            channel varchar(255),
+            subchannel varchar(255),
+            customergroup varchar(255),
+            keyaccount varchar(255),
+            kodesalesman varchar(255),
+            namasalesman varchar(255),
+            kodesalesco varchar(255),
+            namasalesco varchar(255),
+            kodespv varchar(255),
+            namaspv varchar(255),
+            tahunbulan varchar(255),
+            bulan varchar(255),
+            tanggal varchar(255),
+            weekno varchar(255),
+            nomornota varchar(255),
+            salesmethod varchar(255),
+            sellingtype varchar(255),
+            qtysold varchar(255),
+            kartonutuh varchar(255),
+            qtysoldpcs varchar(255),
+            freegoodpcs varchar(255),
+            tonnage varchar(255),
+            volume_ltr varchar(255),
+            grossamount varchar(255),
+            linediscount1 varchar(255),
+            linediscount2 varchar(255),
+            linediscount3 varchar(255),
+            linediscount4 varchar(255),
+            linediscount5 varchar(255),
+            totallinediscount varchar(255),
+            discountnota1 varchar(255),
+            discountnota2 varchar(255),
+            discountnota3 varchar(255),
+            totaldiscountnota varchar(255),
+            dpp varchar(255),
+            ppn varchar(255),
+            ppnbm varchar(255),
+            tax3 varchar(255),
+            netamount varchar(255),
+            warehouse varchar(255),
+            customerpo varchar(255),
+            customerjoindate varchar(255),
+            nofakturpajak varchar(255),
+            tanggalfakturpajak varchar(255),
+            nomorfakturproforma varchar(255),
+            tanggalfakturproforma varchar(255),
+            cogs varchar(255),
+            case_weight_kg varchar(255),
+            tslqtysoldnfg varchar(255),
+            tslconvpcstoctn varchar(255),
+            tsltonnagesoldfg varchar(255),
+            `end` varchar(255),
+            is_valid_kodeprod int(1),
+            is_valid_tanggal int(1),
+            is_valid_customer int(1),
+            id_bridging_log int(11)
+            );
+        ";
+        // echo "<pre>";
+        // print_r($create_table);
+        // echo "</pre>";
+        $create_table = $this->db->query($create_table);
+        return $create_table;
+    }
+
+    public function insert_mmm_bone_import($data)
+    {
+        $this->db->insert('site.bridging_mmm_bone_import', $data);
+        return $this->db->affected_rows();
+    }
+
+    public function get_mmm_bone_import()
+    {
+        $query = "
+            select *
+            from site.bridging_mmm_bone_import a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_bone_import_summary()
+    {
+        $query = "
+            select 	count(*) as count, sum(a.grossamount) as sumgrossamount, 
+                    sum(if(a.is_valid_kodeprod = 0, 1, 0)) as invalid_kodeprod,
+                    sum(if(a.is_valid_kodeprod = 1, 1, 0)) as valid_kodeprod,
+                    sum(if(a.is_valid_tanggal = 0, 1, 0)) as invalid_tanggal,
+                    sum(if(a.is_valid_customer = 0, 1, 0)) as invalid_customer,
+                    sum(if(a.is_valid_customer = 1, 1, 0)) as valid_customer,
+                    sum(if(a.is_valid_tanggal = 1, 1, 0)) as valid_tanggal
+            from site.bridging_mmm_bone_import a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_bone_import_where_is_valid_false()
+    {
+        $query = "
+            select 	*
+            from site.bridging_mmm_bone_import a
+            where a.is_valid_kodeprod = 0 or a.is_valid_tanggal = 0 or a.is_valid_customer = 0 
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function create_table_mmm_bone_import_customer()
+    {
+        $this->db->query("drop table if exists site.bridging_mmm_bone_import_customer");
+
+        $create_table = "
+            create table if not exists site.bridging_mmm_bone_import_customer(
+                id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                kategori varchar(255),
+                nama_site varchar(255),
+                regional varchar(255),
+                customer_id varchar(255),
+                mapping_uli varchar(255),
+                mapping_nd6 varchar(255),
+                mapping_warung_pintar varchar(255),
+                mapping_pbf varchar(255),
+                prefix varchar(255),
+                nama_customer varchar(255),
+                alamat varchar(255),
+                tipe_bayar varchar(255),
+                top varchar(255),
+                status_konsinyasi varchar(255),
+                status_fuguh varchar(255),
+                kelurahan_id varchar(255),
+                nama_kelurahan varchar(255),
+                kecamatan_id varchar(255),
+                nama_kecamatan varchar(255),
+                kota_id varchar(255),
+                nama_kota varchar(255),
+                propinsi_id varchar(255),
+                nama_propinsi varchar(255),
+                kode_pos varchar(255),
+                telp varchar(255),
+                fax varchar(255),
+                email varchar(255),
+                head_office_id varchar(255),
+                nama_head_office varchar(255),
+                company_id varchar(255),
+                nama_company varchar(255),
+                branch_id varchar(255),
+                nama_branch_office varchar(255),
+                site_id varchar(255),
+                segment_id varchar(255),
+                nama_segment varchar(255),
+                type_id varchar(255),
+                nama_type varchar(255),
+                class_id varchar(255),
+                `class` varchar(255),
+                spot_id varchar(255),
+                no_ktp varchar(255),
+                kartu_keluarga varchar(255),
+                pln varchar(255),
+                nama_penghubung varchar(255),
+                alamat_penghubung varchar(255),
+                telp_penghubung varchar(255),
+                hubungan varchar(255),
+                latitude varchar(255),
+                longitude varchar(255),
+                member varchar(255),
+                black_list varchar(255),
+                aktif varchar(255),
+                show_alamat_pkp varchar(255),
+                data_create varchar(255),
+                pbf_izin_no_tdp_tgl varchar(255),
+                pbf_izin_no_tdp varchar(255),
+                pbf_izin_no_siup_tgl varchar(255),
+                pbf_izin_no_siup varchar(255),
+                pbf_izin_no_sito_tgl varchar(255),
+                pbf_izin_no_sito varchar(255),
+                pbf_izin_no_sipa_tgl varchar(255),
+                pbf_izin_no_sipa varchar(255),
+                pbf_izin_no_sia_tgl varchar(255),
+                pbf_izin_no_sia varchar(255),
+                pbf_izin_no_nib_tgl varchar(255),
+                pbf_izin_no_nib varchar(255),
+                pbf_izin_no_cdob_tgl varchar(255),
+                pbf_izin_no_cdob varchar(255),
+                pbf_asis_apoteker_tgl_sipa varchar(255),
+                pbf_asis_apoteker_tgl_lahir varchar(255),
+                pbf_asis_apoteker_telpon varchar(255),
+                pbf_asis_apoteker_no_sipa varchar(255),
+                pbf_asis_apoteker_no_ktp varchar(255),
+                pbf_asis_apoteker_email varchar(255),
+                pbf_asis_apoteker_nama varchar(255),
+                pbf_asis_apoteker_alamat varchar(255),
+                pbf_apoteker_tgl_sipa varchar(255),
+                pbf_apoteker_tgl_lahir varchar(255),
+                pbf_apoteker_telpon varchar(255),
+                pbf_apoteker_no_sipa varchar(255),
+                pbf_apoteker_no_ktp varchar(255),
+                pbf_apoteker_nama varchar(255),
+                pbf_apoteker_alamat varchar(255),
+                pbf_apoteker_email varchar(255),
+                is_valid_type_id int(1),
+                is_valid_class_id int(1)
+            )
+        ";
+        // echo "<pre>";
+        // print_r($create_table);
+        // echo "</pre>";
+        $create_table = $this->db->query($create_table);
+        return $create_table;
+    }
+
+    public function add_unique_mmm_bone_import_customer($column)
+    {
+        $query = "
+            ALTER TABLE site.bridging_mmm_bone_import_customer
+            ADD UNIQUE ($column);
+        ";
+        $add_unique = $this->db->query($query);
+        return $add_unique;
+    }
+
+    public function insert_mmm_bone_import_customer($data)
+    {
+        $this->db->insert('site.bridging_mmm_bone_import_customer', $data);
+        return $this->db->affected_rows();
+    }
+
+    public function get_mmm_bone_import_customer()
+    {
+        $query = "
+            select *
+            from site.bridging_mmm_bone_import_customer a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_bone_import_customer_summary()
+    {
+        $query = "
+            select 	count(*) as count, 
+                    sum(if(a.is_valid_type_id = 0, 1, 0)) as invalid_type_id,
+                    sum(if(a.is_valid_class_id = 0, 1, 0)) as invalid_class_id
+            from site.bridging_mmm_bone_import_customer a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_bone_customer($customer)
+    {
+        $query = "
+            select a.customer_id, a.mapping_uli, a.nama_customer
+            from site.bridging_mmm_bone_import_customer a 
+            where a.mapping_uli = '$customer'
+        ";
+        return $this->db->query($query);
+    }
+
+    public function insert_fi_mmm_bone($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.fi
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    a.qtysoldpcs as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    a.grossamount as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, '0' as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam, '' as harga_excl, '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT3/a.GROSSAMOUNT)*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT4/(a.GROSSAMOUNT-a.LINEDISCOUNT3))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 as rp_cabang, a.LINEDISCOUNT3 as rp_prinsipal, a.LINEDISCOUNT4 as rp_xtra,
+                    '' as bonus, concat('11', c.supp) as principalid,'' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, round((a.LINEDISCOUNT5/(a.GROSSAMOUNT-a.LINEDISCOUNT3-a.LINEDISCOUNT4))*100,1) as disc_cod, LINEDISCOUNT5 as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen,  '' as subarea_id
+            from site.bridging_mmm_bone_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_bone_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans = 'sales' and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_fi_mmm_bone_bonus($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.fi
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    0 as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    '' as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, a.FREEGOODPCS as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam, '' as harga_excl, '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, a.FREEGOODPCS as qty_bonus, '1' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, '' as disc_cabang, '' as disc_prinsipal, '' as disc_xtra,
+                    '' as rp_cabang, '' as rp_prinsipal, '' as rp_xtra, '' as bonus, concat('11', c.supp) as principalid,
+                    '' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen, '' as subarea_id
+            from site.bridging_mmm_bone_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_bone_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans = 'sales' and a.FREEGOODPCS >=1 and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_ri_mmm_bone($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.ri
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    (a.qtysoldpcs) as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    (a.grossamount) as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, '0' as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam,  '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT3/a.GROSSAMOUNT)*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT4/(a.GROSSAMOUNT-a.LINEDISCOUNT3))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 as rp_cabang, a.LINEDISCOUNT3 as rp_prinsipal, a.LINEDISCOUNT4 as rp_xtra,
+                    '' as bonus, concat('11', c.supp) as principalid,'' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, round((a.LINEDISCOUNT5/(a.GROSSAMOUNT-a.LINEDISCOUNT3-a.LINEDISCOUNT4))*100,1) as disc_cod, LINEDISCOUNT5 as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen,  '' as subarea_id
+            from site.bridging_mmm_bone_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_bone_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans != 'sales'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_fi_mmm_bone($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            delete from data$tahun.fi
+            where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_ri_mmm_bone($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            delete from data$tahun.ri
+            where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tblang_mmm_bone($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tblang where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tabsales_mmm_bone($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tabsales where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tbkota_mmm_bone($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tbkota where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+/// PARE-PARE ///
+   public function create_table_mmm_pare_import()
+    {
+        $this->db->query("drop table if exists site.bridging_mmm_pare_import");
+
+        $create_table = "
+            create table if not exists site.bridging_mmm_pare_import(
+            id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            distributor varchar(255),
+            cabang varchar(255),
+            tipetrans varchar(255),
+            divisi varchar(255),
+            principal varchar(255),
+            productgroup1 varchar(255),
+            productgroup2 varchar(255),
+            productgroup3 varchar(255),
+            brand varchar(255),
+            kodeproduk varchar(255),
+            kodevarian varchar(255),
+            kodeprodukprincipal varchar(255),
+            namaproduk varchar(255),
+            packaging varchar(255),
+            productclass varchar(255),
+            kodecustomer varchar(255),
+            namacustomer varchar(255),
+            alamatcustomer text,
+            area varchar(255),
+            subarea varchar(255),
+            channel varchar(255),
+            subchannel varchar(255),
+            customergroup varchar(255),
+            keyaccount varchar(255),
+            kodesalesman varchar(255),
+            namasalesman varchar(255),
+            kodesalesco varchar(255),
+            namasalesco varchar(255),
+            kodespv varchar(255),
+            namaspv varchar(255),
+            tahunbulan varchar(255),
+            bulan varchar(255),
+            tanggal varchar(255),
+            weekno varchar(255),
+            nomornota varchar(255),
+            salesmethod varchar(255),
+            sellingtype varchar(255),
+            qtysold varchar(255),
+            kartonutuh varchar(255),
+            qtysoldpcs varchar(255),
+            freegoodpcs varchar(255),
+            tonnage varchar(255),
+            volume_ltr varchar(255),
+            grossamount varchar(255),
+            linediscount1 varchar(255),
+            linediscount2 varchar(255),
+            linediscount3 varchar(255),
+            linediscount4 varchar(255),
+            linediscount5 varchar(255),
+            totallinediscount varchar(255),
+            discountnota1 varchar(255),
+            discountnota2 varchar(255),
+            discountnota3 varchar(255),
+            totaldiscountnota varchar(255),
+            dpp varchar(255),
+            ppn varchar(255),
+            ppnbm varchar(255),
+            tax3 varchar(255),
+            netamount varchar(255),
+            warehouse varchar(255),
+            customerpo varchar(255),
+            customerjoindate varchar(255),
+            nofakturpajak varchar(255),
+            tanggalfakturpajak varchar(255),
+            nomorfakturproforma varchar(255),
+            tanggalfakturproforma varchar(255),
+            cogs varchar(255),
+            case_weight_kg varchar(255),
+            tslqtysoldnfg varchar(255),
+            tslconvpcstoctn varchar(255),
+            tsltonnagesoldfg varchar(255),
+            `end` varchar(255),
+            is_valid_kodeprod int(1),
+            is_valid_tanggal int(1),
+            is_valid_customer int(1),
+            id_bridging_log int(11)
+            );
+        ";
+        // echo "<pre>";
+        // print_r($create_table);
+        // echo "</pre>";
+        $create_table = $this->db->query($create_table);
+        return $create_table;
+    }
+
+    public function insert_mmm_pare_import($data)
+    {
+        $this->db->insert('site.bridging_mmm_pare_import', $data);
+        return $this->db->affected_rows();
+    }
+
+    public function get_mmm_pare_import()
+    {
+        $query = "
+            select *
+            from site.bridging_mmm_pare_import a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_pare_import_summary()
+    {
+        $query = "
+            select 	count(*) as count, sum(a.grossamount) as sumgrossamount, 
+                    sum(if(a.is_valid_kodeprod = 0, 1, 0)) as invalid_kodeprod,
+                    sum(if(a.is_valid_kodeprod = 1, 1, 0)) as valid_kodeprod,
+                    sum(if(a.is_valid_tanggal = 0, 1, 0)) as invalid_tanggal,
+                    sum(if(a.is_valid_customer = 0, 1, 0)) as invalid_customer,
+                    sum(if(a.is_valid_customer = 1, 1, 0)) as valid_customer,
+                    sum(if(a.is_valid_tanggal = 1, 1, 0)) as valid_tanggal
+            from site.bridging_mmm_pare_import a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_pare_import_where_is_valid_false()
+    {
+        $query = "
+            select 	*
+            from site.bridging_mmm_pare_import a
+            where a.is_valid_kodeprod = 0 or a.is_valid_tanggal = 0 or a.is_valid_customer = 0 
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function create_table_mmm_pare_import_customer()
+    {
+        $this->db->query("drop table if exists site.bridging_mmm_pare_import_customer");
+
+        $create_table = "
+            create table if not exists site.bridging_mmm_pare_import_customer(
+                id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                kategori varchar(255),
+                nama_site varchar(255),
+                regional varchar(255),
+                customer_id varchar(255),
+                mapping_uli varchar(255),
+                mapping_nd6 varchar(255),
+                mapping_warung_pintar varchar(255),
+                mapping_pbf varchar(255),
+                prefix varchar(255),
+                nama_customer varchar(255),
+                alamat varchar(255),
+                tipe_bayar varchar(255),
+                top varchar(255),
+                status_konsinyasi varchar(255),
+                status_fuguh varchar(255),
+                kelurahan_id varchar(255),
+                nama_kelurahan varchar(255),
+                kecamatan_id varchar(255),
+                nama_kecamatan varchar(255),
+                kota_id varchar(255),
+                nama_kota varchar(255),
+                propinsi_id varchar(255),
+                nama_propinsi varchar(255),
+                kode_pos varchar(255),
+                telp varchar(255),
+                fax varchar(255),
+                email varchar(255),
+                head_office_id varchar(255),
+                nama_head_office varchar(255),
+                company_id varchar(255),
+                nama_company varchar(255),
+                branch_id varchar(255),
+                nama_branch_office varchar(255),
+                site_id varchar(255),
+                segment_id varchar(255),
+                nama_segment varchar(255),
+                type_id varchar(255),
+                nama_type varchar(255),
+                class_id varchar(255),
+                `class` varchar(255),
+                spot_id varchar(255),
+                no_ktp varchar(255),
+                kartu_keluarga varchar(255),
+                pln varchar(255),
+                nama_penghubung varchar(255),
+                alamat_penghubung varchar(255),
+                telp_penghubung varchar(255),
+                hubungan varchar(255),
+                latitude varchar(255),
+                longitude varchar(255),
+                member varchar(255),
+                black_list varchar(255),
+                aktif varchar(255),
+                show_alamat_pkp varchar(255),
+                data_create varchar(255),
+                pbf_izin_no_tdp_tgl varchar(255),
+                pbf_izin_no_tdp varchar(255),
+                pbf_izin_no_siup_tgl varchar(255),
+                pbf_izin_no_siup varchar(255),
+                pbf_izin_no_sito_tgl varchar(255),
+                pbf_izin_no_sito varchar(255),
+                pbf_izin_no_sipa_tgl varchar(255),
+                pbf_izin_no_sipa varchar(255),
+                pbf_izin_no_sia_tgl varchar(255),
+                pbf_izin_no_sia varchar(255),
+                pbf_izin_no_nib_tgl varchar(255),
+                pbf_izin_no_nib varchar(255),
+                pbf_izin_no_cdob_tgl varchar(255),
+                pbf_izin_no_cdob varchar(255),
+                pbf_asis_apoteker_tgl_sipa varchar(255),
+                pbf_asis_apoteker_tgl_lahir varchar(255),
+                pbf_asis_apoteker_telpon varchar(255),
+                pbf_asis_apoteker_no_sipa varchar(255),
+                pbf_asis_apoteker_no_ktp varchar(255),
+                pbf_asis_apoteker_email varchar(255),
+                pbf_asis_apoteker_nama varchar(255),
+                pbf_asis_apoteker_alamat varchar(255),
+                pbf_apoteker_tgl_sipa varchar(255),
+                pbf_apoteker_tgl_lahir varchar(255),
+                pbf_apoteker_telpon varchar(255),
+                pbf_apoteker_no_sipa varchar(255),
+                pbf_apoteker_no_ktp varchar(255),
+                pbf_apoteker_nama varchar(255),
+                pbf_apoteker_alamat varchar(255),
+                pbf_apoteker_email varchar(255),
+                is_valid_type_id int(1),
+                is_valid_class_id int(1)
+            )
+        ";
+        // echo "<pre>";
+        // print_r($create_table);
+        // echo "</pre>";
+        $create_table = $this->db->query($create_table);
+        return $create_table;
+    }
+
+    public function add_unique_mmm_pare_import_customer($column)
+    {
+        $query = "
+            ALTER TABLE site.bridging_mmm_pare_import_customer
+            ADD UNIQUE ($column);
+        ";
+        $add_unique = $this->db->query($query);
+        return $add_unique;
+    }
+
+    public function insert_mmm_pare_import_customer($data)
+    {
+        $this->db->insert('site.bridging_mmm_pare_import_customer', $data);
+        return $this->db->affected_rows();
+    }
+
+    public function get_mmm_pare_import_customer()
+    {
+        $query = "
+            select *
+            from site.bridging_mmm_pare_import_customer a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_pare_import_customer_summary()
+    {
+        $query = "
+            select 	count(*) as count, 
+                    sum(if(a.is_valid_type_id = 0, 1, 0)) as invalid_type_id,
+                    sum(if(a.is_valid_class_id = 0, 1, 0)) as invalid_class_id
+            from site.bridging_mmm_pare_import_customer a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_pare_customer($customer)
+    {
+        $query = "
+            select a.customer_id, a.mapping_uli, a.nama_customer
+            from site.bridging_mmm_pare_import_customer a 
+            where a.mapping_uli = '$customer'
+        ";
+        return $this->db->query($query);
+    }
+
+    public function insert_fi_mmm_pare($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.fi
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    a.qtysoldpcs as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    a.grossamount as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, '0' as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam, '' as harga_excl, '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT3/a.GROSSAMOUNT)*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT4/(a.GROSSAMOUNT-a.LINEDISCOUNT3))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 as rp_cabang, a.LINEDISCOUNT3 as rp_prinsipal, a.LINEDISCOUNT4 as rp_xtra,
+                    '' as bonus, concat('11', c.supp) as principalid,'' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, round((a.LINEDISCOUNT5/(a.GROSSAMOUNT-a.LINEDISCOUNT3-a.LINEDISCOUNT4))*100,1) as disc_cod, LINEDISCOUNT5 as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen,  '' as subarea_id
+            from site.bridging_mmm_pare_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_pare_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans = 'sales' and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_fi_mmm_pare_bonus($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.fi
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    0 as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    '' as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, a.FREEGOODPCS as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam, '' as harga_excl, '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, a.FREEGOODPCS as qty_bonus, '1' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, '' as disc_cabang, '' as disc_prinsipal, '' as disc_xtra,
+                    '' as rp_cabang, '' as rp_prinsipal, '' as rp_xtra, '' as bonus, concat('11', c.supp) as principalid,
+                    '' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen, '' as subarea_id
+            from site.bridging_mmm_pare_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_pare_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans = 'sales' and a.FREEGOODPCS >=1 and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_ri_mmm_pare($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.ri
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    (a.qtysoldpcs) as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    (a.grossamount) as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, '0' as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam,  '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT3/a.GROSSAMOUNT)*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT4/(a.GROSSAMOUNT-a.LINEDISCOUNT3))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 as rp_cabang, a.LINEDISCOUNT3 as rp_prinsipal, a.LINEDISCOUNT4 as rp_xtra,
+                    '' as bonus, concat('11', c.supp) as principalid,'' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, round((a.LINEDISCOUNT5/(a.GROSSAMOUNT-a.LINEDISCOUNT3-a.LINEDISCOUNT4))*100,1) as disc_cod, LINEDISCOUNT5 as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen,  '' as subarea_id
+            from site.bridging_mmm_pare_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_pare_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans != 'sales'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_fi_mmm_pare($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            delete from data$tahun.fi
+            where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_ri_mmm_pare($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            delete from data$tahun.ri
+            where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tblang_mmm_pare($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tblang where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tabsales_mmm_pare($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tabsales where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tbkota_mmm_pare($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tbkota where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+/// PALOPO ///
+   public function create_table_mmm_palopo_import()
+    {
+        $this->db->query("drop table if exists site.bridging_mmm_palopo_import");
+
+        $create_table = "
+            create table if not exists site.bridging_mmm_palopo_import(
+            id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            distributor varchar(255),
+            cabang varchar(255),
+            tipetrans varchar(255),
+            divisi varchar(255),
+            principal varchar(255),
+            productgroup1 varchar(255),
+            productgroup2 varchar(255),
+            productgroup3 varchar(255),
+            brand varchar(255),
+            kodeproduk varchar(255),
+            kodevarian varchar(255),
+            kodeprodukprincipal varchar(255),
+            namaproduk varchar(255),
+            packaging varchar(255),
+            productclass varchar(255),
+            kodecustomer varchar(255),
+            namacustomer varchar(255),
+            alamatcustomer text,
+            area varchar(255),
+            subarea varchar(255),
+            channel varchar(255),
+            subchannel varchar(255),
+            customergroup varchar(255),
+            keyaccount varchar(255),
+            kodesalesman varchar(255),
+            namasalesman varchar(255),
+            kodesalesco varchar(255),
+            namasalesco varchar(255),
+            kodespv varchar(255),
+            namaspv varchar(255),
+            tahunbulan varchar(255),
+            bulan varchar(255),
+            tanggal varchar(255),
+            weekno varchar(255),
+            nomornota varchar(255),
+            salesmethod varchar(255),
+            sellingtype varchar(255),
+            qtysold varchar(255),
+            kartonutuh varchar(255),
+            qtysoldpcs varchar(255),
+            freegoodpcs varchar(255),
+            tonnage varchar(255),
+            volume_ltr varchar(255),
+            grossamount varchar(255),
+            linediscount1 varchar(255),
+            linediscount2 varchar(255),
+            linediscount3 varchar(255),
+            linediscount4 varchar(255),
+            linediscount5 varchar(255),
+            totallinediscount varchar(255),
+            discountnota1 varchar(255),
+            discountnota2 varchar(255),
+            discountnota3 varchar(255),
+            totaldiscountnota varchar(255),
+            dpp varchar(255),
+            ppn varchar(255),
+            ppnbm varchar(255),
+            tax3 varchar(255),
+            netamount varchar(255),
+            warehouse varchar(255),
+            customerpo varchar(255),
+            customerjoindate varchar(255),
+            nofakturpajak varchar(255),
+            tanggalfakturpajak varchar(255),
+            nomorfakturproforma varchar(255),
+            tanggalfakturproforma varchar(255),
+            cogs varchar(255),
+            case_weight_kg varchar(255),
+            tslqtysoldnfg varchar(255),
+            tslconvpcstoctn varchar(255),
+            tsltonnagesoldfg varchar(255),
+            `end` varchar(255),
+            is_valid_kodeprod int(1),
+            is_valid_tanggal int(1),
+            is_valid_customer int(1),
+            id_bridging_log int(11)
+            );
+        ";
+        // echo "<pre>";
+        // print_r($create_table);
+        // echo "</pre>";
+        $create_table = $this->db->query($create_table);
+        return $create_table;
+    }
+
+    public function insert_mmm_palopo_import($data)
+    {
+        $this->db->insert('site.bridging_mmm_palopo_import', $data);
+        return $this->db->affected_rows();
+    }
+
+    public function get_mmm_palopo_import()
+    {
+        $query = "
+            select *
+            from site.bridging_mmm_palopo_import a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_palopo_import_summary()
+    {
+        $query = "
+            select 	count(*) as count, sum(a.grossamount) as sumgrossamount, 
+                    sum(if(a.is_valid_kodeprod = 0, 1, 0)) as invalid_kodeprod,
+                    sum(if(a.is_valid_kodeprod = 1, 1, 0)) as valid_kodeprod,
+                    sum(if(a.is_valid_tanggal = 0, 1, 0)) as invalid_tanggal,
+                    sum(if(a.is_valid_customer = 0, 1, 0)) as invalid_customer,
+                    sum(if(a.is_valid_customer = 1, 1, 0)) as valid_customer,
+                    sum(if(a.is_valid_tanggal = 1, 1, 0)) as valid_tanggal
+            from site.bridging_mmm_palopo_import a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_palopo_import_where_is_valid_false()
+    {
+        $query = "
+            select 	*
+            from site.bridging_mmm_palopo_import a
+            where a.is_valid_kodeprod = 0 or a.is_valid_tanggal = 0 or a.is_valid_customer = 0 
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function create_table_mmm_palopo_import_customer()
+    {
+        $this->db->query("drop table if exists site.bridging_mmm_palopo_import_customer");
+
+        $create_table = "
+            create table if not exists site.bridging_mmm_palopo_import_customer(
+                id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                kategori varchar(255),
+                nama_site varchar(255),
+                regional varchar(255),
+                customer_id varchar(255),
+                mapping_uli varchar(255),
+                mapping_nd6 varchar(255),
+                mapping_warung_pintar varchar(255),
+                mapping_pbf varchar(255),
+                prefix varchar(255),
+                nama_customer varchar(255),
+                alamat varchar(255),
+                tipe_bayar varchar(255),
+                top varchar(255),
+                status_konsinyasi varchar(255),
+                status_fuguh varchar(255),
+                kelurahan_id varchar(255),
+                nama_kelurahan varchar(255),
+                kecamatan_id varchar(255),
+                nama_kecamatan varchar(255),
+                kota_id varchar(255),
+                nama_kota varchar(255),
+                propinsi_id varchar(255),
+                nama_propinsi varchar(255),
+                kode_pos varchar(255),
+                telp varchar(255),
+                fax varchar(255),
+                email varchar(255),
+                head_office_id varchar(255),
+                nama_head_office varchar(255),
+                company_id varchar(255),
+                nama_company varchar(255),
+                branch_id varchar(255),
+                nama_branch_office varchar(255),
+                site_id varchar(255),
+                segment_id varchar(255),
+                nama_segment varchar(255),
+                type_id varchar(255),
+                nama_type varchar(255),
+                class_id varchar(255),
+                `class` varchar(255),
+                spot_id varchar(255),
+                no_ktp varchar(255),
+                kartu_keluarga varchar(255),
+                pln varchar(255),
+                nama_penghubung varchar(255),
+                alamat_penghubung varchar(255),
+                telp_penghubung varchar(255),
+                hubungan varchar(255),
+                latitude varchar(255),
+                longitude varchar(255),
+                member varchar(255),
+                black_list varchar(255),
+                aktif varchar(255),
+                show_alamat_pkp varchar(255),
+                data_create varchar(255),
+                pbf_izin_no_tdp_tgl varchar(255),
+                pbf_izin_no_tdp varchar(255),
+                pbf_izin_no_siup_tgl varchar(255),
+                pbf_izin_no_siup varchar(255),
+                pbf_izin_no_sito_tgl varchar(255),
+                pbf_izin_no_sito varchar(255),
+                pbf_izin_no_sipa_tgl varchar(255),
+                pbf_izin_no_sipa varchar(255),
+                pbf_izin_no_sia_tgl varchar(255),
+                pbf_izin_no_sia varchar(255),
+                pbf_izin_no_nib_tgl varchar(255),
+                pbf_izin_no_nib varchar(255),
+                pbf_izin_no_cdob_tgl varchar(255),
+                pbf_izin_no_cdob varchar(255),
+                pbf_asis_apoteker_tgl_sipa varchar(255),
+                pbf_asis_apoteker_tgl_lahir varchar(255),
+                pbf_asis_apoteker_telpon varchar(255),
+                pbf_asis_apoteker_no_sipa varchar(255),
+                pbf_asis_apoteker_no_ktp varchar(255),
+                pbf_asis_apoteker_email varchar(255),
+                pbf_asis_apoteker_nama varchar(255),
+                pbf_asis_apoteker_alamat varchar(255),
+                pbf_apoteker_tgl_sipa varchar(255),
+                pbf_apoteker_tgl_lahir varchar(255),
+                pbf_apoteker_telpon varchar(255),
+                pbf_apoteker_no_sipa varchar(255),
+                pbf_apoteker_no_ktp varchar(255),
+                pbf_apoteker_nama varchar(255),
+                pbf_apoteker_alamat varchar(255),
+                pbf_apoteker_email varchar(255),
+                is_valid_type_id int(1),
+                is_valid_class_id int(1)
+            )
+        ";
+        // echo "<pre>";
+        // print_r($create_table);
+        // echo "</pre>";
+        $create_table = $this->db->query($create_table);
+        return $create_table;
+    }
+
+    public function add_unique_mmm_palopo_import_customer($column)
+    {
+        $query = "
+            ALTER TABLE site.bridging_mmm_palopo_import_customer
+            ADD UNIQUE ($column);
+        ";
+        $add_unique = $this->db->query($query);
+        return $add_unique;
+    }
+
+    public function insert_mmm_palopo_import_customer($data)
+    {
+        $this->db->insert('site.bridging_mmm_palopo_import_customer', $data);
+        return $this->db->affected_rows();
+    }
+
+    public function get_mmm_palopo_import_customer()
+    {
+        $query = "
+            select *
+            from site.bridging_mmm_palopo_import_customer a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_palopo_import_customer_summary()
+    {
+        $query = "
+            select 	count(*) as count, 
+                    sum(if(a.is_valid_type_id = 0, 1, 0)) as invalid_type_id,
+                    sum(if(a.is_valid_class_id = 0, 1, 0)) as invalid_class_id
+            from site.bridging_mmm_palopo_import_customer a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_palopo_customer($customer)
+    {
+        $query = "
+            select a.customer_id, a.mapping_uli, a.nama_customer
+            from site.bridging_mmm_palopo_import_customer a 
+            where a.mapping_uli = '$customer'
+        ";
+        return $this->db->query($query);
+    }
+
+    public function insert_fi_mmm_palopo($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.fi
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    a.qtysoldpcs as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    a.grossamount as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, '0' as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam, '' as harga_excl, '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT3/a.GROSSAMOUNT)*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT4/(a.GROSSAMOUNT-a.LINEDISCOUNT3))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 as rp_cabang, a.LINEDISCOUNT3 as rp_prinsipal, a.LINEDISCOUNT4 as rp_xtra,
+                    '' as bonus, concat('11', c.supp) as principalid,'' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, round((a.LINEDISCOUNT5/(a.GROSSAMOUNT-a.LINEDISCOUNT3-a.LINEDISCOUNT4))*100,1) as disc_cod, LINEDISCOUNT5 as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen,  '' as subarea_id
+            from site.bridging_mmm_palopo_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_palopo_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans = 'sales' and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_fi_mmm_palopo_bonus($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.fi
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    0 as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    '' as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, a.FREEGOODPCS as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam, '' as harga_excl, '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, a.FREEGOODPCS as qty_bonus, '1' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, '' as disc_cabang, '' as disc_prinsipal, '' as disc_xtra,
+                    '' as rp_cabang, '' as rp_prinsipal, '' as rp_xtra, '' as bonus, concat('11', c.supp) as principalid,
+                    '' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen, '' as subarea_id
+            from site.bridging_mmm_palopo_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_palopo_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans = 'sales' and a.FREEGOODPCS >=1 and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_ri_mmm_palopo($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.ri
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    (a.qtysoldpcs) as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    (a.grossamount) as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, '0' as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam,  '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT3/a.GROSSAMOUNT)*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT4/(a.GROSSAMOUNT-a.LINEDISCOUNT3))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 as rp_cabang, a.LINEDISCOUNT3 as rp_prinsipal, a.LINEDISCOUNT4 as rp_xtra,
+                    '' as bonus, concat('11', c.supp) as principalid,'' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, round((a.LINEDISCOUNT5/(a.GROSSAMOUNT-a.LINEDISCOUNT3-a.LINEDISCOUNT4))*100,1) as disc_cod, LINEDISCOUNT5 as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen,  '' as subarea_id
+            from site.bridging_mmm_palopo_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_palopo_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans != 'sales'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_fi_mmm_palopo($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            delete from data$tahun.fi
+            where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_ri_mmm_palopo($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            delete from data$tahun.ri
+            where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tblang_mmm_palopo($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tblang where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tabsales_mmm_palopo($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tabsales where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tbkota_mmm_palopo($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tbkota where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+/// BULUKUMBA ///
+   public function create_table_mmm_bulukumba_import()
+    {
+        $this->db->query("drop table if exists site.bridging_mmm_bulukumba_import");
+
+        $create_table = "
+            create table if not exists site.bridging_mmm_bulukumba_import(
+            id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            distributor varchar(255),
+            cabang varchar(255),
+            tipetrans varchar(255),
+            divisi varchar(255),
+            principal varchar(255),
+            productgroup1 varchar(255),
+            productgroup2 varchar(255),
+            productgroup3 varchar(255),
+            brand varchar(255),
+            kodeproduk varchar(255),
+            kodevarian varchar(255),
+            kodeprodukprincipal varchar(255),
+            namaproduk varchar(255),
+            packaging varchar(255),
+            productclass varchar(255),
+            kodecustomer varchar(255),
+            namacustomer varchar(255),
+            alamatcustomer text,
+            area varchar(255),
+            subarea varchar(255),
+            channel varchar(255),
+            subchannel varchar(255),
+            customergroup varchar(255),
+            keyaccount varchar(255),
+            kodesalesman varchar(255),
+            namasalesman varchar(255),
+            kodesalesco varchar(255),
+            namasalesco varchar(255),
+            kodespv varchar(255),
+            namaspv varchar(255),
+            tahunbulan varchar(255),
+            bulan varchar(255),
+            tanggal varchar(255),
+            weekno varchar(255),
+            nomornota varchar(255),
+            salesmethod varchar(255),
+            sellingtype varchar(255),
+            qtysold varchar(255),
+            kartonutuh varchar(255),
+            qtysoldpcs varchar(255),
+            freegoodpcs varchar(255),
+            tonnage varchar(255),
+            volume_ltr varchar(255),
+            grossamount varchar(255),
+            linediscount1 varchar(255),
+            linediscount2 varchar(255),
+            linediscount3 varchar(255),
+            linediscount4 varchar(255),
+            linediscount5 varchar(255),
+            totallinediscount varchar(255),
+            discountnota1 varchar(255),
+            discountnota2 varchar(255),
+            discountnota3 varchar(255),
+            totaldiscountnota varchar(255),
+            dpp varchar(255),
+            ppn varchar(255),
+            ppnbm varchar(255),
+            tax3 varchar(255),
+            netamount varchar(255),
+            warehouse varchar(255),
+            customerpo varchar(255),
+            customerjoindate varchar(255),
+            nofakturpajak varchar(255),
+            tanggalfakturpajak varchar(255),
+            nomorfakturproforma varchar(255),
+            tanggalfakturproforma varchar(255),
+            cogs varchar(255),
+            case_weight_kg varchar(255),
+            tslqtysoldnfg varchar(255),
+            tslconvpcstoctn varchar(255),
+            tsltonnagesoldfg varchar(255),
+            `end` varchar(255),
+            is_valid_kodeprod int(1),
+            is_valid_tanggal int(1),
+            is_valid_customer int(1),
+            id_bridging_log int(11)
+            );
+        ";
+        // echo "<pre>";
+        // print_r($create_table);
+        // echo "</pre>";
+        $create_table = $this->db->query($create_table);
+        return $create_table;
+    }
+
+    public function insert_mmm_bulukumba_import($data)
+    {
+        $this->db->insert('site.bridging_mmm_bulukumba_import', $data);
+        return $this->db->affected_rows();
+    }
+
+    public function get_mmm_bulukumba_import()
+    {
+        $query = "
+            select *
+            from site.bridging_mmm_bulukumba_import a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_bulukumba_import_summary()
+    {
+        $query = "
+            select 	count(*) as count, sum(a.grossamount) as sumgrossamount, 
+                    sum(if(a.is_valid_kodeprod = 0, 1, 0)) as invalid_kodeprod,
+                    sum(if(a.is_valid_kodeprod = 1, 1, 0)) as valid_kodeprod,
+                    sum(if(a.is_valid_tanggal = 0, 1, 0)) as invalid_tanggal,
+                    sum(if(a.is_valid_customer = 0, 1, 0)) as invalid_customer,
+                    sum(if(a.is_valid_customer = 1, 1, 0)) as valid_customer,
+                    sum(if(a.is_valid_tanggal = 1, 1, 0)) as valid_tanggal
+            from site.bridging_mmm_bulukumba_import a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_bulukumba_import_where_is_valid_false()
+    {
+        $query = "
+            select 	*
+            from site.bridging_mmm_bulukumba_import a
+            where a.is_valid_kodeprod = 0 or a.is_valid_tanggal = 0 or a.is_valid_customer = 0 
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function create_table_mmm_bulukumba_import_customer()
+    {
+        $this->db->query("drop table if exists site.bridging_mmm_bulukumba_import_customer");
+
+        $create_table = "
+            create table if not exists site.bridging_mmm_bulukumba_import_customer(
+                id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                kategori varchar(255),
+                nama_site varchar(255),
+                regional varchar(255),
+                customer_id varchar(255),
+                mapping_uli varchar(255),
+                mapping_nd6 varchar(255),
+                mapping_warung_pintar varchar(255),
+                mapping_pbf varchar(255),
+                prefix varchar(255),
+                nama_customer varchar(255),
+                alamat varchar(255),
+                tipe_bayar varchar(255),
+                top varchar(255),
+                status_konsinyasi varchar(255),
+                status_fuguh varchar(255),
+                kelurahan_id varchar(255),
+                nama_kelurahan varchar(255),
+                kecamatan_id varchar(255),
+                nama_kecamatan varchar(255),
+                kota_id varchar(255),
+                nama_kota varchar(255),
+                propinsi_id varchar(255),
+                nama_propinsi varchar(255),
+                kode_pos varchar(255),
+                telp varchar(255),
+                fax varchar(255),
+                email varchar(255),
+                head_office_id varchar(255),
+                nama_head_office varchar(255),
+                company_id varchar(255),
+                nama_company varchar(255),
+                branch_id varchar(255),
+                nama_branch_office varchar(255),
+                site_id varchar(255),
+                segment_id varchar(255),
+                nama_segment varchar(255),
+                type_id varchar(255),
+                nama_type varchar(255),
+                class_id varchar(255),
+                `class` varchar(255),
+                spot_id varchar(255),
+                no_ktp varchar(255),
+                kartu_keluarga varchar(255),
+                pln varchar(255),
+                nama_penghubung varchar(255),
+                alamat_penghubung varchar(255),
+                telp_penghubung varchar(255),
+                hubungan varchar(255),
+                latitude varchar(255),
+                longitude varchar(255),
+                member varchar(255),
+                black_list varchar(255),
+                aktif varchar(255),
+                show_alamat_pkp varchar(255),
+                data_create varchar(255),
+                pbf_izin_no_tdp_tgl varchar(255),
+                pbf_izin_no_tdp varchar(255),
+                pbf_izin_no_siup_tgl varchar(255),
+                pbf_izin_no_siup varchar(255),
+                pbf_izin_no_sito_tgl varchar(255),
+                pbf_izin_no_sito varchar(255),
+                pbf_izin_no_sipa_tgl varchar(255),
+                pbf_izin_no_sipa varchar(255),
+                pbf_izin_no_sia_tgl varchar(255),
+                pbf_izin_no_sia varchar(255),
+                pbf_izin_no_nib_tgl varchar(255),
+                pbf_izin_no_nib varchar(255),
+                pbf_izin_no_cdob_tgl varchar(255),
+                pbf_izin_no_cdob varchar(255),
+                pbf_asis_apoteker_tgl_sipa varchar(255),
+                pbf_asis_apoteker_tgl_lahir varchar(255),
+                pbf_asis_apoteker_telpon varchar(255),
+                pbf_asis_apoteker_no_sipa varchar(255),
+                pbf_asis_apoteker_no_ktp varchar(255),
+                pbf_asis_apoteker_email varchar(255),
+                pbf_asis_apoteker_nama varchar(255),
+                pbf_asis_apoteker_alamat varchar(255),
+                pbf_apoteker_tgl_sipa varchar(255),
+                pbf_apoteker_tgl_lahir varchar(255),
+                pbf_apoteker_telpon varchar(255),
+                pbf_apoteker_no_sipa varchar(255),
+                pbf_apoteker_no_ktp varchar(255),
+                pbf_apoteker_nama varchar(255),
+                pbf_apoteker_alamat varchar(255),
+                pbf_apoteker_email varchar(255),
+                is_valid_type_id int(1),
+                is_valid_class_id int(1)
+            )
+        ";
+        // echo "<pre>";
+        // print_r($create_table);
+        // echo "</pre>";
+        $create_table = $this->db->query($create_table);
+        return $create_table;
+    }
+
+    public function add_unique_mmm_bulukumba_import_customer($column)
+    {
+        $query = "
+            ALTER TABLE site.bridging_mmm_bulukumba_import_customer
+            ADD UNIQUE ($column);
+        ";
+        $add_unique = $this->db->query($query);
+        return $add_unique;
+    }
+
+    public function insert_mmm_bulukumba_import_customer($data)
+    {
+        $this->db->insert('site.bridging_mmm_bulukumba_import_customer', $data);
+        return $this->db->affected_rows();
+    }
+
+    public function get_mmm_bulukumba_import_customer()
+    {
+        $query = "
+            select *
+            from site.bridging_mmm_bulukumba_import_customer a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_bulukumba_import_customer_summary()
+    {
+        $query = "
+            select 	count(*) as count, 
+                    sum(if(a.is_valid_type_id = 0, 1, 0)) as invalid_type_id,
+                    sum(if(a.is_valid_class_id = 0, 1, 0)) as invalid_class_id
+            from site.bridging_mmm_bulukumba_import_customer a
+        ";
+        return $this->db->query($query);
+    }
+
+    public function get_mmm_bulukumba_customer($customer)
+    {
+        $query = "
+            select a.customer_id, a.mapping_uli, a.nama_customer
+            from site.bridging_mmm_bulukumba_import_customer a 
+            where a.mapping_uli = '$customer'
+        ";
+        return $this->db->query($query);
+    }
+
+    public function insert_fi_mmm_bulukumba($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.fi
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    a.qtysoldpcs as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    a.grossamount as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, '0' as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam, '' as harga_excl, '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT3/a.GROSSAMOUNT)*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT4/(a.GROSSAMOUNT-a.LINEDISCOUNT3))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 as rp_cabang, a.LINEDISCOUNT3 as rp_prinsipal, a.LINEDISCOUNT4 as rp_xtra,
+                    '' as bonus, concat('11', c.supp) as principalid,'' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, round((a.LINEDISCOUNT5/(a.GROSSAMOUNT-a.LINEDISCOUNT3-a.LINEDISCOUNT4))*100,1) as disc_cod, LINEDISCOUNT5 as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen,  '' as subarea_id
+            from site.bridging_mmm_bulukumba_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_bulukumba_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans = 'sales' and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_fi_mmm_bulukumba_bonus($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.fi
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    0 as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    '' as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, a.FREEGOODPCS as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam, '' as harga_excl, '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, a.FREEGOODPCS as qty_bonus, '1' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, '' as disc_cabang, '' as disc_prinsipal, '' as disc_xtra,
+                    '' as rp_cabang, '' as rp_prinsipal, '' as rp_xtra, '' as bonus, concat('11', c.supp) as principalid,
+                    '' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, '' as disc_cod, '' as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen, '' as subarea_id
+            from site.bridging_mmm_bulukumba_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_bulukumba_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans = 'sales' and a.FREEGOODPCS >=1 and a.is_valid_tanggal = 1 and a.is_valid_kodeprod = 1
+        ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function insert_ri_mmm_bulukumba($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            insert into data$tahun.ri
+            select 	'08' as kddokjdi, a.nomornota as nodokjdi, a.nomornota as nodokacu, a.tanggal as tgldokjdi,
+                    a.kodesalesman as kodesales, '$kode_comp' as kode_comp, b.kota_id as kode_kota, b.type_id as kode_type,
+                    b.customer_id as kode_lang, '' as koderayon, a.kodeprodukprincipal as kodeprod, c.supp, 
+                    DATE_FORMAT(a.tanggal, '%d') as hrdok,
+                    DATE_FORMAT(a.tanggal, '%m') as blndok, year(a.tanggal) as thndok, c.namaprod, c.grupprod as groupprod,
+                    (a.qtysoldpcs) as banyak, (a.grossamount) / a.qtysoldpcs as harga, '' as potongan, 
+                    (a.grossamount) as tot1, '' as jum_promo, '' as keterangan, '' as user_isi, 
+                    '' as jam_isi, '' as tgl_isi,
+                    '' as  user_edit, '' as jam_edit, '' as tgl_edit, '' as  user_del, '' as jam_del, '' as tgl_del, '' as no, 
+                    '' as backup, '' as no_urut, 'PST' as kode_gdg, '' as nama_gdg, b.class_id as kodesalur, 
+                    '' as kodebonus, '' as namabonus, '' as grupbonus, '0' as unitbonus, 
+                    a.namasalesman as lampiran,
+                    (a.grossamount)/a.qtysoldpcs as h_beli, '' as kodearea, b.alamat as namaarea,
+                    '' as pinjam, '' as jualbanyak, '' as jualpinjam,  '' as tot1_excl, 
+                    b.nama_customer as namalang, '$nocab' as nocab, '$bulan' as bulan,
+                    '' as siteid, '' as qty1, '' as qty2, '' as qty3, '0' as qty_bonus, '0' as flag_bonus, '' as disc_persen,
+                    '' as disc_rp, '' as disc_value, round((a.LINEDISCOUNT1/a.GROSSAMOUNT)*100,1) as disc_cabang, 
+                    round((a.LINEDISCOUNT3/a.GROSSAMOUNT)*100,1) as disc_prinsipal, 
+                    round((a.LINEDISCOUNT4/(a.GROSSAMOUNT-a.LINEDISCOUNT3))*100,1) as disc_xtra,
+                    a.LINEDISCOUNT1 as rp_cabang, a.LINEDISCOUNT3 as rp_prinsipal, a.LINEDISCOUNT4 as rp_xtra,
+                    '' as bonus, concat('11', c.supp) as principalid,'' as ex_no_sales, '' as status_retur, '' as ref,
+                    '' as term_payment, '' as tipe_kl, round((a.LINEDISCOUNT5/(a.GROSSAMOUNT-a.LINEDISCOUNT3-a.LINEDISCOUNT4))*100,1) as disc_cod, LINEDISCOUNT5 as rp_cod, '' as beban_bonus, 
+                    '' as disc_add_percen,  '' as subarea_id
+            from site.bridging_mmm_bulukumba_import a left join (
+                select a.customer_id, a.mapping_uli, a.nama_customer, a.kota_id, a.type_id, a.class_id, a.alamat
+                from site.bridging_mmm_bulukumba_import_customer a
+            )b on a.kodecustomer = b.mapping_uli left join (
+                select a.kodeprod, a.namaprod, a.supp, a.namasupp, a.h_dp, a.grupprod
+                from site.master_product_with_harga a 
+            )c on a.kodeprodukprincipal = c.kodeprod
+            where a.tipetrans != 'sales'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_fi_mmm_bulukumba($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            delete from data$tahun.fi
+            where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_ri_mmm_bulukumba($kode_comp, $nocab, $tahun, $bulan)
+    {
+        $query = "
+            delete from data$tahun.ri
+            where bulan = $bulan and kode_comp = '$kode_comp' and nocab = '$nocab'
+        ";
+        
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tblang_mmm_bulukumba($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tblang where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tabsales_mmm_bulukumba($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tabsales where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+    public function delete_tbkota_mmm_bulukumba($tahun, $nocab)
+    {
+        $query = "
+            delete from data$tahun.tbkota where nocab='$nocab' ;
+        ";
+        
+        echo "<pre>";
+        print_r($query);
+        echo "</pre>";
+        return $this->db->query($query);
+    }
+
+
+
 }

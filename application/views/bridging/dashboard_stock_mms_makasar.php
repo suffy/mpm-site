@@ -68,7 +68,7 @@
             <div class="col-md-10">
                 <input type="hidden" name="sitecode" value="<?= $sitecode ?>">
                 <input type="submit" value="Import Stock" class="btn btn-submit-orange" style="height: 44px;">
-                <a href="<?= base_url('bridging/download_template_stock') ?>" class="btn btn-submit-black">Download Template Stock</a>
+                <a href="<?= base_url('bridging/download_template_stock_mms') ?>" class="btn btn-submit-black">Download Template Stock</a>
             </div>
         </div>
 

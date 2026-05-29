@@ -62,17 +62,17 @@ class Login_sistem extends MY_Controller
         $min_berat    = $proses['min_berat'];
         $kode_company = $proses['kode_company'];
 
-        // $allowed_user = ['rifqi','adinda','angga','fauzan'];
+        // $allowed_user = ['milla', 'suffy'];
 
         // if(!in_array($username, $allowed_user)){
-        //     $this->session->set_flashdata("pesan", "Website sedang menjalankan closing raw data nasional, estimasi selesai jam 12.00 WIB. Terimakasih");
+        //     $this->session->set_flashdata("pesan", "Website sedang maintenance. Terimakasih");
         //     redirect('login_sistem/formLogin');   
         // }
 
         // ==================================================
         // VALIDASI KHUSUS: LEVEL 10 WAJIB ADA DI TABEL KARYAWAN
         // ==================================================
-        if ($level == 10 && $kode_company == '000' && $username != 'ambar' && $username != 'hilda' && $username != 'yayang') {
+        if ($level == 10 && $kode_company == '000' && $username != 'thomas' && $username != 'yayang' && $username != 'nanita' && $username != 'hendra' && $username != 'fahrodin') {
             // echo "masuk";die;
             $get_personalia = $this->login->get_personalia($username)->result();
             $pic_ids = [];

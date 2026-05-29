@@ -33,7 +33,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             padding: 1.5rem;
             margin-bottom: 2rem;
-            background-color: white;
+            /* background-color: white; */
             border: none;
         }
         
@@ -263,6 +263,7 @@
                 margin-bottom: 0.5rem;
             }
         }
+       
     </style>
 </head>
 <body>
@@ -285,7 +286,7 @@
                     <div class="col-12">
                         <ol>
                             <li>Pastikan selalu mengikuti template yang sudah di sepakati. 
-                                <a href="<?= base_url().'bridging/download_template_sales/'.$filename ?>" class="download-link">
+                                <a href="<?= base_url().'bridging/download_template_palu' ?>" class="download-link">
                                     <i class="fas fa-file-excel"></i> Download template excel di sini
                                 </a>
                             </li>
@@ -370,7 +371,7 @@
                     <div class="col-12">
                         <ol>
                             <li>Pastikan selalu mengikuti template yang sudah di sepakati. 
-                                <a href="<?= base_url().'bridging/download_template_kolaka_customer' ?>" class="download-link">
+                                <a href="<?= base_url().'bridging/download_template_palu_customer' ?>" class="download-link">
                                     <i class="fas fa-file-excel"></i> Download template excel customer di sini
                                 </a>
                             </li>
@@ -460,8 +461,8 @@
                         <!-- <table id="tabel-ajuan-claim"> -->
                             <thead class="table-light">
                                 <tr>
-                                    <th class="text-center">No</th>  
-                                    <th class="text-center">Closing</th>      
+                                    <th class="text-center">No</th>    
+                                    <th class="text-center">Closing</th>     
                                     <th class="text-center">SiteCode</th>       
                                     <th class="text-center">Bulan</th>       
                                     <th class="text-center">Filename</th>       
@@ -591,7 +592,7 @@
             $('#tabel-ajuan-claim').DataTable({
                 "pageLength": 10,
                 "ordering": true,
-                //"order": [6, 'desc'],
+                // "order": [6, 'desc'],
                 "aLengthMenu": [
                     [10, 20, 50, -1],
                     [10, 20, 50, "All"]

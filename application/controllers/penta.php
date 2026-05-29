@@ -1019,7 +1019,7 @@ class Penta extends MY_Controller
         ];
 
         $this->db->where('id', $id);
-        $this->db->update('site.penta_master_produk', $data);
+        $this->db->update('site.penta_master_produk_sales', $data);
 
         $this->session->set_flashdata('pesan_success','Data Product berhasil diupdate');
 
@@ -1074,9 +1074,6 @@ class Penta extends MY_Controller
 
         list($id_log, $signature) = $this->model_penta->get_penta_sales_detail_palu($data['token'],$tahun_final,$bulan_final, $signature, $id_log, 'palu');
         // die;
-
-        // insert and check peoduct 
-        $cek_product_penta = $this->model_penta->cek_product_penta_from_sales($id_log, $bulan_final, $area_id);
         
         $get_sales = $this->model_penta->get_penta_sales_palu_by_tahun_bulan($tahun_final, $bulan_final, $area_id);
 
@@ -1092,6 +1089,9 @@ class Penta extends MY_Controller
             // $insert_sales = $this->model_penta->insert_penta_sales_palu($tahun_final,$bulan_final, $signature, $id_log);
         }
 
+        // insert and check peoduct 
+        $cek_product_penta = $this->model_penta->cek_product_penta_from_sales($id_log, $bulan_final, $area_id);
+        
         $insert_temp_firi = $this->insert_penta_firi($tahun_final, $bulan_final, $id_log);
 
         $this->session->set_flashdata("pesan_success", "Penarikan data berhasil. Silahkan tarik data anda");
