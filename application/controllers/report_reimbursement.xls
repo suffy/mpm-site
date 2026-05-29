@@ -1,0 +1,240 @@
+<!-- ===================================================== -->
+<!-- VIEW -->
+<!-- export_reimbursement_excel.php -->
+<!-- TOTAL DIPISAH -->
+<!-- ===================================================== -->
+
+
+<table border="1">
+
+    <!-- HEADER 1 -->
+    <tr style="background:#ffff00;font-weight:bold;">
+        <th rowspan="2">No</th>
+        <th rowspan="2">Nama</th>
+
+                    <th colspan="2">Januari</th>
+                    <th colspan="2">Februari</th>
+                    <th colspan="2">Maret</th>
+                    <th colspan="2">April</th>
+                    <th colspan="2">Mei</th>
+                    <th colspan="2">Juni</th>
+                    <th colspan="2">Juli</th>
+                    <th colspan="2">Agustus</th>
+                    <th colspan="2">September</th>
+                    <th colspan="2">Oktober</th>
+                    <th colspan="2">November</th>
+                    <th colspan="2">Desember</th>
+        
+        <th colspan="2">Total</th>
+    </tr>
+
+    <!-- HEADER 2 -->
+    <tr style="background:#ffff00;font-weight:bold;">
+                    <th>Pengobatan</th>
+            <th>Kacamata</th>
+                    <th>Pengobatan</th>
+            <th>Kacamata</th>
+                    <th>Pengobatan</th>
+            <th>Kacamata</th>
+                    <th>Pengobatan</th>
+            <th>Kacamata</th>
+                    <th>Pengobatan</th>
+            <th>Kacamata</th>
+                    <th>Pengobatan</th>
+            <th>Kacamata</th>
+                    <th>Pengobatan</th>
+            <th>Kacamata</th>
+                    <th>Pengobatan</th>
+            <th>Kacamata</th>
+                    <th>Pengobatan</th>
+            <th>Kacamata</th>
+                    <th>Pengobatan</th>
+            <th>Kacamata</th>
+                    <th>Pengobatan</th>
+            <th>Kacamata</th>
+                    <th>Pengobatan</th>
+            <th>Kacamata</th>
+        
+        <th>Pengobatan</th>
+        <th>Kacamata</th>
+    </tr>
+
+<tr>
+    <td>1</td>
+    <td>Adinda Yan Maharani Putri</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>500000</td>
+        <td>50000</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+    <!-- TOTAL DIPISAH -->
+    <td><b>500000</b></td>
+    <td><b>50000</b></td>
+
+</tr>
+
+<tr>
+    <td>2</td>
+    <td>Milla Rosiana Dewi</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>300000</td>
+        <td>500000</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+    <!-- TOTAL DIPISAH -->
+    <td><b>300000</b></td>
+    <td><b>500000</b></td>
+
+</tr>
+
+<tr>
+    <td>3</td>
+    <td>Rifqi Zaidan Abiyan</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>50000</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+        <td>0</td>
+        <td>0</td>
+
+    
+    <!-- TOTAL DIPISAH -->
+    <td><b>50000</b></td>
+    <td><b>0</b></td>
+
+</tr>
+
+
+</table>

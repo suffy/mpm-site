@@ -791,9 +791,6 @@ class Penta extends MY_Controller
             $result = $this->model_penta->get_penta_customer($data['token'], $signature, $id_log, 'palu');
 
             $temp = $this->model_penta->get_temp_outlet();
-            // echo "<pre>";
-            // print_r($temp);
-            // echo "</pre>";die;
 
             foreach ($temp as $row)
             {   
@@ -809,16 +806,10 @@ class Penta extends MY_Controller
                 redirect('penta/request_customer', 'refresh');
                 
             }
-            // echo "<pre>";
-            //     print_r($row->org_id);
-            //     echo "<br>";
-            //     print_r($row->location);
-            //     echo "</pre>";die;
         }else{
             $this->session->set_flashdata("pesan", "Penarikan data gagal tidak ada id_log. Silahkan coba lagi");
             redirect('penta/request_customer', 'refresh');
         }
-
 
 
     }
@@ -1028,7 +1019,7 @@ class Penta extends MY_Controller
         ];
 
         $this->db->where('id', $id);
-        $this->db->update('site.penta_master_produk', $data);
+        $this->db->update('site.penta_master_produk_sales', $data);
 
         $this->session->set_flashdata('pesan_success','Data Product berhasil diupdate');
 
@@ -1083,9 +1074,6 @@ class Penta extends MY_Controller
 
         list($id_log, $signature) = $this->model_penta->get_penta_sales_detail_palu($data['token'],$tahun_final,$bulan_final, $signature, $id_log, 'palu');
         // die;
-
-        // insert and check peoduct 
-        $cek_product_penta = $this->model_penta->cek_product_penta_from_sales($id_log, $bulan_final, $area_id);
         
         $get_sales = $this->model_penta->get_penta_sales_palu_by_tahun_bulan($tahun_final, $bulan_final, $area_id);
 
@@ -1101,6 +1089,9 @@ class Penta extends MY_Controller
             // $insert_sales = $this->model_penta->insert_penta_sales_palu($tahun_final,$bulan_final, $signature, $id_log);
         }
 
+        // insert and check peoduct 
+        $cek_product_penta = $this->model_penta->cek_product_penta_from_sales($id_log, $bulan_final, $area_id);
+        
         $insert_temp_firi = $this->insert_penta_firi($tahun_final, $bulan_final, $id_log);
 
         $this->session->set_flashdata("pesan_success", "Penarikan data berhasil. Silahkan tarik data anda");
@@ -1398,29 +1389,134 @@ class Penta extends MY_Controller
 
         $update_log_sales =  $this->model_penta->update_log_sales_palu($data, $id_log);
 
-
-        // if ($id_log) 
-        // {
-        //     $get_sum = $this->model_penta->get_sum_sales_palu($id_log);
-        //     if ($get_sum->num_rows() > 0) {
-        //         $total_gross = $get_sum->row()->total_gross;
-        //         $total_net = $get_sum->row()->total_net;
-
-        //         $data = [
-        //             'total_gross' => $total_gross,
-        //             'total_net' => $total_net
-        //         ];
-
-        //         $update_log_sales =  $this->model_penta->update_log_sales_palu($data, $id_log);
-                
-        //     }    
-        // }else{
-        //     echo "Gagal update log sales";
-        //     die;
-        // }
-
-        
     }
+
+    public function download_master_produk()
+    {
+        $query = "
+            SELECT 
+                kode_produk_penta,
+                item_id_vend_penta,
+                nama_produk_penta,
+                uom,
+                kode_produk_mpm,
+                nama_produk_mpm,
+                qty,
+                tabel
+            FROM site.penta_master_produk_sales
+            ORDER BY kode_produk_penta ASC
+        ";
+
+        $hasil = $this->db->query($query);
+
+        $this->excel_generator->set_query($hasil);
+
+        // HEADER EXCEL
+        $this->excel_generator->set_header(array(
+            'kode_produk_penta',
+            'item_id_vend_penta',
+            'nama_produk_penta',
+            'uom',
+            'kode_produk_mpm',
+            'nama_produk_mpm',
+            'qty',
+            'tabel'
+        ));
+
+        // FIELD DATABASE
+        $this->excel_generator->set_column(array(
+            'kode_produk_penta',
+            'item_id_vend_penta',
+            'nama_produk_penta',
+            'uom',
+            'kode_produk_mpm',
+            'nama_produk_mpm',
+            'qty',
+            'tabel'
+        ));
+
+        // WIDTH KOLOM
+        $this->excel_generator->set_width(array(25, 20, 40, 10, 20, 40, 10, 20));
+
+        // EXPORT
+        $this->excel_generator->exportTo2007('Download Master Produk Penta');
+    }
+
+    public function download_master_outlet()
+{
+    $query = "
+        SELECT 
+            org_id,
+            org_name,
+            location,
+            site_use_id,
+            bill_ship_cust_name,
+            prefix,
+            address1,
+            address2,
+            address3,
+            city,
+            province,
+            primary_salesrep_id,
+            salesman_name,
+            typeid,
+            classid,
+            spot
+        FROM site.penta_outlet
+        where org_id = 485
+        ORDER BY org_name ASC
+    ";
+
+    $hasil = $this->db->query($query);
+
+    $this->excel_generator->set_query($hasil);
+
+    // HEADER EXCEL
+    $this->excel_generator->set_header(array(
+        'org_id',
+        'org_name',
+        'location',
+        'site_use_id',
+        'bill_ship_cust_name',
+        'prefix',
+        'address1',
+        'address2',
+        'address3',
+        'city',
+        'province',
+        'primary_salesrep_id',
+        'salesman_name',
+        'typeid',
+        'classid',
+        'spot'
+    ));
+
+    // FIELD DATABASE
+    $this->excel_generator->set_column(array(
+        'org_id',
+        'org_name',
+        'location',
+        'site_use_id',
+        'bill_ship_cust_name',
+        'prefix',
+        'address1',
+        'address2',
+        'address3',
+        'city',
+        'province',
+        'primary_salesrep_id',
+        'salesman_name',
+        'typeid',
+        'classid',
+        'spot'
+    ));
+
+    // WIDTH COLUMN
+    $this->excel_generator->set_width(array(15, 30, 20, 20, 40, 15, 50, 50, 50, 25, 25, 25, 35, 15, 15, 15));
+
+    // EXPORT
+    $this->excel_generator->exportTo2007('Download Master Outlet Penta');
+}
 
 }
 ?>

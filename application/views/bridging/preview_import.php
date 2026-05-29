@@ -17,20 +17,79 @@
         text-align: center;
     }
     
-    /* Add some animations and styling for invalid rows */
-    .bg-danger-subtle {
-        background-color: rgba(220, 53, 69, 0.15) !important;
+    .group-header {
+        cursor: pointer;
+        font-weight: bold;
+        /* margin-top: 20px; */
+        /* background: #eee; */
+        /* padding: 5px 10px; */
+        user-select: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
-    
-    /* Enhanced hover effects for rows */
-    #tabel tbody tr:hover td.bg-danger-subtle {
-        background-color: rgba(220, 53, 69, 0.25) !important;
+    .icon-play {
+        width: 0; 
+        height: 0; 
+        border-left: 10px solid #6c757d; 
+        border-top: 6px solid transparent;
+        border-bottom: 6px solid transparent;
+        transition: transform 0.2s ease;
     }
+    .icon-play.rotate {
+        transform: rotate(90deg);
+    }
+
+    /* Ratakan kolom angka */
+    .text-right {
+        text-align: right;
+        width: 120px;   /* sesuaikan ukuran supaya semua sama */
+        white-space: nowrap; /* supaya angka tidak turun ke bawah */
+    }
+
+    /* Hilangkan semua border tabel */
+    .table-clean {
+        /* table-layout: fixed; */
+        /* background-color: var(--bs-body-bg); */
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .table-clean thead {
+        background-color: #f5f5f5;
+        /* background-color: var(--bs-body-bg); */
+    }
+
+    /* Sedikit jarak antar baris */
+    .table-clean tbody tr {
+        border-bottom: 8px solid transparent; /* jarak antar baris */
+    }
+
+    .table-clean th, 
+    .table-clean td {
+        padding: 8px 10px;
+        text-align: left;
+        border: none;
+        color: black;
+    }
+
+    .table-clean tbody tr:nth-child(even) {
+        background-color: #f9f9f9; /* warna abu muda untuk striping */
+    }
+
+    .table-clean tbody tr:nth-child(odd) {
+        background-color: #fff; /* putih untuk baris ganjil */
+    }
+    .card{
+        border: 1px solid #e0e0e0;
+    }
+
 </style>
 
 <div class="container-fluid py-4">
     <div class="card shadow-sm">
-        <div class="card-header bg-light">
+        <div class="card-header">
             <h5 class="card-title mb-0"><?= $title ?></h5>
         </div>
         
@@ -50,27 +109,88 @@
                 </div>
             <?php endif; ?>
 
+            <!-- Data Table Section -->
+            <?php
+                foreach ($data_by_supp as $supp_code => $items):
+                    $supplier_name = isset($supplier_names[$supp_code]) ? $supplier_names[$supp_code] : "What Supplier ? $supp_code";
+                    $total = isset($totals[$supp_code]) ? $totals[$supp_code] : ['unit_kecil' => 0, 'unit_karton' => 0];
+                ?>
+                <div class="card mb-3 ">
+                    <div class="group-header" onclick="toggleGroup(this)">
+                        <div class="icon-play"></div>
+                        <?= htmlspecialchars($supplier_name) ?>
+                    </div>
+                    <table class="table-clean" style="display:table;">
+                        <thead>
+                            <tr>
+                                <th>Kode Produk</th>
+                                <th>Nama Produk</th>
+                                <th class="text-right">Unit Kecil</th>
+                                <th class="text-right">Harga</th>
+                                <th class="text-right">Unit Karton</th>
+                                <th>Satuan Besar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($items as $a): ?>
+                            <tr>
+                                <td>
+                                    <?= $a->kodeprod ?>
+                                    <?php if($a->is_valid_kodeprod == 0): ?>
+                                        <i class="fas fa-exclamation-circle ms-1 text-danger"></i>
+                                        <span class="badge bg-danger">Invalid</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?= $a->namaprod ?></td>
+                                <td class="text-right"><?= $a->qty_kecil ?></td>
+                                <td class="text-right"><?= number_format($a->harga, 2)?></td>
+                                <td class="text-right"><?= $a->qty_besar ?></td>
+                                <td><?= $a->satuan_besar ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="2">Total Unit</th>
+                                <th class="text-right"><?= $total['unit_kecil'] ?></th>
+                                <th class="text-right"></th>
+                                <th class="text-right"><?= $total['unit_karton'] ?></th>
+                                <th class="text-right"></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            <?php endforeach; ?>
+
             <!-- Summary Section -->
-            <div class="card mb-4 border-0 bg-light">
+            <div class="card mb-4">
                 <div class="card-body">
                     <h6 class="card-subtitle mb-3 text-muted">Summary Information</h6>
                     
                     <div class="row g-3">
-                        <!-- Count Row -->
                         <div class="col-md-6">
                             <div class="form-group row">
                                 <label for="count_row" class="col-sm-5 col-form-label">Count Row</label>
                                 <div class="col-sm-7">
-                                    <input type="text" class="form-control" id="count_row" name="count_row" 
+                                    <input type="text" class="form-control bg-success-subtle border-success" id="count_row" name="count_row" 
                                         value="<?= $get_summary->row()->count ?>" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="count_row" class="col-sm-5 col-form-label">Total Omzet Stock</label>
+                                <div class="col-sm-7">
+                                    <input type="text" class="form-control bg-success-subtle border-success" id="count_row" name="count_row" 
+                                        value="<?=number_format($total_value->row()->total_value, 2) ?>" readonly>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Baris baru: Invalid Productid dan Valid Kodeproduk Principal -->
                     <div class="row g-3">
-                        <!-- Invalid Productid -->
                         <div class="col-md-6">
                             <div class="form-group row">
                                 <label for="invalid_kodeprod" class="col-sm-5 col-form-label fw-bold text-danger">
@@ -91,62 +211,34 @@
                             </div>
                         </div>
 
-                        <!-- Valid Kodeproduk Principal -->
                         <div class="col-md-6">
                             <div class="form-group row">
                                 <label for="valid_kodeprod" class="col-sm-5 col-form-label">Valid Productid</label>
                                 <div class="col-sm-7">
-                                    <input type="text" class="form-control" id="valid_kodeprod" name="valid_kodeprod" 
+                                    <input type="text" class="form-control bg-success-subtle border-success" id="valid_kodeprod" name="valid_kodeprod" 
                                         value="<?= number_format($get_summary->row()->valid_kodeprod, 0, ',', '.') ?>" readonly>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-
-                </div>
-            </div>
-
-            <!-- Data Table Section -->
-            <div class="card">
-                
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="tabel" class="table table-striped table-hover" style="width:100%">
-                            <thead class="table-light">
-                                <tr>
-                                    <th class="text-center">No</th>       
-                                    <th class="text-center">kodeproduk</th>
-                                    <th class="text-center">namaproduk</th>
-                                    <th class="text-center">satuan</th>
-                                    <th class="text-center">stock_akhir(pcs)</th>
-                                </tr>
-                            </thead>
-                            <tbody>  
-                                <?php 
-                                $no = 1;
-                                foreach ($get_data->result() as $a) : 
-                                ?>  
-                                    <tr>
-                                        <td class="text-center"><?= $no++ ?></td> 
-                                        <td>
-                                            <?= $a->kodeprod ?>
-                                            <?php if($a->is_valid_kodeprod == 0): ?>
-                                                <i class="fas fa-exclamation-circle ms-1 text-danger"></i>
-                                                <span class="badge bg-danger">Invalid</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><?= $a->namaprod ?></td>
-                                        <td><?= $a->satuan ?></td>
-                                        <td><?= $a->stockakhir_pcs ?></td>
-                                    </tr>
-                                <?php endforeach; ?> 
-                            </tbody>
-                        </table>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="count_row" class="col-sm-5 col-form-label">Total Unit PCS</label>
+                                <div class="col-sm-7">
+                                    <input type="text" class="form-control bg-success-subtle border-success" id="count_row" name="count_row" 
+                                        value="<?= number_format($total_value_kecil,2) ?>" readonly>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    
+
                 </div>
             </div>
-            
+
             <div class="mt-4 d-flex gap-2">
                 <button type="button" id="btnBack" class="btn btn-secondary">
                     <i class="fas fa-arrow-left me-1"></i> Back
@@ -203,42 +295,18 @@
         $("#btnBack").show();
         $("#btnLoading").hide();
         $("#btnLanjutkanLoading").hide();
-        
-        // Highlight the invalid kodeprod if greater than 0
-        if (parseInt($("#invalid_kodeprod").val().replace(/\./g, '')) > 0) {
-            $("#invalid_kodeprod").parent().parent().addClass('animate__animated animate__pulse animate__repeat-3');
-        }
-        
-        // Initialize DataTable with improved options and custom rendering
-        var table = $('#tabel').DataTable({
-            language: {
-                search: "Search:",
-                lengthMenu: "Show _MENU_ entries per page",
-                info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                paginate: {
-                    first: "First",
-                    last: "Last",
-                    next: "Next",
-                    previous: "Previous"
-                }
-            },
-            pageLength: 10,
-            ordering: true,
-            order: [0, 'asc'],
-            lengthMenu: [
-                [10, 25, 50, 100, 200, -1],
-                [10, 25, 50, 100, 200, "All"]
-            ],
-            responsive: true,
-            scrollX: true,
-        });
-        
+
         // Back button click handler
         $("#btnBack").on("click", function() {
             $(this).hide();
             $("#btnLoading").show();
             window.history.back();
         });
+        
+        // Highlight the invalid kodeprod if greater than 0
+        if (parseInt($("#invalid_kodeprod").val().replace(/\./g, '')) > 0) {
+            $("#invalid_kodeprod").parent().parent().addClass('animate__animated animate__pulse animate__repeat-3');
+        }
         
         // Form submit handler (for the Lanjutkan button)
         $("form").on("submit", function() {
@@ -279,3 +347,17 @@
         background-color: rgba(220, 53, 69, 0.25) !important;
     }
 </style>
+
+<script>
+function toggleGroup(header) {
+    const icon = header.querySelector('.icon-play');
+    const table = header.nextElementSibling;
+    if(table.style.display === 'none') {
+        table.style.display = 'table';
+        icon.classList.add('rotate');
+    } else {
+        table.style.display = 'none';
+        icon.classList.remove('rotate');
+    }
+}
+</script>

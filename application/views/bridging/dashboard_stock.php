@@ -68,7 +68,7 @@
             <div class="col-md-10">
                 <input type="hidden" name="sitecode" value="<?= $sitecode ?>">
                 <input type="submit" value="Import Stock" class="btn btn-submit-orange" style="height: 44px;">
-                <a href="<?= base_url('management_stock/download_template_stock') ?>" class="btn btn-submit-black">Download Template Stock</a>
+                <a href="<?= base_url('bridging/download_template_stock') ?>" class="btn btn-submit-black">Download Template Stock</a>
             </div>
         </div>
 
@@ -89,7 +89,8 @@
                             <th class="text-center">SiteCode</th>
                             <th class="text-center">SubBranch</th>       
                             <th class="text-center">Bulan</th>       
-                            <th class="text-center">Filename</th>     
+                            <th class="text-center">Filename</th>
+                            <th class="text-center">Total Stok (Unit)</th>     
                             <th class="text-center">CreatedAt</th>       
                         </tr>
                     </thead>
@@ -104,6 +105,7 @@
                                 <td class="text-center"><?= $a->nama_comp ?></td>
                                 <td class="text-center"><?= $a->bulan ?></td> 
                                 <td class="text-center"><?= $a->filename ?></td>
+                                <td class="text-center"><?= $a->total_stock_on_pcs ?></td>
                                 <td class="text-center"><?= $a->created_at ?></td> 
                             </tr>
                         <?php endforeach; ?> 

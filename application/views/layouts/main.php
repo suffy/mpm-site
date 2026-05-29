@@ -96,6 +96,9 @@
   <!-- jQuery -->
   <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 
+  <!-- select2 -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
   <style>
     * {
       font-family: 'Poppins', sans-serif;
@@ -1015,6 +1018,22 @@
         width: auto;
       }
     }
+
+    /* Samakan tinggi Select2 dengan input Bootstrap */
+    .select2-container .select2-selection--single {
+        height: 38px !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 38px !important;
+        padding-left: 12px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 38px !important;
+    }
   </style>
 </head>
 
@@ -1030,6 +1049,8 @@
   <script src="https://cdn.datatables.net/1.13.3/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <script src="<?= base_url() ?>assets/css/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="<?= base_url() ?>assets/js/azia.js"></script>
+  
   
   <!-- Theme Switcher Script -->
   <script>
@@ -1123,5 +1144,6 @@
       document.documentElement.style.opacity = '';
     });
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </body>
 </html>

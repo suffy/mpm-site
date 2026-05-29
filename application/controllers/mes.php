@@ -1551,7 +1551,7 @@ class Mes extends MY_Controller
         $periode_2 = $this->input->post('periode_2');
         // $signature = $this->input->post('signature');
 
-        
+        // echo 'periode_1 :'.$periode_1; die;
         $signature = md5($this->model_outlet_transaksi->timezone());
         
         if($this->session->flashdata('per_1') && $this->session->flashdata('per_2')){
