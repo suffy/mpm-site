@@ -111,19 +111,9 @@
                                         <td><?= $a->mapping_uli ?></td>
                                         <td><?= $a->nama_customer ?></td>
                                         <td><?= $a->alamat ?></td>
-                                        <td><?= $a->type_id ?>
-                                            <?php if($a->is_valid_type_id == 0): ?>
-                                                <i class="fas fa-exclamation-circle ms-1 text-danger"></i>
-                                                <span class="badge bg-danger">Invalid</span>
-                                            <?php endif; ?>
-                                        </td>
+                                        <td><?= $a->type_id ?></td>
                                         <td><?= $a->nama_type ?></td>
-                                        <td><?= $a->class_id ?>
-                                            <?php if($a->is_valid_class_id == 0): ?>
-                                                <i class="fas fa-exclamation-circle ms-1 text-danger"></i>
-                                                <span class="badge bg-danger">Invalid</span>
-                                            <?php endif; ?>
-                                        </td>
+                                        <td><?= $a->class_id ?></td>
                                         <td><?= $a->class ?></td>
                                     </tr>
                                 <?php endforeach; ?> 
@@ -185,9 +175,34 @@
                 [10, 25, 50, 100, "All"]
             ],
             responsive: true,
+            dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex align-items-center"l><"d-flex"f>>t<"d-flex justify-content-between align-items-center mt-3"<"d-flex align-items-center"i><"d-flex"p>>',
             scrollX: true,
-            
+            createdRow: function(row, data, dataIndex) {
+                // If the Status column (index 7) contains "Invalid"
+                if($(data[7]).text().trim() === "Invalid") {
+                    $(row).addClass('border-danger border-start border-5');
+                }
+            }
         });
+        
+        // Add a custom filter for valid/invalid status
+        $.fn.dataTable.ext.search.push(
+            function(settings, data, dataIndex) {
+                var status = $('#status-filter').val();
+                var rowStatus = $(data[7]).text().trim();
+                
+                if (status === 'all') {
+                    return true;
+                } else if (status === 'invalid' && rowStatus === 'Invalid') {
+                    return true;
+                } else if (status === 'valid' && rowStatus === 'Valid') {
+                    return true;
+                }
+                return false;
+            }
+        );
+        
+       
         
         // Back button click handler
         $("#btnBack").on("click", function() {

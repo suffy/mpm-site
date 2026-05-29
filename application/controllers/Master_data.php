@@ -4167,9 +4167,6 @@ class Master_data extends MY_Controller
 
         list($id_log, $signature) = $this->model_master_data->get_penta_sales_detail_palu($data['token'],$tahun_final,$bulan_final, $signature, $id_log, 'palu');
         // die;
-
-        // insert and check peoduct 
-        $cek_product_penta = $this->model_penta->cek_product_penta_from_sales($id_log, $bulan_final, $area_id);
         
         $get_sales = $this->model_penta->get_penta_sales_palu_by_tahun_bulan($tahun_final, $bulan_final, $area_id);
 
@@ -4186,6 +4183,9 @@ class Master_data extends MY_Controller
             $this->insert_sales_palu($id_log, $bulan_final, $tahun_final);
             // $insert_sales = $this->model_penta->insert_penta_sales_palu($tahun_final,$bulan_final, $signature, $id_log);
         }
+
+        // insert and check peoduct 
+        $cek_product_penta = $this->model_penta->cek_product_penta_from_sales($id_log, $bulan_final, $area_id);
 
         $insert_temp_firi = $this->insert_penta_firi($tahun_final, $bulan_final, $id_log);
     }
