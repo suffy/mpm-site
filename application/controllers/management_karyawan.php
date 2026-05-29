@@ -4,185 +4,108 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class management_karyawan extends MY_Controller
 {
-  function __construct()
-  {
-    parent::__construct();
-    $logged_in = $this->session->userdata('logged_in');
-    if(!isset($logged_in) || $logged_in != TRUE)
+    function __construct()
     {
-        redirect('login_sistem/','refresh');
-    }
-    set_time_limit(0);
-      
-    $this->load->library(array('table', 'template', 'Excel_generator', 'form_validation', 'email', 'zip'));
-    $this->load->helper(array('url', 'csv'));
-    $this->load->model(array('model_outlet_transaksi','model_management_karyawan'));
+        parent::__construct();
+        $logged_in = $this->session->userdata('logged_in');
+        if(!isset($logged_in) || $logged_in != TRUE)
+        {
+            redirect('login_sistem/','refresh');
+        }
+        set_time_limit(0);
+        
+        $this->load->library(array('table', 'template', 'Excel_generator', 'form_validation', 'email', 'zip'));
+        $this->load->helper(array('url', 'csv'));
+        $this->load->model(array('model_outlet_transaksi','model_management_karyawan', 'model_relokasi'));
 
-    $this->created_at = $this->model_outlet_transaksi->timezone();
-    $this->created_by = $this->session->userdata('id');
-    $this->username = $this->session->userdata('username');
-  }
-
-  function index()
-  {
-      $this->input_management_karyawan();
-  }
-
-  public function input_management_karyawan() 
-  {
-    $raw_status = $this->input->post('status');
-    $is_search = $this->input->post('search');
-
-    if ($is_search && !empty($raw_status)) {
-        // Simpan JKT88 untuk dikirim balik ke View agar dropdown tidak reset
-        $view_search = $raw_status; 
-        // Potong jadi 88 untuk kebutuhan query
-        $form_search = substr($raw_status, 3);
-    } else {
-        $view_search = null;
-        $form_search = null;
+        $this->created_at = $this->model_outlet_transaksi->timezone();
+        $this->created_by = $this->session->userdata('id');
+        $this->username = $this->session->userdata('username');
     }
 
-    if ($is_search == 2) {
-        $this->export_data_all_karyawan($form_search);
-    }
-    // $submit_search = $this->input->post('submit');
-    // echo "Submit Search: $is_search\n"; // Debugging line, bisa dihapus nanti
-    // die;
-
-    $get_site_code = $this->model_management_karyawan->get_site_code($this->username);
-    if ($get_site_code->num_rows() > 0) {
-        $site_code = $get_site_code->row()->site_code;
-    }else{
-        $site_code = "";
+    function index()
+    {
+        $this->input_management_karyawan();
     }
 
-    if ($site_code != '') {
-        // echo "Site Code: $site_code\n";die;
-        $get_sub_company = $this->model_management_karyawan->get_sub($site_code, $form_search);
-        if($get_sub_company->num_rows() > 0) {
-            $sub_company = $get_sub_company->row()->sub;
+    public function input_management_karyawan() 
+    {
+
+        $raw_status = $this->input->post('status');
+        $is_search = $this->input->post('search');
+
+        if ($is_search && !empty($raw_status)) {
+            // Simpan JKT88 untuk dikirim balik ke View agar dropdown tidak reset
+            $view_search = $raw_status; 
+            // Potong jadi 88 untuk kebutuhan query
+            $form_search = substr($raw_status, 3);
+        } else {
+            $view_search = null;
+            $form_search = null;
+        }
+
+        if ($is_search == 2) {
+            $this->export_data_all_karyawan($form_search);
+        }
+        // $submit_search = $this->input->post('submit');
+        // echo "Submit Search: $is_search\n"; // Debugging line, bisa dihapus nanti
+        // die;
+
+        // $get_site_code = $this->model_management_karyawan->get_site_code($this->username);
+        // if ($get_site_code->num_rows() > 0) {
+        //     $site_code = $get_site_code->row()->site_code;
+        // }else{
+        //     $site_code = "";
+        // }
+
+        $get_user = $this->model_management_karyawan->get_user($this->username);
+        $site_code  = $get_user->row()->company_site_code;
+
+        if ($site_code != '') {
+            // echo "Site Code: $site_code\n";die;
+            $get_sub_company = $this->model_management_karyawan->get_sub($site_code, $form_search);
+            if($get_sub_company->num_rows() > 0) {
+                $sub_company = $get_sub_company->row()->sub;
+                $sub_branch = $get_sub_company->row()->nama_comp;
+            }else{
+                $sub_company = "";
+                $sub_branch = "";
+            }
         }else{
             $sub_company = "";
+            $sub_branch = "";
         }
-    }else{
-        $sub_company = "";
+
+        $get_ho = $this->model_management_karyawan->get_ho($sub_company);
+        if ($get_ho->num_rows() > 0) {
+            $ho = $get_ho->row()->branch_name;
+        } else {
+            $ho = "";
+        }
+
+        $data = [
+            'title'              => 'Personalia',
+            'url'                => 'management_karyawan/save_input_karyawan',
+            'url_search'         => 'management_karyawan/input_management_karyawan',
+            'get_username'       => $get_user,
+            'get_ho'             => $get_ho,
+            'sub_branch'         => $sub_branch,
+            'site_code'          => $site_code,
+            'search'             => $view_search,
+            'count_reimbusement' => $this->model_management_karyawan->count_reimbusement(),
+            'get_data'           => $this->model_management_karyawan->get_all_karyawan($sub_company, $this->username, $form_search),
+            'username'           => $this->username
+        ];
+
+        // $this->view($data, false, 'input_management_karyawan');
+        $this->render('management_karyawan/input_management_karyawan', $data);
     }
-
-    $data = [
-        'title'         => 'Personalia',
-        'url'           => 'management_karyawan/save_input_karyawan',
-        'url_search'    => 'management_karyawan/input_management_karyawan',
-        'get_username'  => $this->model_management_karyawan->get_username($this->username),
-        'search'        => $view_search,
-        'get_data'      => $this->model_management_karyawan->get_all_karyawan($sub_company, $this->username, $form_search),
-        'username'      => $this->username
-    ];
-
-    // $this->view($data, false, 'input_management_karyawan');
-    $this->render('management_karyawan/input_management_karyawan', $data);
-  }
-
-    // public function save_input_karyawan()
-    // {
-    //     // $action = $this->input->post('button_action');
-    //     // echo "Action: $action\n"; // Debugging line, bisa dihapus nanti
-    //     // die;
-    //     // Ambil data POST
-    //     $data = [
-    //         'site_code'                   => $this->input->post('kode_dp', true),
-    //         'username_web'                => $this->input->post('username', true),
-    //         'nomor_kepegawaian'           => $this->input->post('no_kepegawaian', true),
-    //         'nama_lengkap'                => $this->input->post('nama_lengkap', true),
-    //         'jenis_kelamin'               => $this->input->post('jenis_kelamin', true),
-    //         'tempat_lahir'                => $this->input->post('tempat_lahir', true),
-    //         'tanggal_lahir'               => $this->input->post('tanggal_lahir', true),
-    //         'golongan_darah'              => $this->input->post('golongan_darah', true),
-    //         'status_perkawinan'           => $this->input->post('status_perkawinan', true),
-    //         'agama'                       => $this->input->post('agama', true),
-    //         'alamat_ktp'                  => $this->input->post('alamat', true),
-    //         'alamat_domisili'             => $this->input->post('alamat_domisili', true),
-    //         'email'                       => $this->input->post('email', true),
-    //         'email_perusahaan'            => $this->input->post('email_perusahaan', true),
-    //         'phone'                       => $this->input->post('phone', true),
-    //         'nama_kontak_darurat'         => $this->input->post('nama_kontak_darurat', true),
-    //         'nomor_kontak_darurat'        => $this->input->post('nomor_kontak_darurat', true),
-    //         'status_karyawan'             => $this->input->post('status_karyawan', true),
-    //         'tanggal_mulai_kerja'         => $this->input->post('tanggal_mulai_kerja', true),
-    //         'nomor_ktp'                   => $this->input->post('nomor_ktp', true),
-    //         'nomor_kk'                    => $this->input->post('nomor_kk', true),
-    //         'npwp'                        => $this->input->post('npwp', true),
-    //         'nama_bank'                   => $this->input->post('nama_bank', true),
-    //         'nomor_rekening'              => $this->input->post('nomor_rekening', true),
-    //         'nama_rekening'               => $this->input->post('nama_rekening', true),
-    //         'departement'                  => $this->input->post('departement', true),
-    //         'divisi'                      => $this->input->post('divisi', true),
-    //         'job_level'                   => $this->input->post('job_level', true),
-    //         'nama_atasan_langsung'        => $this->input->post('nama_atasan_langsung', true),
-    //         'created_at'                  => date('Y-m-d H:i:s'),
-    //         'created_by'                  => $this->created_by,
-    //         'signature'                   => 'kry_sig-' . rand() . md5($this->model_outlet_transaksi->timezone()) . date('Ymd'),
-    //     ];
-
-    //     // echo "<pre>";
-    //     // print_r($data);
-    //     // echo "</pre>";
-    //     // var_dump($data);die;
-
-    //     // ================= UPLOAD FILE =================
-    //     $files = ['file_ktp','file_kk','file_npwp'];
-
-    //     foreach ($files as $file) {
-    //         $data[$file] = $this->attachment_config($file);
-    //     }
-
-    //     $nomor_ktp = $this->input->post('nomor_ktp');
-    //     $is_exist = $this->model_management_karyawan->check_ktp_exists($nomor_ktp);
-
-    //     if ($is_exist) {
-    //         $this->session->set_flashdata('pesan', 'Gagal! Nomor KTP sudah ada.');
-    //         redirect('management_karyawan/input_management_karyawan');
-    //     } else {
-    //         $id_karyawan = $this->model_management_karyawan->insert_karyawan($data);
-    //     }
-
-    //     // echo "Inserted karyawan ID: $id_karyawan\n"; // Debugging line, bisa dihapus nanti 
-    //     // die;
-
-    //     $action = $this->input->post('button_action');
-    //     $get_data_by_id = $this->model_management_karyawan->get_data_by_id($id_karyawan);
-
-    //     if($action == 2) {
-    //         if ($get_data_by_id->num_rows() > 0) {
-    //             $data = [
-    //                 'flag_status' => 2,
-    //                 'nama_status' => 'Pending HRD'
-    //             ];
-    //         } 
-    //         else {
-    //             $this->session->set_flashdata('pesan', 'Gagal! Data karyawan belum lengkap untuk diajukan ke HRD.');
-    //             redirect('management_karyawan/input_management_karyawan');die;
-    //         }
-    //     }else{
-    //         $data = [
-    //             'flag_status' => 1,
-    //             'nama_status' => 'Draft'
-    //         ];
-    //     }
-
-    //     $this->handlePendidikan($id_karyawan);
-    //     $this->handleKeluarga($id_karyawan);
-    //     $this->handleAsuransi($id_karyawan);
-
-    //     $this->model_management_karyawan->update_karyawan_by_id($id_karyawan, $data);
-
-    //     $this->session->set_flashdata('pesan_success', 'Data karyawan berhasil disimpan!');
-    //     redirect('management_karyawan/input_management_karyawan');
-    // }
 
     public function save_input_karyawan()
     {
         $action = $this->input->post('button_action');
+        $email_gmail = $this->input->post('email', true);
+        $username_karyawan = $this->input->post('username', true);
 
         $get_atasan = $this->model_management_karyawan->get_atasan($this->input->post('username', true));
         if ($get_atasan->num_rows() > 0) {
@@ -197,7 +120,7 @@ class management_karyawan extends MY_Controller
         // ================= AMBIL DATA =================
         $data = [
             'site_code'            => $this->input->post('kode_dp', true),
-            'username_web'         => $this->input->post('username', true),
+            'username_web'         => $username_karyawan,
             'nomor_kepegawaian'    => $this->input->post('no_kepegawaian', true),
             'nama_lengkap'         => $this->input->post('nama_lengkap', true),
             'jenis_kelamin'        => $this->input->post('jenis_kelamin', true),
@@ -208,7 +131,7 @@ class management_karyawan extends MY_Controller
             'agama'                => $this->input->post('agama', true),
             'alamat_ktp'           => $this->input->post('alamat', true),
             'alamat_domisili'      => $this->input->post('alamat_domisili', true),
-            'email'                => $this->input->post('email', true),
+            'email'                => $email_gmail,
             'email_perusahaan'     => $this->input->post('email_perusahaan', true), // boleh kosong
             'phone'                => $this->input->post('phone', true),
             'nama_kontak_darurat'  => $this->input->post('nama_kontak_darurat', true),
@@ -233,18 +156,6 @@ class management_karyawan extends MY_Controller
             'signature'            => 'kry_sig-' . rand() . md5($this->model_outlet_transaksi->timezone()) . date('Ymd'),
         ];
 
-        // ================= VALIDASI LENGKAP SEBELUM INSERT =================
-        if ($action == 2 && !$this->isDataLengkap($data)) {
-            // echo "<pre>";
-            // print_r($data);die;
-            $this->session->set_flashdata(
-                'pesan',
-                'Gagal! Data karyawan belum lengkap untuk diajukan ke HRD.'
-            );
-            redirect('management_karyawan/input_management_karyawan');
-            die;
-        }
-
         // ================= CEK DUPLIKASI KTP =================
         if ($this->model_management_karyawan->check_ktp_exists($data['nomor_ktp'])) {
             $this->session->set_flashdata('pesan', 'Gagal! Nomor KTP sudah ada.');
@@ -257,24 +168,43 @@ class management_karyawan extends MY_Controller
             $data[$file] = $this->attachment_config($file);
         }
 
-        // ================= SET STATUS =================
-        if ($action == 2) {
-            $data['flag_status'] = 2;
-            $data['nama_status'] = 'Pending HRD';
-        } else {
+        if ($action == 2 && !$this->isDataLengkap($data)) {
             $data['flag_status'] = 1;
             $data['nama_status'] = 'Draft';
+            $sessin_flash = $this->session->set_flashdata('pesan_success', 'Data karyawan tidak lengkap, data disimpan dan status diubah menjadi Draft. Silakan lengkapi data sebelum diajukan ke HRD.');
+        }elseif ($action == 2 && $this->isDataLengkap($data)) {
+            $data['flag_status'] = 2;
+            $data['nama_status'] = 'Pending HRD';
+            $sessin_flash = $this->session->set_flashdata('pesan_success', 'Data karyawan lengkap dan berhasil diajukan ke HRD!');
+        }elseif ($action == 1) {
+            $data['flag_status'] = 1;
+            $data['nama_status'] = 'Draft';
+            $sessin_flash = $this->session->set_flashdata('pesan_success', 'Data karyawan berhasil disimpan sebagai Draft!');
         }
 
         // ================= INSERT =================
         $id_karyawan = $this->model_management_karyawan->insert_karyawan($data);
+
+        if (!empty($email_gmail)) {
+            $data_user = [
+                'email'       => $email_gmail
+            ];
+
+            // contoh pakai id_karyawan
+            $this->model_management_karyawan->update_user_by_username_karyawan($username_karyawan, $data_user);
+        }
 
         // ================= DETAIL =================
         $this->handlePendidikan($id_karyawan);
         $this->handleKeluarga($id_karyawan);
         $this->handleAsuransi($id_karyawan);
 
-        $this->session->set_flashdata('pesan_success', 'Data karyawan berhasil disimpan!');
+        if ($id_karyawan) {
+            $sessin_flash;
+        } else {
+            $this->session->set_flashdata('pesan', 'Gagal menyimpan data karyawan!');
+        }
+
         redirect('management_karyawan/input_management_karyawan');
     }
 
@@ -282,7 +212,7 @@ class management_karyawan extends MY_Controller
     {
         // var_dump($data);
         // die;
-        $exclude = ['email_perusahaan', 'tgl_mulai_kontrak', 'tgl_selesai_kontrak', 'tgl_karyawan_tetap'];
+        $exclude = ['email_perusahaan', 'tgl_mulai_kontrak', 'tgl_selesai_kontrak', 'tgl_karyawan_tetap', 'tanggal_selesai_kerja'];
 
         foreach ($data as $key => $value) {
             if (in_array($key, $exclude)) {
@@ -398,6 +328,8 @@ class management_karyawan extends MY_Controller
     {
         $signature   = $this->input->post('signature', true);
         $id_karyawan = $this->input->post('id_karyawan', true);
+        $action = $this->input->post('button_action');
+        $email_gmail = $this->input->post('email', true);
 
         $get_username_by_id_karyawan = $this->model_management_karyawan->get_username_by_id_karyawan($id_karyawan);
         if ($get_username_by_id_karyawan->num_rows() > 0) {
@@ -426,13 +358,17 @@ class management_karyawan extends MY_Controller
             'agama'                      => $this->input->post('agama', true),
             'alamat_ktp'                 => $this->input->post('alamat', true),
             'alamat_domisili'            => $this->input->post('alamat_domisili', true),
-            'email'                      => $this->input->post('email', true),
+            'email'                      => $email_gmail,
             'email_perusahaan'           => $this->input->post('email_perusahaan', true),
             'phone'                      => $this->input->post('phone', true),
             'nama_kontak_darurat'        => $this->input->post('nama_kontak_darurat', true),
             'nomor_kontak_darurat'       => $this->input->post('nomor_kontak_darurat', true),
             'status_karyawan'            => $this->input->post('status_karyawan', true),
-            'tanggal_mulai_kerja'        => $this->input->post('tanggal_mulai_kerja', true),
+            'tanggal_mulai_kerja'        => $this->formatTanggal($this->input->post('tanggal_mulai_kerja', true)),
+            'tgl_mulai_kontrak'          => $this->formatTanggal($this->input->post('tgl_mulai_kontrak', true)),
+            'tgl_selesai_kontrak'        => $this->formatTanggal($this->input->post('tgl_selesai_kontrak', true)),
+            'tgl_karyawan_tetap'         => $this->formatTanggal($this->input->post('tgl_karyawan_tetap', true)),
+            'tanggal_selesai_kerja'      => $this->formatTanggal($this->input->post('tanggal_selesai_kerja', true)),
             'nomor_ktp'                  => $this->input->post('nomor_ktp', true),
             'nomor_kk'                   => $this->input->post('nomor_kk', true),
             'npwp'                       => $this->input->post('npwp', true),
@@ -447,6 +383,17 @@ class management_karyawan extends MY_Controller
             'updated_by'                 => $this->created_by,
         ];
 
+        // if ($action == 2 && !$this->isDataLengkap($data_karyawan)) {
+        //     // echo "<pre>";
+        //     // print_r($data_karyawan);die;
+        //     $this->session->set_flashdata(
+        //         'pesan',
+        //         'Gagal! Data karyawan belum lengkap untuk diajukan ke HRD.'
+        //     );
+        //     redirect('management_karyawan/edit_management_karyawan/' . $signature);
+        //     die;
+        // }
+
         // Upload file jika ada
         $files = ['file_ktp','file_kk','file_npwp'];
         foreach ($files as $file) {
@@ -458,6 +405,15 @@ class management_karyawan extends MY_Controller
             }
         }
 
+        if (!empty($email_gmail)) {
+            $data_user = [
+                'email'       => $email_gmail
+            ];
+
+            // contoh pakai id_karyawan
+            $this->model_management_karyawan->update_user_by_username_karyawan($username_karyawan, $data_user);
+        }
+
         // Update data karyawan
         $update = $this->model_management_karyawan->update_karyawan($signature, $data_karyawan);
 
@@ -465,28 +421,29 @@ class management_karyawan extends MY_Controller
         $this->handleKeluarga($id_karyawan);
         $this->handleAsuransi($id_karyawan);
 
-        $get_data_by_id = $this->model_management_karyawan->get_data_by_id($id_karyawan);
-        if ($get_data_by_id->num_rows() > 0) {
-            $data = [
-                'flag_status' => 2,
-                'nama_status' => 'Pending HRD'
-            ];
-        } else {
-            $data = [
-                'flag_status' => 1,
-                'nama_status' => 'Draft'
-            ];
+        if ($action == 2 && !$this->isDataLengkap($data_karyawan)) {
+            $data['flag_status'] = 1;
+            $data['nama_status'] = 'Draft';
+            $sessin_flash = $this->session->set_flashdata('pesan_success', 'Data karyawan tidak lengkap, data disimpan dan status diubah menjadi Draft. Silakan lengkapi data sebelum diajukan ke HRD.');
+        }elseif ($action == 2 && $this->isDataLengkap($data_karyawan)) {
+            $data['flag_status'] = 2;
+            $data['nama_status'] = 'Pending HRD';
+            $sessin_flash = $this->session->set_flashdata('pesan_success', 'Data karyawan lengkap dan berhasil diajukan ke HRD!');
+        }elseif ($action == 1) {
+            $data['flag_status'] = 1;
+            $data['nama_status'] = 'Draft';
+            $sessin_flash = $this->session->set_flashdata('pesan_success', 'Data karyawan berhasil disimpan sebagai Draft!');
         }
 
         $this->model_management_karyawan->update_karyawan_by_id($id_karyawan, $data);
 
         // Flash message dan redirect
         if ($update) {
-            $this->session->set_flashdata('pesan_success', 'Data karyawan berhasil diupdate!');
+            $sessin_flash;
         } else {
             $this->session->set_flashdata('pesan', 'Gagal update data karyawan!');
         }
-
+        
         redirect('management_karyawan/edit_management_karyawan/' . $signature);
     }
 
@@ -1205,355 +1162,359 @@ class management_karyawan extends MY_Controller
         return date('Y-m-d', strtotime($tanggal));
     }
 
+    public function reimbursement()
+    {
+
+        $id_karyawan = $this->input->post('id_karyawan');
+        $start_date  = $this->input->post('bulan_from');
+        $end_date    = $this->input->post('bulan_to');
+        $is_submit   = $this->input->post('submit');
+
+        if ($this->input->post('search') == 2) {
+            $this->export_reimbursement_excel();
+            return;
+        }
+
+        $get_user = $this->model_management_karyawan->get_user($this->username);
+        $site_code  = $get_user->row()->company_site_code;
+
+        if ($site_code != 'MPMHO') {
+            $this->session->set_flashdata('pesan', 'Anda tidak memiliki izin untuk mengakses fitur ini!');
+            redirect('management_karyawan');
+            return;
+        }
+        
+        if ($start_date == '' && $end_date == '' && $id_karyawan == '') {
+            $id_karyawan = $this->model_management_karyawan->get_id_karyawan_by_username($this->username)->row()->id;
+            $start_date = ''; // Awal bulan ini
+            $end_date   = ''; // Akhir bulan ini
+        } else {
+            $start_date = date('Y-m-01', strtotime($start_date));
+            $end_date   = date('Y-m-t', strtotime($end_date)); // t = last day of month
+        }
+
+        $data = [
+            'title' => 'Form Reimbursement',
+            'url'   => 'management_karyawan/reimbursement_submit',
+            'url_search' => 'reimbursement',
+            'get_username' => $this->model_management_karyawan->get_username($this->username),
+            'list_karyawan' => $this->model_management_karyawan->get_karyawan_aktif($this->username),
+            'list_kategori' => $this->model_management_karyawan->get_kategori_reimbursement(),
+            'reimbursement_list' => $this->model_management_karyawan->get_history_reimbursement_by_karyawan($id_karyawan, $start_date, $end_date)
+        ];
+
+        $this->render('management_karyawan/form_reimbursement', $data);
+    }
 
 
-    // public function import_excel()
+    public function reimbursement_submit()
+    {
+        $id_karyawan  = $this->input->post('id_karyawan');
+        $nominal      = $this->input->post('nominal');
+        $keterangan   = $this->input->post('keterangan');
+        $tanggal_nota = $this->input->post('tanggal_nota');
+        $id_kategori     = $this->input->post('id_kategori');
+
+        $jumlah = preg_replace('/[^0-9]/', '', $nominal);
+
+        if ($this->username != 'ratri' && $this->username != 'milla') 
+        {
+            $this->session->set_flashdata('error', 'Anda tidak memiliki izin untuk input data reimbursement!');
+            redirect('management_karyawan/reimbursement');
+            return;
+        }
+
+        if (empty($id_karyawan) || empty($jumlah) || empty($keterangan)) {
+            $this->session->set_flashdata('error', 'Semua field wajib diisi!');
+            redirect('management_karyawan/reimbursement');
+            return;
+        }
+
+        // Upload
+        $this->attachment_config('reimbursement');
+
+        $file_name = null;
+        if (!empty($_FILES['file_nota']['name'])) {
+            if (!$this->upload->do_upload('file_nota')) {
+                $this->session->set_flashdata('error', $this->upload->display_errors('', ''));
+                redirect('management_karyawan/reimbursement');
+                return;
+            }
+            $upload_data = $this->upload->data();
+            $file_name = $upload_data['file_name'];
+        }
+
+        // Insert header
+        $data = [
+            'id_karyawan' => $id_karyawan,
+            'no_pengajuan'      => $this->model_management_karyawan->generate($this->created_at),
+            'tanggal_pengajuan' => $tanggal_nota,
+            'total' => $jumlah,
+            'status' => 1,
+            'created_at' => date('Y-m-d H:i:s'),
+            'created_by' => $this->created_by
+        ];
+
+        $insert = $this->model_management_karyawan->insert_reimbursement($data);
+
+        // Insert detail
+        if ($insert) {
+            $this->model_management_karyawan->insert_reimbursement_detail([
+                'id_reimbursement' => $insert,
+                'id_kategori' => $id_kategori,
+                'tanggal_nota' => $tanggal_nota,
+                'nominal' => $jumlah,
+                'keterangan' => $keterangan,
+                'file_nota' => $file_name,
+                'created_at' => date('Y-m-d H:i:s'),
+                'created_by' => $this->created_by
+            ]);
+        }
+
+        $get = $this->model_management_karyawan->get_reimbursement_by_id($insert)->row();
+
+        $data_reimbursement = [
+            'no_pengajuan' => $get->no_pengajuan,
+            'nama_lengkap' => $get->nama_lengkap,
+            'nama_kategori' => $get->nama_kategori,
+            'tanggal_pengajuan' => $get->tanggal_pengajuan,
+            'nominal' => $get->total, 
+            'keterangan' => $get->keterangan,
+            'get' => $get
+        ];
+
+        // var_dump($data_reimbursement);die;
+
+        // send email
+        $email_data = [
+        'from'      => 'milla@muliaputramandiri.com',
+        'from_name' => 'PT. Mulia Putra Mandiri',
+        'to'        => 'millarosianad2@gmail.com',
+        'subject'   => 'Pengajuan Reimbursement - ' . $get->no_pengajuan . ' - ' . $get->nama_kategori,
+        'message'   => $this->load->view("management_karyawan/email_reimbursement",$data_reimbursement,TRUE)
+        ];
+
+        // SEND EMAIL
+        $send = $this->model_relokasi->send_email($email_data, 'biop');
+
+        if ($send) {
+            $this->session->set_flashdata('pesan_success', 'Reimbursement berhasil disimpan! dan Email Berhasil Dikirim');
+            redirect('management_karyawan/reimbursement');
+        } else {
+            $this->session->set_flashdata('pesan', "Data berhasil disimpan, Email gagal terkirim: ".$this->email->print_debugger());
+            redirect('management_karyawan/reimbursement');
+        }
+
+        // $this->session->set_flashdata('success', 'Reimbursement berhasil disimpan!');
+        
+    }
+
+    public function search_reimbursement()
+    {
+        // echo 'masuk search';die;
+        $id_karyawan = $this->input->post('id_karyawan');
+        $start_date  = $this->input->post('bulan_from');
+        $end_date    = $this->input->post('bulan_to');
+
+        $data = $this->model_management_karyawan->get_history_reimbursement_by_karyawan($id_karyawan, $start_date, $end_date);
+
+
+        // echo json_encode($data);
+    }
+
+    public function approve_reimbursement($id)
+    {
+
+        if ($this->username != 'nanita' && $this->username != 'milla') {
+            $this->session->set_flashdata('error', 'Anda tidak memiliki izin untuk melakukan aksi ini!');
+            redirect('management_karyawan/reimbursement');
+            return;
+        }
+
+        echo 'ID yang diterima: ' . $id; // Debug: pastikan ID diterima dengan benar
+        // die;
+
+        $this->db->where('id', $id);
+        $this->db->update('site.reimbursement', [
+            'status' => 2 // Released
+        ]);
+
+        redirect('management_karyawan/reimbursement');
+        // echo json_encode(['success' => true]);
+    }
+
+    public function approve_all()
+    {
+        if ($this->username != 'nanita' && $this->username != 'millax') {
+            $this->session->set_flashdata('error', 'Anda tidak memiliki izin untuk melakukan aksi ini!');
+            redirect('management_karyawan/reimbursement');
+            return;
+        }
+
+        $this->db->where('status', 1); // pending
+        $this->db->update('site.reimbursement', [
+            'status' => 2 // released
+        ]);
+
+        $this->session->set_flashdata('success', 'Semua data berhasil di-release');
+        redirect('management_karyawan/reimbursement');
+    }
+
+    public function count_pending()
+    {
+        // 🔥 bersihin semua output sebelumnya
+        ob_clean();
+
+        $this->output->set_content_type('application/json');
+
+        $this->db->where('status', 1);
+        $count = $this->db->count_all_results('site.reimbursement');
+
+        echo json_encode(['total' => (int)$count]);
+        exit;
+    }
+
+    // public function reimbursement_karyawan($signature) 
     // {
-    //     $this->attachment_config('karyawan');
-
-    //     if (!$this->upload->do_upload('file')) {
-    //         $this->session->set_flashdata(
-    //             'pesan',
-    //             'Gagal upload file: ' . $this->upload->display_errors()
-    //         );
-    //         redirect('management_karyawan');
-    //     }
-
-    //     $upload_data = $this->upload->data();
-    //     $filename = $upload_data['full_path'];
-
-    //     $this->load->library('excel');
-    //     $object = PHPExcel_IOFactory::load($filename);
-
-    //     // Validasi sheet
-    //     if ($object->getSheetCount() > 1) {
-    //         $this->session->set_flashdata('pesan', 'File harus 1 sheet saja');
-    //         redirect('management_karyawan');
-    //     }
-
-    //     $worksheet = $object->getActiveSheet();
-    //     $highestRow = $worksheet->getHighestRow();
-    //     $highestColumn = $worksheet->getHighestColumn();
-
-    //     if ($highestColumn != 'AD') {
-    //         $this->session->set_flashdata('pesan', 'Jumlah kolom tidak sesuai template');
-    //         redirect('management_karyawan');
-    //     }
-
-    //     if ($highestRow <= 1) {
-    //         $this->session->set_flashdata('pesan', 'Data Excel kosong');
-    //         redirect('management_karyawan');
-    //     }
-
-    //     for ($row = 2; $row <= $highestRow; $row++) {
-
-    //         $data = [
-    //             'nama_perusahaan'        => trim($worksheet->getCellByColumnAndRow(0, $row)->getValue()),
-    //             'site_code'              => trim($worksheet->getCellByColumnAndRow(1, $row)->getValue()),
-    //             'username'               => trim($worksheet->getCellByColumnAndRow(2, $row)->getValue()),
-    //             'no_kepegawaian'         => trim($worksheet->getCellByColumnAndRow(3, $row)->getValue()),
-    //             'nama_lengkap'           => trim($worksheet->getCellByColumnAndRow(4, $row)->getValue()),
-    //             'jenis_kelamin'          => trim($worksheet->getCellByColumnAndRow(5, $row)->getValue()),
-    //             'tempat_lahir'           => trim($worksheet->getCellByColumnAndRow(6, $row)->getValue()),
-    //             'tanggal_lahir'          => trim($worksheet->getCellByColumnAndRow(7, $row)->getValue()),
-    //             'golongan_darah'         => trim($worksheet->getCellByColumnAndRow(8, $row)->getValue()),
-    //             'status_perkawinan'      => trim($worksheet->getCellByColumnAndRow(9, $row)->getValue()),
-    //             'agama'                  => trim($worksheet->getCellByColumnAndRow(10, $row)->getValue()),
-    //             'alamat'                 => trim($worksheet->getCellByColumnAndRow(11, $row)->getValue()),
-    //             'alamat_domisili'        => trim($worksheet->getCellByColumnAndRow(12, $row)->getValue()),
-    //             'email'                  => trim($worksheet->getCellByColumnAndRow(13, $row)->getValue()),
-    //             'email_perusahaan'       => trim($worksheet->getCellByColumnAndRow(14, $row)->getValue()),
-    //             'phone'                  => trim($worksheet->getCellByColumnAndRow(15, $row)->getValue()),
-    //             'nama_kontak_darurat'    => trim($worksheet->getCellByColumnAndRow(16, $row)->getValue()),
-    //             'nomor_kontak_darurat'   => trim($worksheet->getCellByColumnAndRow(17, $row)->getValue()),
-    //             'status_karyawan'        => trim($worksheet->getCellByColumnAndRow(18, $row)->getValue()),
-    //             'tanggal_mulai_kerja'    => trim($worksheet->getCellByColumnAndRow(19, $row)->getValue()),
-    //             'nomor_ktp'              => trim($worksheet->getCellByColumnAndRow(20, $row)->getValue()),
-    //             'nomor_kk'               => trim($worksheet->getCellByColumnAndRow(21, $row)->getValue()),
-    //             'npwp'                   => trim($worksheet->getCellByColumnAndRow(22, $row)->getValue()),
-    //             'nama_bank'              => trim($worksheet->getCellByColumnAndRow(23, $row)->getValue()),
-    //             'nomor_rekening'         => trim($worksheet->getCellByColumnAndRow(24, $row)->getValue()),
-    //             'nama_rekening'          => trim($worksheet->getCellByColumnAndRow(25, $row)->getValue()),
-    //             'departement'            => trim($worksheet->getCellByColumnAndRow(26, $row)->getValue()),
-    //             'divisi'                 => trim($worksheet->getCellByColumnAndRow(27, $row)->getValue()),
-    //             'job_level'              => trim($worksheet->getCellByColumnAndRow(28, $row)->getValue()),
-    //             'nama_atasan_langsung'   => trim($worksheet->getCellByColumnAndRow(29, $row)->getValue()),
-    //             'created_at'             => date('Y-m-d H:i:s'),
-    //             'created_by'             => $this->session->userdata('id')
-    //         ];
-
-    //         $this->db->insert('karyawan', $data);
-    //     }
-
-    //     $this->session->set_flashdata('pesan_success', 'Import karyawan berhasil');
-    //     redirect('management_karyawan');
-    // }
-
-
-    // public function export_excel($signature)
-    // {
-    //     // ===== ambil data =====
     //     $karyawan = $this->model_management_karyawan->get_karyawan_by_signature($signature);
-    //     $pendidikan = $this->model_management_karyawan->get_pendidikan_by_karyawan_id($karyawan->id);
-    //     $keluarga   = $this->model_management_karyawan->get_keluarga_by_karyawan_id($karyawan->id);
-    //     $asuransi   = $this->model_management_karyawan->get_asuransi_by_karyawan_id($karyawan->id);
-
-    //     $spreadsheet = new Spreadsheet();
-    //     $sheet = $spreadsheet->getActiveSheet();
-    //     $sheet->setTitle('Data Karyawan');
-
-    //     $row = 1;
-
-    //     // ======================
-    //     // HEADER
-    //     // ======================
-    //     $sheet->setCellValue("A$row", "DATA KARYAWAN");
-    //     $sheet->mergeCells("A$row:D$row");
-    //     $sheet->getStyle("A$row")->getFont()->setBold(true)->setSize(14);
-    //     $row += 2;
-
-    //     // ======================
-    //     // DATA PRIBADI
-    //     // ======================
-    //     $sheet->setCellValue("A$row", "Nama Lengkap");
-    //     $sheet->setCellValue("B$row", $karyawan->nama_lengkap);
-
-    //     $sheet->setCellValue("C$row", "NIK");
-    //     $sheet->setCellValue("D$row", $karyawan->nomor_ktp);
-    //     $row++;
-
-    //     $sheet->setCellValue("A$row", "Email");
-    //     $sheet->setCellValue("B$row", $karyawan->email);
-
-    //     $sheet->setCellValue("C$row", "No HP");
-    //     $sheet->setCellValue("D$row", $karyawan->phone);
-    //     $row += 2;
-
-    //     // ======================
-    //     // PENDIDIKAN
-    //     // ======================
-    //     $sheet->setCellValue("A$row", "PENDIDIKAN");
-    //     $sheet->mergeCells("A$row:D$row");
-    //     $sheet->getStyle("A$row")->getFont()->setBold(true);
-    //     $row++;
-
-    //     $sheet->fromArray(
-    //         ['Jenjang', 'Institusi', 'Jurusan'],
-    //         NULL,
-    //         "A$row"
-    //     );
-    //     $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
-    //     $row++;
-
-    //     foreach ($pendidikan as $p) {
-    //         $sheet->setCellValue("A$row", $p->pendidikan_terakhir);
-    //         $sheet->setCellValue("B$row", $p->institusi_pendidikan);
-    //         $sheet->setCellValue("C$row", $p->jurusan);
-    //         $row++;
-    //     }
-
-    //     $row++;
-
-    //     // ======================
-    //     // KELUARGA
-    //     // ======================
-    //     $sheet->setCellValue("A$row", "DATA KELUARGA");
-    //     $sheet->mergeCells("A$row:D$row");
-    //     $sheet->getStyle("A$row")->getFont()->setBold(true);
-    //     $row++;
-
-    //     $sheet->fromArray(
-    //         ['Nama', 'Hubungan', 'Pendidikan', 'Pekerjaan'],
-    //         NULL,
-    //         "A$row"
-    //     );
-    //     $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
-    //     $row++;
-
-    //     foreach ($keluarga as $k) {
-    //         $sheet->setCellValue("A$row", $k->nama);
-    //         $sheet->setCellValue("B$row", $k->hubungan);
-    //         $sheet->setCellValue("C$row", $k->pendidikan);
-    //         $sheet->setCellValue("D$row", $k->pekerjaan);
-    //         $row++;
-    //     }
-
-    //     $row++;
-
-    //     // ======================
-    //     // ASURANSI
-    //     // ======================
-    //     $sheet->setCellValue("A$row", "ASURANSI");
-    //     $sheet->mergeCells("A$row:D$row");
-    //     $sheet->getStyle("A$row")->getFont()->setBold(true);
-    //     $row++;
-
-    //     $sheet->fromArray(
-    //         ['No Kartu', 'No Polis', 'Plan', 'No Peserta'],
-    //         NULL,
-    //         "A$row"
-    //     );
-    //     $sheet->getStyle("A$row:D$row")->getFont()->setBold(true);
-    //     $row++;
-
-    //     foreach ($asuransi as $a) {
-    //         $sheet->setCellValue("A$row", $a->nomor_kartu_asuransi);
-    //         $sheet->setCellValue("B$row", $a->nomor_polis_asuransi);
-    //         $sheet->setCellValue("C$row", $a->plan_asuransi);
-    //         $sheet->setCellValue("D$row", $a->nomor_peserta_asuransi);
-    //         $row++;
-    //     }
-
-    //     // ======================
-    //     // AUTO SIZE
-    //     // ======================
-    //     foreach (range('A', 'D') as $col) {
-    //         $sheet->getColumnDimension($col)->setAutoSize(true);
-    //     }
-
-    //     // ======================
-    //     // OUTPUT
-    //     // ======================
-    //     $filename = 'Data_Karyawan_' . $karyawan->nama_lengkap . '.xlsx';
-
-    //     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    //     header("Content-Disposition: attachment; filename=\"$filename\"");
-    //     header('Cache-Control: max-age=0');
-
-    //     $writer = new Xlsx($spreadsheet);
-    //     $writer->save('php://output');
-    //     exit;
-    // }
-
-
-    // public function update_karyawan()
-    // {
-    //     // Load helper & library
-    //     $this->load->helper(['url','form']);
-    //     $this->load->library('upload');
         
-    //     $signature = $this->input->post('signature', true);
-    //     $id_karyawan = $this->input->post('id_karyawan', true);
-        
-    //     // Ambil data POST
+    //     // Cek apakah data ditemukan
+    //     if (!$karyawan) {
+    //         $this->session->set_flashdata('pesan', 'Data karyawan tidak ditemukan!');
+    //         redirect('management_karyawan/input_management_karyawan');
+    //         return;
+    //     }
+
+    //     $id_karyawan = $karyawan->id;
+
+    //     // Cek apakah user yang sedang login adalah pemilik data
+    //     if ($this->username == 'ratri' || $this->username == 'millax') {
+    //         // Admin boleh mengedit data siapa saja
+    //     }
+    //     elseif ($karyawan->username_web != $this->username) {
+    //         $this->session->set_flashdata('pesan', 'Anda tidak memiliki izin untuk export data ini!');
+    //         redirect('management_karyawan/input_management_karyawan');
+    //         return;
+    //     }
+
+    //     $karyawan = null;
+    //     $history  = [];
+
+    //     if ($id_karyawan) {
+    //         $karyawan = $this->model_management_karyawan->get_karyawan_by_id($id_karyawan);
+    //         $history  = $this->model_management_karyawan->get_history_reimbursement_by_karyawan($id_karyawan, '', '');
+    //     }
+
     //     $data = [
-    //         'site_code'                   => $this->input->post('nama_perusahaan', true),
-    //         'nama_lengkap'                => $this->input->post('nama_lengkap', true),
-    //         'jenis_kelamin'               => $this->input->post('jenis_kelamin', true),
-    //         'tempat_lahir'                => $this->input->post('tempat_lahir', true),
-    //         'tanggal_lahir'               => $this->input->post('tanggal_lahir', true),
-    //         'golongan_darah'              => $this->input->post('golongan_darah', true),
-    //         'status_perkawinan'           => $this->input->post('status_perkawinan', true),
-    //         'agama'                       => $this->input->post('agama', true),
-    //         'alamat_ktp'                  => $this->input->post('alamat', true),
-    //         'alamat_domisili'             => $this->input->post('alamat_domisili', true),
-    //         'email'                       => $this->input->post('email', true),
-    //         'phone'                       => $this->input->post('phone', true),
-    //         'nama_kontak_darurat'         => $this->input->post('nama_kontak_darurat', true),
-    //         'nomor_kontak_darurat'        => $this->input->post('nomor_kontak_darurat', true),
-    //         'status_karyawan'             => $this->input->post('status_karyawan', true),
-    //         'tanggal_mulai_kerja'         => $this->input->post('tanggal_mulai_kerja', true),
-    //         'nomor_ktp'                   => $this->input->post('nomor_ktp', true),
-    //         'nomor_kk'                    => $this->input->post('nomor_kk', true),
-    //         'npwp'                        => $this->input->post('npwp', true),
-    //         'nomor_bpjs_ketenagakerjaan'  => $this->input->post('nomor_bpjs_ketenagakerjaan', true),
-    //         'nomor_bpjs_kesehatan'        => $this->input->post('nomor_bpjs_kesehatan', true),
-    //         'nama_bank'                   => $this->input->post('nama_bank', true),
-    //         'nomor_rekening'              => $this->input->post('nomor_rekening', true),
-    //         'nama_rekening'               => $this->input->post('nama_rekening', true),
-    //         'departement'                 => $this->input->post('departement', true),
-    //         'divisi'                      => $this->input->post('divisi', true),
-    //         'job_level'                   => $this->input->post('job_level', true),
-    //         'nama_atasan_langsung'        => $this->input->post('nama_atasan_langsung', true),
-    //         'updated_at'                  => date('Y-m-d H:i:s'),
-    //         'updated_by'                  => $this->created_by,
+    //         'title'          => 'Form Reimbursement',
+    //         'url'            => 'management_karyawan/reimbursement_submit',
+    //         'id_karyawan'    => $id_karyawan,
+    //         'karyawan'       => $karyawan,
+    //         'get_username'  => $this->model_management_karyawan->get_username($this->username),
+    //         'list_karyawan'  => $this->model_management_karyawan->get_karyawan_aktif(),
+    //         'history'        => $history,
+    //         'signature'      => $signature
     //     ];
 
-    //     // Upload file jika ada
-    //     $files = ['file_ktp','file_kk','file_npwp','file_bpjs_ketenagakerjaan','file_bpjs_kesehatan'];
-        
-    //     foreach ($files as $file) {
-    //         if (!empty($_FILES[$file]['name'])) {
-    //             $upload_result = $this->attachment_config($file);
-    //             if ($upload_result) {
-    //                 $data[$file] = $upload_result;
-    //             }
-    //         }
-    //     }
-
-    //     // Update ke database
-    //     $this->db->where('signature', $signature);
-    //     $update = $this->db->update('mpm.karyawan', $data);
-
-
-    //     // Update data pendidikan
-    //     $this->db->where('id_karyawan', $id_karyawan);
-    //     $this->db->delete('mpm.m_pendidikan');
-
-    //     $pendidikan = $this->input->post('pendidikan');
-
-    //     if (!empty($pendidikan)) {
-    //         foreach ($pendidikan as $row) {
-    //             if (!empty($row['jenjang']) || !empty($row['institusi'])) {
-    //                 $this->db->insert('mpm.m_pendidikan', [
-    //                     'id_karyawan'             => $id_karyawan,
-    //                     'pendidikan_terakhir'     => $row['jenjang'],
-    //                     'institusi_pendidikan'    => $row['institusi'],
-    //                     'jurusan'                 => $row['jurusan'],
-    //                     'created_at'              => $this->created_at,
-    //                     'created_by'              => $this->created_by,
-    //                 ]);
-    //             }
-    //         }
-    //     }
-
-    //     // Update data keluarga
-    //     $keluarga = $this->input->post('keluarga');
-    //     if (!empty($keluarga)) {
-    //         foreach ($keluarga as $row) {
-    //             if (empty($row['nama'])) continue;
-    //             $data = [
-    //                 'id_karyawan' => $id_karyawan,
-    //                 'nama'        => $row['nama'],
-    //                 'hubungan'    => $row['hubungan'],
-    //                 'pendidikan'  => $row['pendidikan'],
-    //                 'pekerjaan'   => $row['pekerjaan'],
-    //                 'created_at'  => $this->created_at,
-    //                 'created_by'  => $this->created_by
-    //             ];
-
-    //             if (!empty($row['id'])) {
-    //                 $this->db->where('id', $row['id'])->update('mpm.m_keluarga', $data);
-    //             } else {
-    //                 $this->db->insert('mpm.m_keluarga', $data);
-    //             }
-    //         }
-    //     }
-
-        
-    //     if ($update) {
-    //         $this->session->set_flashdata('pesan_success', 'Data karyawan berhasil diupdate!');
-    //     } else {
-    //         $this->session->set_flashdata('pesan', 'Gagal update data karyawan!');
-    //     }
-        
-    //     redirect('management_karyawan/input_management_karyawan');
+    //     $this->render('management_karyawan/form_reimbursement', $data);
     // }
 
-    // public function save_input_karyawan() 
+    // public function reimbursement_submit_karyawan()
     // {
-    //     // Proses penyimpanan data karyawan
-    //     // Implementasikan logika penyimpanan data sesuai kebutuhan Anda
-    //     // Contoh:
-    //     // $data = [
-    //     //     'nama' => $this->input->post('nama'),
-    //     //     'email' => $this->input->post('email'),
-    //     //     // Tambahkan field lainnya sesuai kebutuhan
-    //     // ];
-    //     // $this->model_management_karyawan->insert_karyawan($data);
-        
-    //     // Setelah penyimpanan, redirect atau tampilkan pesan sukses
-    //     redirect('management_karyawan/input_management_karyawan');
+    //     // echo 'disini';
+    //     // die;
+    //     $id_karyawan = $this->input->post('id_karyawan');
+    //     $nominal      = $this->input->post('nominal');
+    //     $keterangan   = $this->input->post('keterangan');
+    //     $signature    = $this->input->post('signature');
+    //     $tanggal_nota   = $this->input->post('tanggal_nota');
+
+    //     $jumlah = preg_replace('/[^0-9]/', '', $nominal);
+
+    //     // echo 'id_karyawan: ' . $id_karyawan . '<br>';
+    //     // echo 'jumlah: ' . $jumlah . '<br>';
+    //     // echo 'keterangan: ' . $keterangan . '<br>';
+    //     // echo 'signature: ' . $signature . '<br>';
+    //     // die;
+
+    //     if (empty($id_karyawan) || empty($jumlah) || empty($keterangan)) {
+    //         $this->session->set_flashdata('pesan', 'Semua field wajib diisi!');
+    //         redirect('management_karyawan/reimbursement/' . $signature);
+    //         return;
+    //     }
+
+    //     // Upload file
+    //     $this->attachment_config('reimbursement');
+
+    //     if (!$this->upload->do_upload('file_nota')) {
+    //         $this->session->set_flashdata('error', 'Gagal upload file: ' . $this->upload->display_errors('', ''));
+    //         redirect('management_karyawan/reimbursement/' . $signature);
+    //     }
+
+    //     $upload_data   = $this->upload->data();
+    //     // $file_nota_path = 'uploads/reimbursement/' . $upload_data['file_name'];
+
+
+    //     $data = [
+    //         'id_karyawan'       => $id_karyawan,
+    //         'no_pengajuan'      => $this->model_management_karyawan->generate($this->created_at),
+    //         'tanggal_pengajuan' => $tanggal_nota,
+    //         'total'             => $jumlah,
+    //         'status'            => 1,
+    //         'created_at'        => $this->created_at,
+    //         'created_by'        => $this->created_by
+    //     ];
+
+    //     var_dump($data);die;
+
+    //     $insert = $this->model_management_karyawan->insert_reimbursement($data);
+
+    //     $data_detail = [
+    //         'id_reimbursement' => $insert,
+    //         'tanggal_nota' => $tanggal_nota,
+    //         'nominal' => $jumlah,
+    //         'file_nota' => $upload_data['file_name'],
+    //         'created_at' => $this->created_at,
+    //         'created_by' => $this->created_by
+    //     ];
+
+    //     $insert_detail = $this->model_management_karyawan->insert_reimbursement_detail($data_detail);
+
+    //     if ($insert) {
+    //         $this->session->set_flashdata('pesan_success', 'Reimbursement berhasil disimpan!');
+    //     } else {
+    //         $this->session->set_flashdata('pesan', 'Gagal mengajukan reimbursement!');
+    //     }
+
+    //     redirect('management_karyawan/reimbursement/' . $this->input->post('signature'));
     // }
+
+    public function export_reimbursement_excel()
+    {
+        $start = $this->input->post('bulan_from');
+        $end   = $this->input->post('bulan_to');
+
+        if ($start == '' || $end == '') {
+            $tahun = date('Y');
+            $start = $tahun . '-01';
+            $end   = $tahun . '-12';
+        }
+
+        $start_date = date('Y-m-01', strtotime($start));
+        $end_date   = date('Y-m-t', strtotime($end));
+
+        $data['rows'] = $this->model_management_karyawan
+            ->get_export_reimbursement($start_date, $end_date);
+
+        header("Content-Type: application/vnd.ms-excel");
+        header("Content-Disposition: attachment; filename=report_reimbursement.xls");
+        header("Pragma: no-cache");
+        header("Expires: 0");
+
+        $this->load->view(
+            'management_karyawan/export_reimbursement_excel',
+            $data
+        );
+    }
 
 }

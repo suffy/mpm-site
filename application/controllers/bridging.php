@@ -4,8 +4,9 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Bridging extends MY_Controller
 {    
-    function bridging()
-    {       
+    function __construct()
+    {
+        parent::__construct();
         $logged_in= $this->session->userdata('logged_in');
         if(!isset($logged_in) || $logged_in != TRUE)
         {
@@ -20,33 +21,49 @@ class Bridging extends MY_Controller
         $this->username = $this->session->userdata('username');
         $this->tahun_folder = date('Y');
     }
+    // function bridging()
+    // {       
+    //     $logged_in= $this->session->userdata('logged_in');
+    //     if(!isset($logged_in) || $logged_in != TRUE)
+    //     {
+    //         redirect('login_sistem/','refresh');
+    //     }
+    //     set_time_limit(0);
+        
+    //     $this->load->library(array('table', 'template', 'Excel_generator', 'form_validation', 'email', 'zip'));
+    //     $this->load->helper(array('url', 'csv'));
+    //     $this->load->model(array('model_outlet_transaksi','model_bridging'));
+    //     $this->userid = $this->session->userdata('id');
+    //     $this->username = $this->session->userdata('username');
+    //     $this->tahun_folder = date('Y');
+    // }
 
     function index()
     {
         $this->dashboard();
     }
 
-    function navbar($data)
-    {
-        // echo "level : ".$this->session->userdata('level');
-        if ($this->session->userdata('level') === '4') { // jika dp
-            $this->load->view('management_office/top_header_dp', $data);
-        }elseif ($this->session->userdata('level') === '3') { // jika principal
-            $this->load->view('management_office/top_header_principal', $data);
-        }elseif ($this->session->userdata('level') === "3a") { // jika principal tanpa sales 
-            $this->load->view('management_office/top_header_principal_nosales', $data);
-        }elseif ($this->session->userdata('level') === "3b") { // jika principal hanya raw data, claim, rpd 
-            $this->load->view('management_office/top_header_principal_rawdata', $data);
-        }elseif ($this->session->userdata('level') === "3c") { // jika principal raw_data dan retur dan rpd = RSPH = ghozali yoseph sudarsono
-            $this->load->view('management_office/top_header_principal_rawdata_retur', $data);
-        }elseif ($this->session->userdata('level') === "3d") { // jika principal rpd
-            $this->load->view('management_office/top_header_principal_rpd', $data);
-        }elseif ($this->session->userdata('level') === '5') { // jika dp mpi
-            $this->load->view('management_office/top_header_dp_mpi', $data);
-        }else{
-            $this->load->view('management_office/top_header', $data);
-        }
-    }
+    // function navbar($data)
+    // {
+    //     // echo "level : ".$this->session->userdata('level');
+    //     if ($this->session->userdata('level') === '4') { // jika dp
+    //         $this->load->view('management_office/top_header_dp', $data);
+    //     }elseif ($this->session->userdata('level') === '3') { // jika principal
+    //         $this->load->view('management_office/top_header_principal', $data);
+    //     }elseif ($this->session->userdata('level') === "3a") { // jika principal tanpa sales 
+    //         $this->load->view('management_office/top_header_principal_nosales', $data);
+    //     }elseif ($this->session->userdata('level') === "3b") { // jika principal hanya raw data, claim, rpd 
+    //         $this->load->view('management_office/top_header_principal_rawdata', $data);
+    //     }elseif ($this->session->userdata('level') === "3c") { // jika principal raw_data dan retur dan rpd = RSPH = ghozali yoseph sudarsono
+    //         $this->load->view('management_office/top_header_principal_rawdata_retur', $data);
+    //     }elseif ($this->session->userdata('level') === "3d") { // jika principal rpd
+    //         $this->load->view('management_office/top_header_principal_rpd', $data);
+    //     }elseif ($this->session->userdata('level') === '5') { // jika dp mpi
+    //         $this->load->view('management_office/top_header_dp_mpi', $data);
+    //     }else{
+    //         $this->load->view('management_office/top_header', $data);
+    //     }
+    // }
 
     public function dashboard()
     {
@@ -55,7 +72,8 @@ class Bridging extends MY_Controller
             'url'   => 'bridging/dashboard',
             'site_code' => $this->model_bridging->get_bridging_list_subbranch(),
         ];
-        $this->view($data, false, "dashboard");
+        // $this->view($data, false, "dashboard");
+        $this->render('bridging/dashboard', $data);
     }
 
     public function routing($signature)
@@ -128,10 +146,37 @@ class Bridging extends MY_Controller
         {
             redirect('bridging/berau','refresh');
         }
+
+        if($site_code->site_code == 'AJP2V')
+        {
+            redirect('bridging/palu','refresh');
+        }
+
+        if($site_code->site_code == 'MMRE1')
+        {
+            redirect('bridging/mmm_makassar','refresh');
+        }
+        if($site_code->site_code == 'MMBE2')
+        {
+            redirect('bridging/mmm_bone','refresh');
+        }
+         if($site_code->site_code == 'PAME3')
+        {
+            redirect('bridging/mmm_pare','refresh');
+        }
+        if($site_code->site_code == 'MMPE4')
+        {
+            redirect('bridging/mmm_palopo','refresh');
+        }
+        if($site_code->site_code == 'BULE5')
+        {
+            redirect('bridging/mmm_bulukumba','refresh');
+        }     
     }
 
     public function routing_stock($signature)
     {
+        // echo 'signature: '.$signature;die;
         if(!isset($signature) || $signature == "") {
             redirect('bridging/dashboard','refresh');
         }
@@ -140,8 +185,9 @@ class Bridging extends MY_Controller
         if(!$get_list_subbranch) {
             redirect('bridging/dashboard','refresh');
         }
-        $onsitecode = $get_list_subbranch->site_code;
 
+        $onsitecode = $get_list_subbranch->site_code;
+        
         if($this->username != 'milla')
         {
             // Cek apakah site_code milik user ada yang sama dengan $onsitecode
@@ -159,6 +205,11 @@ class Bridging extends MY_Controller
                 redirect('bridging/dashboard', 'refresh');
             }
         }
+
+        if($onsitecode == 'MMS1O' || $onsitecode == 'BNE1T' || $onsitecode == 'PRE1U')
+        {
+            return $this->stock_mms_makasar($signature);
+        }
         
         $data = [
             "title" => "Stock Import",
@@ -168,137 +219,369 @@ class Bridging extends MY_Controller
             'sitecode' => $onsitecode,
             'get_data' => $this->model_bridging->get_history_import($onsitecode),
         ];
-        $this->view($data, false, "dashboard_stock");
+        // $this->view($data, false, "dashboard_stock");
+         $this->render('bridging/dashboard_stock', $data);
     }
+
+    // public function proses_import()
+    // {
+    //     $month = $this->input->post('month');
+    //     $bulan = explode('-', $month)[1];
+    //     $tahun = explode('-', $month)[0];
+        
+    //     $sitecode = $this->input->post('sitecode');
+    //     $signature = 'stock-' . md5($sitecode . $month . $this->model_outlet_transaksi->timezone());
+
+    //     // cek data bulan terakhir upload
+    //     $get_history_import_by_site_code = $this->model_bridging->get_history_import_by_site_code($sitecode);
+    //     if ($get_history_import_by_site_code->num_rows() > 0) {
+    //         $bulan_history = $get_history_import_by_site_code->row()->bulan;
+    //     }else{
+    //         $bulan_history = null;
+    //     }
+
+    //     // inisialisasi upload
+    //     $init_upload = $this->attachment_config('',$sitecode);        
+    //     if ($this->upload->do_upload('file')) 
+    //     {
+    //         $upload_data = $this->upload->data();
+    //         $filename_excel = $upload_data['file_name'];
+
+    //         $this->load->library('excel');
+    //         $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/stock/$filename_excel");
+
+    //         $jumlahSheet = $object->getSheetCount();
+    //         if ($jumlahSheet > 1) {
+    //             echo "jumlah_sheet : ".$jumlahSheet;
+    //             echo "<script>alert('upload file gagal karena file mempunyai lebih dari 1 sheet'); </script>";
+    //             redirect('bridging','refresh');
+    //         }
+
+    //         $highestColumm = $object->setActiveSheetIndex(0)->getHighestColumn();
+    //         // var_dump($highestColumm);die;
+    //         if ($highestColumm != 'D') {
+    //             echo "<script>alert('upload file gagal karena melebihi max column'); </script>";
+    //             redirect('bridging','refresh');
+    //         }
+
+    //         $input_log_history = [
+    //             "site_code"     => $sitecode,
+    //             "tahun"         => $tahun,
+    //             "bulan"         => $bulan,
+    //             "filename"      => $filename_excel,
+    //             "created_at"    => $this->model_outlet_transaksi->timezone(),
+    //             "created_by"    => $this->userid,
+    //             "signature"     => $signature,
+    //         ];
+
+    //         $id_log = $this->model_bridging->input_log_history($input_log_history);
+
+    //         foreach ($object->getWorksheetIterator() as $worksheet) 
+    //         {
+    //             $highestRow = $worksheet->getHighestRow();
+    //             $highestColumn = $worksheet->getHighestColumn();
+
+    //             if ($highestRow > 500) {
+    //                 $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 500 ROW.");
+    //                 redirect('bridging','refresh');
+    //             }
+
+    //             if ($highestRow <= 1) {
+    //                 $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+    //                 redirect('bridging','refresh');
+    //             }
+
+    //             for ($row = 2; $row <= $highestRow; $row++) 
+    //             {   
+    //                 $tahun_excel    = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+    //                 if ($tahun_excel != $tahun) {
+    //                     $this->session->set_flashdata("pesan", "Terdapat data tahun yang tidak sesuai yaitu $tahun_excel. Silahkan periksa excel anda kembali.");
+    //                     redirect('bridging/routing_stock/'.md5($sitecode));
+    //                 }
+    //                 $bulan_excel    = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
+    //                 if ($bulan_excel != $bulan) {
+    //                     $this->session->set_flashdata("pesan", "Terdapat data bulan pada excel tidak sesuai dengan bulan dipilih. Silahkan periksa excel anda kembali.");
+    //                     redirect('bridging/routing_stock/'.md5($sitecode));
+    //                 }elseif ($bulan_excel < $bulan_history) {
+    //                     $this->session->set_flashdata("pesan", "Tidak dapat upload bulan sebelumnya. Silahkan Periksa Kembali data excel yang anda upload.");
+    //                     redirect('bridging/routing_stock/'.md5($sitecode));
+    //                 }
+    //                 // cek kodeproduk mpm
+    //                 $kodeprod    = (strlen($temp = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue())) == 5) ? '0' . $temp : $temp;
+    //                 // echo $kodeprod;
+    //                 $get_kodeprod = $this->model_bridging->get_master_product_harga_by_kodeprod($kodeprod);
+    //                 if($get_kodeprod->num_rows() > 0) {
+    //                     $kode_prc = $get_kodeprod->row()->kode_prc;
+    //                     $namaprod = $get_kodeprod->row()->namaprod;
+    //                     $supp = $get_kodeprod->row()->supp;
+    //                     $GRUPPROD = $get_kodeprod->row()->GRUPPROD;
+    //                     $odrunit = $get_kodeprod->row()->ODRUNIT;
+    //                     $isisatuan = $get_kodeprod->row()->isisatuan;
+    //                     // mengambil master qty produk di mpm
+    //                     $m_qty1 = $get_kodeprod->row()->qty1;
+    //                     $m_besar = $get_kodeprod->row()->besar;
+    //                     $m_qty3 = $get_kodeprod->row()->qty3;
+    //                     $m_kecil = $get_kodeprod->row()->kecil;
+    //                     $h_dp = $get_kodeprod->row()->h_dp;
+
+    //                     $is_valid_kodeprod = 1;
+    //                 }else{
+    //                     $kode_prc = '';
+    //                     $namaprod = '';
+    //                     $supp = '';
+    //                     $GRUPPROD = '';
+    //                     $odrunit = '';
+    //                     $isisatuan = '';
+    //                     $m_qty1 = '0';
+    //                     $m_besar = '';
+    //                     $m_qty3 = '0';
+    //                     $m_kecil = '';
+    //                     $h_dp = '0';
+    //                     $is_valid_kodeprod = 0;
+    //                 }
+
+    //                 $stockakhir_pcs    = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());
+    //                 // menghitung stok berdasarkan master qty
+    //                 $qty_besar = ($m_qty1 != 0) ? round($stockakhir_pcs / $m_qty1,2) : 0;
+    //                 $qty_kecil = ($m_qty3 != 0) ? round($stockakhir_pcs / $m_qty3,2) : 0;
+                    
+    //                 $data = [
+    //                     'kodeprod'          => $kodeprod,
+    //                     'namaprod'          => $namaprod,
+    //                     'kode_prc'          => $kode_prc,
+    //                     'supp'              => $supp,
+    //                     'grupprod'          => $GRUPPROD,
+    //                     'satuan'            => $odrunit,
+    //                     'isisatuan'         => $isisatuan,
+    //                     'stockakhir_pcs'    => $stockakhir_pcs,
+    //                     'qty_besar'         => $qty_besar,
+    //                     'qty_kecil'         => $qty_kecil,
+    //                     'satuan_besar'      => $m_besar,
+    //                     'satuan_kecil'      => $m_kecil,
+    //                     'harga'             => $h_dp,
+    //                     'is_valid_kodeprod' => $is_valid_kodeprod,
+    //                     'id_history'        => $id_log,
+    //                     'created_at'        => $this->model_outlet_transaksi->timezone(),
+    //                     'created_by'        => $this->userid,
+    //                     'signature'         => $signature
+    //                 ];
+
+    //                 $insert = $this->model_bridging->insert_stock_import_detail($data);
+    //             }
+    //         }
+    //     }else
+    //     {
+    //         $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+    //         redirect('bridging','refresh'); die;
+    //     }
+
+    //     $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
+    //     redirect('bridging/preview_import/'.$signature.'','refresh');
+    // }
 
     public function proses_import()
     {
         $month = $this->input->post('month');
         $bulan = explode('-', $month)[1];
         $tahun = explode('-', $month)[0];
-
-        $sitecode = $this->input->post('sitecode');
-
-        $signature = 'stock-' . md5($sitecode . $month . $this->model_outlet_transaksi->timezone());
         
-        // echo 'sitecode '.$sitecode;die;
+        $sitecode = $this->input->post('sitecode');
+        $signature = 'stock-' . md5($sitecode . $month . $this->model_outlet_transaksi->timezone());
+
+        // cek data bulan terakhir upload
+        $get_history_import_by_site_code = $this->model_bridging->get_history_import_by_site_code($sitecode);
+        $bulan_history = ($get_history_import_by_site_code->num_rows() > 0) 
+            ? $get_history_import_by_site_code->row()->bulan 
+            : null;
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('',$sitecode);        
-        if ($this->upload->do_upload('file')) 
+        $init_upload = $this->attachment_config('', $sitecode);        
+        if (!$this->upload->do_upload('file')) {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+            redirect('bridging','refresh'); die;
+        }
+
+        $upload_data = $this->upload->data();
+        $filename_excel = $upload_data['file_name'];
+
+        $this->load->library('excel');
+        $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/stock/$filename_excel");
+
+        $jumlahSheet = $object->getSheetCount();
+        if ($jumlahSheet > 1) {
+            $this->session->set_flashdata("pesan", "Upload gagal: file punya lebih dari 1 sheet");
+            redirect('bridging','refresh');
+        }
+
+        $highestColumm = $object->setActiveSheetIndex(0)->getHighestColumn();
+        if ($highestColumm != 'D') {
+            $this->session->set_flashdata("pesan", "Upload gagal: melebihi max column");
+            redirect('bridging','refresh');
+        }
+
+        $input_log_history = [
+            "site_code"     => $sitecode,
+            "tahun"         => $tahun,
+            "bulan"         => $bulan,
+            "filename"      => $filename_excel,
+            "created_at"    => $this->model_outlet_transaksi->timezone(),
+            "created_by"    => $this->userid,
+            "signature"     => $signature,
+        ];
+        $id_log = $this->model_bridging->input_log_history($input_log_history);
+
+        foreach ($object->getWorksheetIterator() as $worksheet) 
         {
-            $upload_data = $this->upload->data();
-            $filename_excel = $upload_data['file_name'];
+            $highestRow = $worksheet->getHighestRow();
 
-            $this->load->library('excel');
-            $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/stock/$filename_excel");
-
-            $jumlahSheet = $object->getSheetCount();
-            if ($jumlahSheet > 1) {
-                echo "jumlah_sheet : ".$jumlahSheet;
-                echo "<script>alert('upload file gagal karena file mempunyai lebih dari 1 sheet'); </script>";
+            if ($highestRow > 500) {
+                $this->session->set_flashdata("pesan", "Import gagal. Terlalu banyak ROW. Maximal 500 ROW.");
+                redirect('bridging','refresh');
+            }
+            if ($highestRow <= 1) {
+                $this->session->set_flashdata("pesan", "Data kosong. Silahkan ulangi.");
                 redirect('bridging','refresh');
             }
 
-            $highestColumm = $object->setActiveSheetIndex(0)->getHighestColumn();
-            // var_dump($highestColumm);die;
-            if ($highestColumm != 'D') {
-                echo "<script>alert('upload file gagal karena melebihi max column'); </script>";
-                redirect('bridging','refresh');
+            // 1️⃣ Kumpulkan semua kodeprod
+            $kodeprod_list = [];
+            for ($row = 2; $row <= $highestRow; $row++) {
+                $kodeprod = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                if (strlen($kodeprod) == 5) $kodeprod = '0'.$kodeprod;
+                $kodeprod_list[] = $kodeprod;
             }
+            // var_dump($kodeprod_list);die;
 
-            $input_log_history = [
-                "site_code"     => $sitecode,
-                "tahun"         => $tahun,
-                "bulan"         => $bulan,
-                "filename"      => $filename_excel,
-                "created_at"    => $this->model_outlet_transaksi->timezone(),
-                "created_by"    => $this->userid,
-                "signature"     => $signature,
-            ];
+            // 2️⃣ Ambil master produk sekali query
+            $master_produk = $this->model_bridging->get_master_product_harga_by_kodeprod_in(array_unique($kodeprod_list));
+            $master_map = [];
+            foreach ($master_produk as $p) {
+                $master_map[$p['kodeprod']] = $p;
+            }
+            // var_dump($master_map);die;
 
-            $id_log = $this->model_bridging->input_log_history($input_log_history);
+            // 3️⃣ Siapkan data insert batch
+            $data_insert = [];
+            for ($row = 2; $row <= $highestRow; $row++) 
+            {   
+                $tahun_excel = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+                $bulan_excel = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
 
-            foreach ($object->getWorksheetIterator() as $worksheet) 
-            {
-                $highestRow = $worksheet->getHighestRow();
-                $highestColumn = $worksheet->getHighestColumn();
-
-                if ($highestRow > 500) {
-                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 500 ROW.");
-                    redirect('bridging','refresh');
+                if ($tahun_excel != $tahun) {
+                    $this->session->set_flashdata("pesan", "Data tahun tidak sesuai: $tahun_excel");
+                    redirect('bridging/routing_stock/'.md5($sitecode));
+                }
+                if ($bulan_excel != $bulan) {
+                    $this->session->set_flashdata("pesan", "Bulan excel tidak sesuai dengan bulan yang dipilih.");
+                    redirect('bridging/routing_stock/'.md5($sitecode));
+                } elseif ($bulan_excel < $bulan_history) {
+                    $this->session->set_flashdata("pesan", "Tidak bisa upload bulan sebelumnya.");
+                    redirect('bridging/routing_stock/'.md5($sitecode));
                 }
 
-                if ($highestRow <= 1) {
-                    $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
-                    redirect('bridging','refresh');
-                }
+                $kodeprod = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                if (strlen($kodeprod) == 5) $kodeprod = '0'.$kodeprod;
 
-                for ($row = 2; $row <= $highestRow; $row++) 
-                {   
-                    // cek kodeproduk mpm
-                    $kodeprod    = (strlen($temp = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue())) == 5) ? '0' . $temp : $temp;
-                    // echo $kodeprod;
-                    $get_kodeprod = $this->model_bridging->get_master_product_by_kodeprod($kodeprod);
-                    if($get_kodeprod->num_rows() > 0) {
-                        $kode_prc = $get_kodeprod->row()->kode_prc;
-                        $namaprod = $get_kodeprod->row()->namaprod;
-                        $supp = $get_kodeprod->row()->supp;
-                        $GRUPPROD = $get_kodeprod->row()->GRUPPROD;
-                        $isisatuan = $get_kodeprod->row()->isisatuan;
-                        $is_valid_kodeprod = 1;
-                    }else{
-                        $kode_prc = '';
-                        $namaprod = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
-                        $supp = '';
-                        $GRUPPROD = '';
-                        $isisatuan = '';
-                        $is_valid_kodeprod = 0;
-                    }
+                $stockakhir_pcs = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());
 
-                    // echo $GRUPPROD;die;
+                // Cek master product
+                if (isset($master_map[$kodeprod])) {
+                    $m = $master_map[$kodeprod];
+                    $qty_besar = ($m['qty1'] != 0) ? round($stockakhir_pcs / $m['qty1'],2) : 0;
+                    $qty_kecil = ($m['qty3'] != 0) ? round($stockakhir_pcs / $m['qty3'],2) : 0;
 
-                    // $namaprod    = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
-                    $satuan    = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
-                    $stockakhir_pcs    = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());
-                    
-                    $data = [
+                    $data_insert[] = [
                         'kodeprod'          => $kodeprod,
-                        'namaprod'          => $namaprod,
-                        'kode_prc'          => $kode_prc,
-                        'supp'              => $supp,
-                        'grupprod'          => $GRUPPROD,
-                        'isisatuan'         => $isisatuan,
-                        'satuan'            => $satuan,
+                        'namaprod'          => $m['namaprod'],
+                        'kode_prc'          => $m['kode_prc'],
+                        'supp'              => $m['supp'],
                         'stockakhir_pcs'    => $stockakhir_pcs,
-                        'is_valid_kodeprod' => $is_valid_kodeprod,
+                        'qty_besar'         => $qty_besar,
+                        'qty_kecil'         => $qty_kecil,
+                        'satuan_besar'      => $m['besar'],
+                        'satuan_kecil'      => $m['kecil'],
+                        'harga'             => $m['h_dp'],
+                        'is_valid_kodeprod' => 1,
                         'id_history'        => $id_log,
                         'created_at'        => $this->model_outlet_transaksi->timezone(),
                         'created_by'        => $this->userid,
                         'signature'         => $signature
                     ];
-
-                    $insert = $this->model_bridging->insert_stock_import_detail($data);
+                } else {
+                    $data_insert[] = [
+                        'kodeprod'          => $kodeprod,
+                        'namaprod'          => '',
+                        'kode_prc'          => '',
+                        'supp'              => '',
+                        'stockakhir_pcs'    => $stockakhir_pcs,
+                        'qty_besar'         => 0,
+                        'qty_kecil'         => 0,
+                        'satuan_besar'      => '',
+                        'satuan_kecil'      => '',
+                        'harga'             => 0,
+                        'is_valid_kodeprod' => 0,
+                        'id_history'        => $id_log,
+                        'created_at'        => $this->model_outlet_transaksi->timezone(),
+                        'created_by'        => $this->userid,
+                        'signature'         => $signature
+                    ];
                 }
             }
-        }else
-        {
-            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
-            redirect('bridging','refresh');
-        };
 
-        $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
-        redirect('bridging/preview_import/'.$signature.'','refresh');
+            // 4️⃣ Insert sekali jalan
+            if (!empty($data_insert)) {
+                $this->model_bridging->insert_stock_import_detail_batch($data_insert);
+            }
+        }
+
+        $this->session->set_flashdata("pesan_success", "Upload berhasil!");
+        redirect('bridging/preview_import/'.$signature,'refresh');
+
     }
 
     public function preview_import($signature)
     {
         $get_data = $this->model_bridging->get_stock_import_detail($signature);
+
         if ($get_data->num_rows() == 0) {
             $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
             redirect('bridging','refresh');
         }
-        $id_log = $get_data->row()->id_history;
+
+        $get_data_array = $get_data->result(); // object
+        $id_log = $get_data_array[0]->id_history;
+
+        // var_dump($id_log);die;
+
+        $data_by_supp = [];
+
+        foreach ($get_data_array as $item) {
+        $supp_code = $item->supp;
+            // Masukkan ke dalam array berdasarkan supp
+            if (!isset($data_by_supp[$supp_code])) {
+                $data_by_supp[$supp_code] = [];
+                }
+
+                $data_by_supp[$supp_code][] = $item;
+        }
+
+         //Panggil data supplier
+        $get_supplier = $this->model_bridging->get_supplier()->result();
+
+        //Ubah hasil query jadi array mapping kode => nama
+        $supplier_names = array();
+        foreach ($get_supplier as $row) {
+            $supplier_names[$row->supp] = $row->namasupp;
+        }
+
+        $get_value = $this->model_bridging->get_value_group_by_supp($signature);
+        $totals = [];
+        foreach ($get_value->result() as $row) {
+            $totals[$row->supp] = [
+                'unit_kecil'  => $row->total_value_kecil,
+                'unit_karton' => $row->total_value_besar
+            ];
+        }
 
         $is_invalid = $this->model_bridging->get_stock_import_where_is_valid_false($signature);
         if($is_invalid->num_rows() > 0)
@@ -309,6 +592,14 @@ class Bridging extends MY_Controller
             $params_invalid = 0;
         }
 
+        $total_value = $this->model_bridging->total_value($signature);
+        if ($total_value->num_rows() > 0) {
+            $total_value_kecil = $total_value->row()->total_value_kecil;
+            $total_value_besar = $total_value->row()->total_value_besar;
+        }else{
+            $total_value = 0;
+        }
+
         $data = [
             "title"             => "Preview Import",
             'url'               => 'bridging/import_stock',
@@ -316,13 +607,22 @@ class Bridging extends MY_Controller
             'get_data'          => $get_data,
             'id_log'            => $id_log,
             'get_summary'       => $this->model_bridging->get_stock_import_detail_summary($signature),
+            'data_by_supp'      => $data_by_supp,
+            'total_value_besar' => $total_value_besar,
+            'total_value_kecil' => $total_value_kecil, 
+            'supplier_names'    => $supplier_names,
+            'total_value'       => $this->model_bridging->get_total_omzet_stock($signature),
+            'totals'            => $totals
         ];
-        $this->view($data, false, "preview_import");
+        // var_dump($data);die;
+        // $this->view($data, false, "preview_import");
+         $this->render('bridging/preview_import', $data);
     }
 
     public function import_stock()
     {
         $id_log = $this->input->post('id_log');
+        // var_dump($id_log);die;
 
         $get_data_log = $this->model_bridging->get_history_import_by_id($id_log);
         if ($get_data_log->num_rows() == 0) {
@@ -354,13 +654,12 @@ class Bridging extends MY_Controller
                 'kode_prc'          => $key->kode_prc,
                 'namaprod'          => $key->namaprod,
                 'supp'              => $key->supp,
-                'grupprod'          => $key->grupprod,
-                'satuan'            => $key->satuan,
-                'isisatuan'         => $key->isisatuan,
-                'saldo_awal'        => $key->stockakhir_pcs,
+                'saldoawal'         => '0',
+                'STOK_AKHIR'        => $key->stockakhir_pcs,
+                // 'saldoawal'         => $key->stockakhir_pcs,
+                // 'STOK_AKHIR'        => '0',
                 'kode_gdg'          => 'PST',
                 'nama_gdg'          => 'PUSAT',
-                'stok_akhir'        => '0',
                 'nick_site'         => $kode_comp,
                 'gudang_id'         => '1',
                 'nama_gudang'       => 'Gudang Baik/Inti',
@@ -370,10 +669,25 @@ class Bridging extends MY_Controller
 
             $this->model_bridging->insert_st($tahun, $data_insert);
         }
+
+        $get_data_result = $this->model_bridging->get_result_stock($site_code, $tahun, $tahunbulan);
+        if($get_data_result->num_rows() > 0)
+        {
+            $total_unit = $get_data_result->row()->total_unit;
+        }else{
+            $total_unit = 0;         
+        }
+        
+        // update total_stock_on_pcs
+        $update_bridging = [
+            'total_stock_on_pcs' => $total_unit
+        ];
+
+        $this->model_bridging->update_history_import($update_bridging, $id_log);
         
         if (!empty($data_insert)) {
-            $this->session->set_flashdata("pesan_success", "upload file excel berhasil");
-            redirect('bridging','refresh');
+            $this->session->set_flashdata("pesan_success", "upload data stock berhasil");
+            redirect('bridging/routing_stock/'.md5($site_code));
         }else{
             $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
             redirect('bridging','refresh');
@@ -383,9 +697,9 @@ class Bridging extends MY_Controller
     public function download_template_stock()
     {
         $query = "
-            select 	'' as kodeproduk,
-                    '' as namaproduk,
-                    '' as satuan,
+            select 	'' as tahun,
+                    '' as bulan,
+                    '' as kodeproduk,
                     '' as stockakhir_pcs
         ";
         $hasil = $this->db->query($query);   
@@ -394,20 +708,451 @@ class Bridging extends MY_Controller
 
         $this->excel_generator->set_header(array
         (
+            'tahun',
+            'bulan',
             'kodeproduk',
-            'namaproduk',
-            'satuan',
             'stockakhir_pcs'
         ));
         $this->excel_generator->set_column(array
         ( 
+            'tahun',
+            'bulan',
             'kodeproduk',
-            'namaproduk',
-            'satuan',
             'stockakhir_pcs'
         ));
         $this->excel_generator->set_width(array(10,10,10,10)); 
         $this->excel_generator->exportTo2007('Download Template Stock Import'); 
+    }
+
+    public function stock_mms_makasar($signature)
+    {
+        if(!isset($signature) || $signature == "") {
+            redirect('bridging/dashboard','refresh');
+        }
+        
+        $get_list_subbranch = $this->model_bridging->get_bridging_list_subbranch($signature)->row();
+        if(!$get_list_subbranch) {
+            redirect('bridging/dashboard','refresh');
+        }
+
+        $onsitecode = $get_list_subbranch->site_code;
+
+        
+        $data = [
+            "title" => "Stock Import",
+            "title2" => "History Import",
+            'url'   => 'bridging/proses_import_mms_makasar',
+            'userid' => $this->userid,
+            'sitecode' => $onsitecode,
+            'get_data' => $this->model_bridging->get_history_import($onsitecode),
+        ];
+        // $this->view($data, false, "dashboard_stock_mms_makasar");
+        $this->render('bridging/dashboard_stock_mms_makasar', $data);
+    }
+
+    public function proses_import_mms_makasar()
+    {
+        $month = $this->input->post('month');
+        $bulan = explode('-', $month)[1];
+        $tahun = explode('-', $month)[0];
+
+        // echo 'bulan : '.$bulan.' tahun : '.$tahun; echo '<br>';
+
+        $sitecode = $this->input->post('sitecode');
+        $signature = 'stock-' . md5($sitecode . $month . $this->model_outlet_transaksi->timezone());
+
+        // echo 'sitecode : '.$sitecode.' signature : '.$signature; echo '<br>';
+
+
+        // cek data bulan terakhir upload
+        $get_history_import_by_site_code = $this->model_bridging->get_history_import_by_site_code($sitecode);
+        $bulan_history = ($get_history_import_by_site_code->num_rows() > 0) 
+            ? $get_history_import_by_site_code->row()->bulan 
+            : null;
+
+        // echo 'bulan_history : '.$bulan_history;
+        
+        // inisialisasi upload
+        $init_upload = $this->attachment_config('', $sitecode);        
+        if (!$this->upload->do_upload('file')) {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+            redirect('bridging','refresh'); die;
+        }
+
+        $upload_data = $this->upload->data();
+        $filename_excel = $upload_data['file_name'];
+
+        $this->load->library('excel');
+        $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/stock/$filename_excel");
+
+        $jumlahSheet = $object->getSheetCount();
+        if ($jumlahSheet > 1) {
+            $this->session->set_flashdata("pesan", "Upload gagal: file punya lebih dari 1 sheet");
+            redirect('bridging','refresh');
+        }
+
+        $highestColumm = $object->setActiveSheetIndex(0)->getHighestColumn();
+        // echo  'jumlah highestColumm : '.$highestColumm; echo '<br>';
+        if ($highestColumm != 'J') {
+            $this->session->set_flashdata("pesan", "Upload gagal: melebihi max column");
+            redirect('bridging','refresh');
+        }
+
+        $input_log_history = [
+            "site_code"     => $sitecode,
+            "tahun"         => $tahun,
+            "bulan"         => $bulan,
+            "filename"      => $filename_excel,
+            "created_at"    => $this->model_outlet_transaksi->timezone(),
+            "created_by"    => $this->userid,
+            "signature"     => $signature,
+        ];
+        $id_log = $this->model_bridging->input_log_history($input_log_history);
+
+        foreach ($object->getWorksheetIterator() as $worksheet) 
+        {
+            $highestRow = $worksheet->getHighestRow();
+
+            if ($highestRow > 500) {
+                $this->session->set_flashdata("pesan", "Import gagal. Terlalu banyak ROW. Maximal 500 ROW.");
+                redirect('bridging','refresh');
+            }
+            if ($highestRow <= 1) {
+                $this->session->set_flashdata("pesan", "Data kosong. Silahkan ulangi.");
+                redirect('bridging','refresh');
+            }
+
+            // 1️⃣ Kumpulkan semua kodeprod
+            $kodeprod_list = [];
+            for ($row = 2; $row <= $highestRow; $row++) {
+                $kodeprod = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                if (strlen($kodeprod) == 5) $kodeprod = '0'.$kodeprod;
+                $kodeprod_list[] = $kodeprod;
+            }
+            // var_dump($kodeprod_list);die;
+
+            // 2️⃣ Ambil master produk sekali query
+            $master_produk = $this->model_bridging->get_master_product_harga_by_kodeprod_in(array_unique($kodeprod_list));
+            $master_map = [];
+            foreach ($master_produk as $p) {
+                $master_map[$p['kodeprod']] = $p;
+            }
+            // var_dump($master_map);die;
+
+            // 3️⃣ Siapkan data insert batch
+            $data_insert = [];
+            for ($row = 2; $row <= $highestRow; $row++) 
+            {   
+                $tahun_excel = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+                $bulan_excel = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
+
+                if ($tahun_excel != $tahun) {
+                    $this->session->set_flashdata("pesan", "Data tahun tidak sesuai: $tahun_excel");
+                    redirect('bridging/routing_stock/'.md5($sitecode));
+                }
+                if ($bulan_excel != $bulan) {
+                    $this->session->set_flashdata("pesan", "Bulan excel tidak sesuai dengan bulan yang dipilih.");
+                    redirect('bridging/routing_stock/'.md5($sitecode));
+                } elseif ($bulan_excel < $bulan_history) {
+                    $this->session->set_flashdata("pesan", "Tidak bisa upload bulan sebelumnya.");
+                    redirect('bridging/routing_stock/'.md5($sitecode));
+                }
+
+                $kodeprod = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                if (strlen($kodeprod) == 5) $kodeprod = '0' . $kodeprod;
+
+                 // ✅ Lewati baris kosong
+                if (empty($kodeprod)) continue;
+
+                $qty_besar     = trim($worksheet->getCellByColumnAndRow(4, $row)->getValue());
+                $satuan_besar  = strtoupper(trim($worksheet->getCellByColumnAndRow(5, $row)->getValue()));
+                $qty_sedang    = trim($worksheet->getCellByColumnAndRow(6, $row)->getValue());
+                $satuan_sedang = strtoupper(trim($worksheet->getCellByColumnAndRow(7, $row)->getValue()));
+                $qty_kecil     = trim($worksheet->getCellByColumnAndRow(8, $row)->getValue());
+                $satuan_kecil  = strtoupper(trim($worksheet->getCellByColumnAndRow(9, $row)->getValue()));
+                
+                // echo 'qty_besar : '.$qty_besar.' satuan_besar : '.$satuan_besar.' qty_sedang : '.$qty_sedang.' satuan_sedang : '.$satuan_sedang.' qty_kecil : '.$qty_kecil.' satuan_kecil : '.$satuan_kecil; echo '<br>';die;
+                
+                // ✅ Lewati baris tanpa qty (semua 0)
+                if ($qty_besar == '' && $qty_sedang == '' && $qty_kecil == '') continue;
+
+                // ✅ Normalisasi satuan
+                if (!in_array($satuan_besar, ['KRT'])) {
+                    if ($qty_besar > 0) {
+                        $qty_kecil    = $qty_besar;
+                        $satuan_kecil = $satuan_besar;
+                        $qty_besar    = 0;
+                        $satuan_besar = 'KRT';
+                    }
+                }
+
+                // ✅ STEP 2: Ambil master product (kalau ada)
+                if (isset($master_map[$kodeprod])) {
+                    $is_valid_kodeprod = 1;
+                    $m = $master_map[$kodeprod];
+
+                    $m_besar  = $m['qty1'];
+                    $m_sedang = $m['qty2'];
+                    $m_kecil  = $m['qty3'];
+
+                    // echo $m_besar . ' - ' . $m_sedang . ' - ' . $m_kecil . '<br>';
+
+                    // Hindari pembagian nol
+                    if ($m_besar <= 0) $m_besar = 1;
+                    if ($m_sedang <= 0) $m_sedang = 1;
+                    if ($m_kecil <= 0) $m_kecil = 1;
+
+                    // ✅ STEP 3: Hitung total qty
+                    $total_qty3 = round(($qty_besar * $m_besar) + ($qty_sedang * $m_sedang) + ($qty_kecil * $m_kecil),2);
+                    // echo $total_qty3 . '<br>';die;
+                    
+                    $total_qty1 = round(($total_qty3 / $m_besar),2);
+                    // echo $total_qty1 . '<br>';die;
+                } else {
+                    // echo 'disini';die;
+                    $is_valid_kodeprod = 0;
+                    $m = null;
+                }
+
+                
+                // ✅ STEP 4: Simpan ke array insert
+                $data_insert[] = [
+                    'kodeprod'         => $kodeprod,
+                    'namaprod'         => $m['namaprod'],
+                    'kode_prc'         => $m['kode_prc'],
+                    'supp'             => $m['supp'],
+                    'qty_besar'        => $qty_besar,
+                    'satuan_besar'     => $satuan_besar,
+                    'qty_sedang'       => $qty_sedang,
+                    'satuan_sedang'    => $satuan_sedang,
+                    'qty_kecil'        => $qty_kecil,
+                    'satuan_kecil'     => $satuan_kecil,
+                    'total_qty1'       => $total_qty1,
+                    'm_satuan_besar'   => $m['besar'],
+                    'total_qty3'       => $total_qty3,
+                    'm_satuan_kecil'   => $m['kecil'],
+                    'harga'             => $m['h_dp'],
+                    'is_valid_kodeprod' => $is_valid_kodeprod,
+                    'id_history'       => $id_log,
+                    'signature'        => $signature,
+                    'created_at'       => $this->model_outlet_transaksi->timezone(),
+                    'created_by'       => $this->userid,
+                ];
+                
+            }
+            // echo "<pre>";
+            // var_dump($data_insert);
+            // echo "</pre>";die;
+            // 4️⃣ Insert sekali jalan
+            if (!empty($data_insert)) {
+                $this->model_bridging->insert_stock_import_detail_mms_batch($data_insert);
+            }
+        }
+
+        $this->session->set_flashdata("pesan_success", "Upload berhasil!");
+        redirect('bridging/preview_import_mms/'.$signature,'refresh');
+    }
+
+    public function preview_import_mms($signature)
+    {
+        $get_data = $this->model_bridging->get_stock_import_detail_mms($signature);
+
+        if ($get_data->num_rows() == 0) {
+            $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+            redirect('bridging','refresh');
+        }
+
+        $get_data_array = $get_data->result(); // object
+        $id_log = $get_data_array[0]->id_history;
+
+        // var_dump($id_log);die;
+
+        $data_by_supp = [];
+
+        foreach ($get_data_array as $item) {
+        $supp_code = $item->supp;
+            // Masukkan ke dalam array berdasarkan supp
+            if (!isset($data_by_supp[$supp_code])) {
+                $data_by_supp[$supp_code] = [];
+                }
+
+                $data_by_supp[$supp_code][] = $item;
+        }
+
+         //Panggil data supplier
+        $get_supplier = $this->model_bridging->get_supplier()->result();
+
+        //Ubah hasil query jadi array mapping kode => nama
+        $supplier_names = array();
+        foreach ($get_supplier as $row) {
+            $supplier_names[$row->supp] = $row->namasupp;
+        }
+
+        $get_value = $this->model_bridging->get_value_group_by_supp_mms($signature);
+        $totals = [];
+        foreach ($get_value->result() as $row) {
+            $totals[$row->supp] = [
+                'unit_kecil'  => $row->total_value_kecil,
+                'unit_karton' => $row->total_value_besar
+            ];
+        }
+
+        $is_invalid = $this->model_bridging->get_stock_import_where_is_valid_false_mms($signature);
+        if($is_invalid->num_rows() > 0)
+        {
+            // echo "is_invalid : ".$is_invalid->num_rows();
+            $params_invalid = 1;
+        }else{
+            $params_invalid = 0;
+        }
+
+        $total_value = $this->model_bridging->total_value_mms($signature);
+        if ($total_value->num_rows() > 0) {
+            $total_value_kecil = $total_value->row()->total_value_kecil;
+            $total_value_besar = $total_value->row()->total_value_besar;
+        }else{
+            $total_value = 0;
+        }
+
+        $data = [
+            "title"             => "Preview Import",
+            'url'               => 'bridging/import_stock_mms',
+            'params_invalid'    => $params_invalid,
+            'get_data'          => $get_data,
+            'id_log'            => $id_log,
+            'get_summary'       => $this->model_bridging->get_stock_import_detail_summary_mms($signature),
+            'data_by_supp'      => $data_by_supp,
+            'total_value_besar' => $total_value_besar,
+            'total_value_kecil' => $total_value_kecil, 
+            'supplier_names'    => $supplier_names,
+            'total_value'       => $this->model_bridging->get_total_omzet_stock_mms($signature),
+            'totals'            => $totals
+        ];
+        // var_dump($data);die;
+        // $this->view($data, false, "preview_import_mms");
+        $this->render('bridging/preview_import_mms', $data);
+    }
+
+    public function import_stock_mms()
+    {
+        $id_log = $this->input->post('id_log');
+        // var_dump($id_log);die;
+
+        $get_data_log = $this->model_bridging->get_history_import_by_id($id_log);
+        if ($get_data_log->num_rows() == 0) {
+            $this->session->set_flashdata("pesan", "Id tidak ditemukan. Silahkan ulangi kembali.");
+            redirect('bridging','refresh');
+        }
+        $site_code = $get_data_log->row()->site_code;
+        $tahun = $get_data_log->row()->tahun;
+        // $tahun_stock = substr($tahun, 2, 2);
+        // $bulan = $get_data_log->row()->bulan;
+        $tahunbulan = $get_data_log->row()->tahunbulan;
+
+        $get_master_site = $this->model_bridging->get_master_site($site_code);
+        if ($get_master_site->num_rows() == 0) {
+            $this->session->set_flashdata("pesan", "Site tidak ditemukan. Silahkan ulangi kembali.");
+            redirect('bridging','refresh');
+        }
+
+        $kode_comp = $get_master_site->row()->kode_comp;
+        $nocab = $get_master_site->row()->nocab;
+
+        $this->model_bridging->delete_st($kode_comp, $nocab, $tahunbulan, $tahun);
+
+        $get_data = $this->model_bridging->get_stock_import_detail_mms_by_id_history($id_log)->result();
+
+        foreach ($get_data as $key) {
+            $data_insert = [
+                'kodeprod'          => $key->kodeprod,
+                'kode_prc'          => $key->kode_prc,
+                'namaprod'          => $key->namaprod,
+                'supp'              => $key->supp,
+                'saldoawal'         => '0',
+                'STOK_AKHIR'        => $key->total_qty3,
+                'kode_gdg'          => 'PST',
+                'nama_gdg'          => 'PUSAT',
+                'nick_site'         => $kode_comp,
+                'gudang_id'         => '1',
+                'nama_gudang'       => 'Gudang Baik/Inti',
+                'nocab'             => $nocab,
+                'bulan'             => $tahunbulan
+            ];
+
+            $this->model_bridging->insert_st($tahun, $data_insert);
+        }
+
+        $get_data_result = $this->model_bridging->get_result_stock($site_code, $tahun, $tahunbulan);
+        if($get_data_result->num_rows() > 0)
+        {
+            $total_unit = $get_data_result->row()->total_unit;
+        }else{
+            $total_unit = 0;         
+        }
+
+        // update total_stock_on_pcs
+        $update_bridging = [
+            'total_stock_on_pcs' => $total_unit
+        ];
+
+        $this->model_bridging->update_history_import($update_bridging, $id_log);
+        
+        if (!empty($data_insert)) {
+            $this->session->set_flashdata("pesan_success", "upload data stock berhasil");
+            redirect('bridging/routing_stock/'.md5($site_code));
+        }else{
+            $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+            redirect('bridging','refresh');
+        }
+    }
+
+
+    public function download_template_stock_mms()
+    {
+        $query = "
+            select 	'' as tahun,
+                    '' as bulan,
+                    '' as kodeproduk,
+                    '' as namaproduk,
+                    '' as qty_besar, 
+                    '' as satuan_besar,
+                    '' as qty_sedang, 
+                    '' as satuan_sedang, 
+                    '' as qty_kecil, 
+                    '' as satuan_kecil
+        ";
+        $hasil = $this->db->query($query);   
+    
+        $this->excel_generator->set_query($hasil);
+
+        $this->excel_generator->set_header(array
+        (
+            'tahun',
+            'bulan',
+            'kodeproduk',
+            'namaproduk',
+            'qty_besar',
+            'satuan_besar',
+            'qty_sedang',
+            'satuan_sedang',
+            'qty_kecil',
+            'satuan_kecil'
+        ));
+        $this->excel_generator->set_column(array
+        ( 
+            'tahun',
+            'bulan',
+            'kodeproduk',
+            'namaproduk',
+            'qty_besar',
+            'satuan_besar',
+            'qty_sedang',
+            'satuan_sedang',
+            'qty_kecil',
+            'satuan_kecil'
+        ));
+        $this->excel_generator->set_width(array(10,10,10,10,10,10,10,10,10,10)); 
+        $this->excel_generator->exportTo2007('Download Template Stock MMS'); 
     }
     
     public function master_sitecode()
@@ -464,6 +1209,14 @@ class Bridging extends MY_Controller
             redirect('bridging/dashboard','refresh');
         }
 
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
         $data = [
             "title" => "Bridging Bontang Sales",
             "title_customer" => "Bridging Customer (Outlet)",
@@ -472,7 +1225,8 @@ class Bridging extends MY_Controller
             'bridging'  => "bontang",
             'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
         ];
-        $this->view($data, false, "bontang");
+        // $this->view($data, false, "bontang");
+        $this->render('bridging/bontang', $data);
 
     }
 
@@ -523,7 +1277,7 @@ class Bridging extends MY_Controller
         }
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('bontang');        
+        $init_upload = $this->attachment_config('bontang', '');        
         if ($this->upload->do_upload('file')) 
         {
             $upload_data = $this->upload->data();
@@ -841,7 +1595,8 @@ class Bridging extends MY_Controller
             'get_summary'   => $this->model_bridging->get_bontang_import_summary(),
             'params_invalid' => $params_invalid
         ];
-        $this->view($data, false, "preview_bontang");
+        // $this->view($data, false, "preview_bontang");
+        $this->render("bridging/preview_bontang", $data);
     }
 
     public function submit_bontang()
@@ -891,11 +1646,12 @@ class Bridging extends MY_Controller
 
         $delete_tblang = $this->model_bridging->delete_tblang_bontang($tahun_upload, $nocab);
         $delete_tabsales = $this->model_bridging->delete_tabsales_bontang($tahun_upload, $nocab);
-        $delete_tbkota = $this->model_bridging->delete_tbkota_bontang($tahun_upload, $nocab);
+        // $delete_tbkota = $this->model_bridging->delete_tbkota_bontang($tahun_upload, $nocab);
 
         $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
         $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
-        $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
+        // $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
 
 
         // update bridging_log
@@ -1180,7 +1936,7 @@ class Bridging extends MY_Controller
         $unique_mapping_uli = $this->model_bridging->add_unique_bontang_import_customer('mapping_uli');
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('bontang');        
+        $init_upload = $this->attachment_config('bontang', '');        
         if ($this->upload->do_upload('file_customer')) 
         {
             $upload_data = $this->upload->data();
@@ -1317,7 +2073,7 @@ class Bridging extends MY_Controller
                     $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
                     $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
 
-                    if($kategori == "" || $nama_site == "" || $regional == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $nama_type == "" || $class_id = "" || $class = "") {
+                    if($kategori == "" || $nama_site == "" || $spot_id == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $nama_type == "" || $class_id = "" || $class = "") {
                         $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
                         redirect('bridging/bontang','refresh');
                     }
@@ -1429,7 +2185,8 @@ class Bridging extends MY_Controller
             'get_data' => $this->model_bridging->get_bontang_import_customer(),
             'get_summary' => $this->model_bridging->get_bontang_import_customer_summary(),
         ];
-        $this->view($data, false, "result_bontang_customer");
+        // $this->view($data, false, "result_bontang_customer");
+        $this->render('bridging/result_bontang_customer', $data);
     }
 
     public function download_template_bontang_customer()
@@ -1716,6 +2473,14 @@ class Bridging extends MY_Controller
             redirect('bridging/dashboard','refresh');
         }
 
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
         $data = [
             "title" => "Bridging Samarinda Sales",
             "title_customer" => "Bridging Customer Samarinda (Outlet)",
@@ -1724,7 +2489,8 @@ class Bridging extends MY_Controller
             'bridging'  => "samarinda",
             'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
         ];
-        $this->view($data, false, "samarinda");
+        // $this->view($data, false, "samarinda");
+        $this->render('bridging/samarinda', $data);
     }
 
     public function samarinda_import()
@@ -1775,7 +2541,7 @@ class Bridging extends MY_Controller
         }
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('samarinda');        
+        $init_upload = $this->attachment_config('samarinda', '');        
         if ($this->upload->do_upload('file')) 
         {
             $upload_data = $this->upload->data();
@@ -2069,6 +2835,28 @@ class Bridging extends MY_Controller
             redirect('bridging/samarinda','refresh');
         };
 
+        $get_summary = $this->model_bridging->get_samarinda_import_summary();
+        if($get_summary->num_rows() > 0){
+            $sumgrossamount = $get_summary->row()->sumgrossamount;
+            $sumqty = $get_summary->row()->sumqty;
+            $sumfreegood = $get_summary->row()->sumfreegood;
+        }
+
+        if($sumgrossamount == 0){ 
+            $this->session->set_flashdata("pesan", "upload file excel gagal, total grossamount = $sumgrossamount, silahkan cek kembali file excel anda");
+            redirect('bridging/samarinda','refresh');
+        }
+
+        if($sumqty > 500000) {
+            $this->session->set_flashdata("pesan", "upload file excel gagal, total qty = $sumqty, silahkan cek kembali file excel anda");
+            redirect('bridging/samarinda','refresh');
+        }
+
+        if($sumfreegood > 20000) {
+            $this->session->set_flashdata("pesan", "upload file excel gagal, total freegood = $sumfreegood, silahkan cek kembali file excel anda");
+            redirect('bridging/samarinda','refresh');
+        }
+
         $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
         redirect('bridging/preview_samarinda','refresh');
     }
@@ -2096,7 +2884,8 @@ class Bridging extends MY_Controller
             'get_summary'   => $this->model_bridging->get_samarinda_import_summary(),
             'params_invalid' => $params_invalid
         ];
-        $this->view($data, false, "preview_samarinda");
+        // $this->view($data, false, "preview_samarinda");
+        $this->render('bridging/preview_samarinda', $data);
     }
 
     public function download_template_samarinda()
@@ -2346,7 +3135,7 @@ class Bridging extends MY_Controller
 
         // echo'disini'; die;
         // inisialisasi upload
-        $init_upload = $this->attachment_config('samarinda'); 
+        $init_upload = $this->attachment_config('samarinda', ''); 
         if ($this->upload->do_upload('file_customer')) 
         {
             // echo 'disini'; die;
@@ -2485,7 +3274,7 @@ class Bridging extends MY_Controller
                     $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
                     $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
 
-                    if($kategori == "" || $nama_site == "" || $regional == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $nama_type == "" || $class_id = "" || $class = "") {
+                    if($kategori == "" || $nama_site == "" || $spot_id == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $nama_type == "" || $class_id = "" || $class = "") {
                         $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
                         redirect('bridging/samarinda','refresh');
                     }
@@ -2872,7 +3661,8 @@ class Bridging extends MY_Controller
             'get_data' => $this->model_bridging->get_samarinda_import_customer(),
             'get_summary' => $this->model_bridging->get_samarinda_import_customer_summary(),
         ];
-        $this->view($data, false, "result_samarinda_customer");
+        // $this->view($data, false, "result_samarinda_customer");
+        $this->render('bridging/result_samarinda_customer', $data);
     }
 
     public function submit_samarinda()
@@ -2925,11 +3715,12 @@ class Bridging extends MY_Controller
 
         $delete_tblang = $this->model_bridging->delete_tblang_samarinda($tahun_upload, $nocab);
         $delete_tabsales = $this->model_bridging->delete_tabsales_samarinda($tahun_upload, $nocab);
-        $delete_tbkota = $this->model_bridging->delete_tbkota_samarinda($tahun_upload, $nocab);
+        // $delete_tbkota = $this->model_bridging->delete_tbkota_samarinda($tahun_upload, $nocab);
 
         $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
         $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
-        $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
+        // $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
 
 
         // update bridging_log
@@ -2977,6 +3768,14 @@ class Bridging extends MY_Controller
             redirect('bridging/dashboard','refresh');
         }
 
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
         $data = [
             "title" => "Bridging Kolaka Sales",
             "title_customer" => "Bridging Customer (Outlet)",
@@ -2986,7 +3785,8 @@ class Bridging extends MY_Controller
             'bridging'  => "kolaka",
             'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
         ];
-        $this->view($data, false, "kolaka");
+        // $this->view($data, false, "kolaka");
+        $this->render('bridging/kolaka', $data);
 
     }
 
@@ -3041,7 +3841,7 @@ class Bridging extends MY_Controller
         }
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('kolaka');        
+        $init_upload = $this->attachment_config('kolaka', '');        
         if ($this->upload->do_upload('file')) 
         {
             $upload_data = $this->upload->data();
@@ -3242,7 +4042,8 @@ class Bridging extends MY_Controller
             'get_summary'   => $this->model_bridging->get_kolaka_import_summary(),
             'params_invalid' => $params_invalid
         ];
-        $this->view($data, false, "preview_kolaka");
+        // $this->view($data, false, "preview_kolaka");
+        $this->render('bridging/preview_kolaka', $data);
     }
 
     // public function download_template_kolaka()
@@ -3621,7 +4422,7 @@ class Bridging extends MY_Controller
         $unique_mapping_uli = $this->model_bridging->add_unique_kolaka_import_customer('mapping_uli');
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('kolaka');        
+        $init_upload = $this->attachment_config('kolaka', '');        
         if ($this->upload->do_upload('file_customer')) 
         {
             $upload_data = $this->upload->data();
@@ -3758,8 +4559,8 @@ class Bridging extends MY_Controller
                     $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
                     $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
 
-                    if($kategori == "" || $nama_site == "" || $regional == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $nama_type == "" || $class_id = "" || $class = "") {
-                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
+                    if($kategori == "" || $nama_site == "" || $spot_id == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $nama_type == "" || $class_id = "" || $class = "") {
+                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or spot_id or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
                         redirect('bridging/kolaka','refresh');
                     }
 
@@ -3870,7 +4671,8 @@ class Bridging extends MY_Controller
             'get_data' => $this->model_bridging->get_kolaka_import_customer(),
             'get_summary' => $this->model_bridging->get_kolaka_import_customer_summary(),
         ];
-        $this->view($data, false, "result_kolaka_customer");
+        // $this->view($data, false, "result_kolaka_customer");
+        $this->render('bridging/result_kolaka_customer', $data);
     }
 
     public function submit_kolaka()
@@ -3925,6 +4727,7 @@ class Bridging extends MY_Controller
         // die;
 
         $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
         $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
         $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
 
@@ -3978,6 +4781,14 @@ class Bridging extends MY_Controller
             redirect('bridging/dashboard','refresh');
         }
 
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
         $data = [
             "title" => "Bridging Kendari Sales",
             "title_customer" => "Bridging Customer Kendari (Outlet)",
@@ -3987,7 +4798,8 @@ class Bridging extends MY_Controller
             'bridging'  => "kendari",
             'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
         ];
-        $this->view($data, false, "kendari");
+        // $this->view($data, false, "kendari");
+        $this->render('bridging/kendari', $data);
     }
 
     public function kendari_import()
@@ -4037,7 +4849,7 @@ class Bridging extends MY_Controller
         }
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('kendari');        
+        $init_upload = $this->attachment_config('kendari', '');        
         if ($this->upload->do_upload('file')) 
         {
             $upload_data = $this->upload->data();
@@ -4238,7 +5050,8 @@ class Bridging extends MY_Controller
             'get_summary'   => $this->model_bridging->get_kendari_import_summary(),
             'params_invalid' => $params_invalid
         ];
-        $this->view($data, false, "preview_kendari");
+        // $this->view($data, false, "preview_kendari");
+        $this->render('bridging/preview_kendari', $data);
     }
 
     public function submit_kendari()
@@ -4293,6 +5106,7 @@ class Bridging extends MY_Controller
         // die;
 
         $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
         $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
         $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
 
@@ -4713,7 +5527,7 @@ class Bridging extends MY_Controller
         $unique_mapping_uli = $this->model_bridging->add_unique_kendari_import_customer('mapping_uli');
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('kendari');        
+        $init_upload = $this->attachment_config('kendari', '');        
         if ($this->upload->do_upload('file_customer')) 
         {
             $upload_data = $this->upload->data();
@@ -4850,8 +5664,8 @@ class Bridging extends MY_Controller
                     $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
                     $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
 
-                    if($kategori == "" || $nama_site == "" || $regional == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $nama_type == "" || $class_id = "" || $class = "") {
-                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
+                    if($kategori == "" || $nama_site == "" || $spot_id == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $nama_type == "" || $class_id = "" || $class = "") {
+                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or spot_id or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
                         redirect('bridging/kendari','refresh');
                     }
 
@@ -4963,7 +5777,8 @@ class Bridging extends MY_Controller
             'get_summary' => $this->model_bridging->get_kendari_import_customer_summary(),
         ];
         // var_dump($data);die;
-        $this->view($data, false, "result_kendari_customer");
+        // $this->view($data, false, "result_kendari_customer");
+        $this->render('bridging/result_kendari_customer', $data);
     }
 
 
@@ -5004,17 +5819,17 @@ class Bridging extends MY_Controller
         return $proses;
     }
 
-    private function view($data, $flag_accordion, $view)
-    {
-        $data = [
-            "navbar"        => $this->navbar($data),
-            "full_width"    => $this->load->view('kalimantan/header_full_width', $data),
-            "css"           => $this->load->view('management_claim/css', $data),
-            "view"          => $this->load->view('bridging/'.$view.'', $data),
-            "footer"        => $this->load->view('kalimantan/footer')
-        ];
-        return $data;       
-    }
+    // private function view($data, $flag_accordion, $view)
+    // {
+    //     $data = [
+    //         "navbar"        => $this->navbar($data),
+    //         "full_width"    => $this->load->view('kalimantan/header_full_width', $data),
+    //         "css"           => $this->load->view('management_claim/css', $data),
+    //         "view"          => $this->load->view('bridging/'.$view.'', $data),
+    //         "footer"        => $this->load->view('kalimantan/footer')
+    //     ];
+    //     return $data;       
+    // }
 
 
     public function baubau()
@@ -5024,6 +5839,14 @@ class Bridging extends MY_Controller
         if(!$cek_hak) {
             $this->session->set_flashdata("pesan", "user anda tidak diijinkan mengakses halaman ini");
             redirect('bridging/dashboard','refresh');
+        }
+
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
         }
 
         $data = [
@@ -5036,7 +5859,8 @@ class Bridging extends MY_Controller
             'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
             
         ];
-        $this->view($data, false, "baubau");
+        // $this->view($data, false, "baubau");
+        $this->render('bridging/baubau', $data);
     }
 
     public function baubau_import()
@@ -5086,7 +5910,7 @@ class Bridging extends MY_Controller
         }
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('baubau');        
+        $init_upload = $this->attachment_config('baubau', '');        
         if ($this->upload->do_upload('file')) 
         {
             $upload_data = $this->upload->data();
@@ -5287,7 +6111,8 @@ class Bridging extends MY_Controller
             'get_summary'   => $this->model_bridging->get_baubau_import_summary(),
             'params_invalid' => $params_invalid
         ];
-        $this->view($data, false, "preview_baubau");
+        // $this->view($data, false, "preview_baubau");
+        $this->render('bridging/preview_baubau', $data);
     }
 
     public function submit_baubau()
@@ -5342,6 +6167,7 @@ class Bridging extends MY_Controller
         // die;
 
         $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
         $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
         $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
 
@@ -5762,7 +6588,7 @@ class Bridging extends MY_Controller
         $unique_mapping_uli = $this->model_bridging->add_unique_baubau_import_customer('mapping_uli');
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('baubau');        
+        $init_upload = $this->attachment_config('baubau', '');        
         if ($this->upload->do_upload('file_customer')) 
         {
             $upload_data = $this->upload->data();
@@ -5899,8 +6725,8 @@ class Bridging extends MY_Controller
                     $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
                     $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
 
-                    if($kategori == "" || $nama_site == "" || $regional == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $nama_type == "" || $class_id = "" || $class = "") {
-                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
+                    if($kategori == "" || $nama_site == "" || $spot_id == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $nama_type == "" || $class_id = "" || $class = "") {
+                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or spot_id or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
                         redirect('bridging/baubau','refresh');
                     }
 
@@ -6012,7 +6838,8 @@ class Bridging extends MY_Controller
             'get_summary' => $this->model_bridging->get_baubau_import_customer_summary(),
         ];
         // var_dump($data);die;
-        $this->view($data, false, "result_baubau_customer");
+        // $this->view($data, false, "result_baubau_customer");
+        $this->render('bridging/result_baubau_customer', $data);
     }
 
     public function mms_makasar()
@@ -6024,6 +6851,14 @@ class Bridging extends MY_Controller
             redirect('bridging/dashboard','refresh');
         }
 
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
         $data = [
             "title" => "Bridging Makasar Sales",
             "title_customer" => "Bridging Customer mms_makasar (Outlet)",
@@ -6033,7 +6868,8 @@ class Bridging extends MY_Controller
             'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
             
         ];
-        $this->view($data, false, "mms_makasar");
+        // $this->view($data, false, "mms_makasar");
+        $this->render('bridging/mms_makasar', $data);
     }
 
     public function mms_makasar_import()
@@ -6083,7 +6919,7 @@ class Bridging extends MY_Controller
         }
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('mms_makasar');        
+        $init_upload = $this->attachment_config('mms_makasar', '');        
         if ($this->upload->do_upload('file')) 
         {
             $upload_data = $this->upload->data();
@@ -6215,6 +7051,15 @@ class Bridging extends MY_Controller
                     $raw_qty3    = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
                     $raw_kecil    = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue());
 
+                    if (!in_array($raw_besar, ['KRT'])) {
+                        if ($raw_qty1 > 0) {
+                            $raw_qty3    = $raw_qty1;
+                            $raw_kecil = $raw_besar;
+                            $raw_qty1    = 0;
+                            $raw_besar = 'KRT';
+                        }
+                    }
+
                     // menghitung result qty
                     $r_qty1 = $raw_qty1 * $m_qty1;
                     $r_qty2 = $raw_qty2 * $m_qty2;
@@ -6339,7 +7184,8 @@ class Bridging extends MY_Controller
             'get_summary'   => $this->model_bridging->get_mms_makasar_import_summary(),
             'params_invalid' => $params_invalid
         ];
-        $this->view($data, false, "preview_mms_makasar");
+        // $this->view($data, false, "preview_mms_makasar");
+        $this->render('bridging/preview_mms_makasar', $data);
     }
 
     public function submit_mms_makasar()
@@ -6388,6 +7234,7 @@ class Bridging extends MY_Controller
         $proses_ri = $this->model_bridging->insert_ri_mms_makasar($kode_comp, $nocab, $tahun_upload, $bulan_upload);
 
         $delete_tblang = $this->model_bridging->delete_tblang($tahun_upload, $nocab);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
         $delete_tabsales = $this->model_bridging->delete_tabsales($tahun_upload, $nocab);
         $delete_tbkota = $this->model_bridging->delete_tbkota($tahun_upload, $nocab);
         
@@ -6727,7 +7574,7 @@ class Bridging extends MY_Controller
         $unique_mapping_uli = $this->model_bridging->add_unique_mms_makasar_import_customer('mapping_uli');
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('mms_makasar');        
+        $init_upload = $this->attachment_config('mms_makasar', '');        
         if ($this->upload->do_upload('file_customer')) 
         {
             $upload_data = $this->upload->data();
@@ -6865,7 +7712,7 @@ class Bridging extends MY_Controller
                     $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
 
                     if($nama_site == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "" || $class = "") {
-                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai nama_site or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
+                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai nama_site or customer_id or mapping_uli or spot_id kosong.. Silahkan ulangi kembali.");
                         redirect('bridging/mms_makasar','refresh');
                     }
 
@@ -6977,7 +7824,8 @@ class Bridging extends MY_Controller
             'get_summary' => $this->model_bridging->get_mms_makasar_import_customer_summary(),
         ];
         // var_dump($data);die;
-        $this->view($data, false, "result_mms_makasar_customer");
+        // $this->view($data, false, "result_mms_makasar_customer");
+        $this->render('bridging/result_mms_makasar_customer', $data);
     }
 
     public function mms_bone()
@@ -6989,6 +7837,14 @@ class Bridging extends MY_Controller
             redirect('bridging/dashboard','refresh');
         }
 
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
         $data = [
             "title" => "Bridging bone Sales",
             "title_customer" => "Bridging Customer MMS Bone (Outlet)",
@@ -6998,7 +7854,8 @@ class Bridging extends MY_Controller
             'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
             
         ];
-        $this->view($data, false, "mms_bone");
+        // $this->view($data, false, "mms_bone");
+        $this->render('bridging/mms_bone', $data);
     }
 
     public function mms_bone_import()
@@ -7049,7 +7906,7 @@ class Bridging extends MY_Controller
         }
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('mms_bone');        
+        $init_upload = $this->attachment_config('mms_bone', '');        
         if ($this->upload->do_upload('file')) 
         {
             $upload_data = $this->upload->data();
@@ -7181,6 +8038,15 @@ class Bridging extends MY_Controller
                     $raw_qty3    = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
                     $raw_kecil    = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue());
 
+                    if (!in_array($raw_besar, ['KRT'])) {
+                        if ($raw_qty1 > 0) {
+                            $raw_qty3    = $raw_qty1;
+                            $raw_kecil = $raw_besar;
+                            $raw_qty1    = 0;
+                            $raw_besar = 'KRT';
+                        }
+                    }
+                    
                     // menghitung result qty
                     $r_qty1 = $raw_qty1 * $m_qty1;
                     $r_qty2 = $raw_qty2 * $m_qty2;
@@ -7304,7 +8170,8 @@ class Bridging extends MY_Controller
             'get_summary'   => $this->model_bridging->get_mms_bone_import_summary(),
             'params_invalid' => $params_invalid
         ];
-        $this->view($data, false, "preview_mms_bone");
+        // $this->view($data, false, "preview_mms_bone");
+        $this->render('bridging/preview_mms_bone', $data);
     }
 
     public function submit_mms_bone()
@@ -7359,6 +8226,7 @@ class Bridging extends MY_Controller
         // die;
 
         $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
         $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
         $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
 
@@ -7691,7 +8559,7 @@ class Bridging extends MY_Controller
         $unique_mapping_uli = $this->model_bridging->add_unique_mms_bone_import_customer('mapping_uli');
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('mms_bone');        
+        $init_upload = $this->attachment_config('mms_bone', '');        
         if ($this->upload->do_upload('file_customer')) 
         {
             $upload_data = $this->upload->data();
@@ -7828,8 +8696,8 @@ class Bridging extends MY_Controller
                     $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
                     $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
 
-                    if($nama_site == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "" || $class = "") {
-                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai nama_site or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
+                    if($nama_site == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "" || $class = "" || $spot_id == "") {
+                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai nama_site or customer_id or mapping_uli or spot_id kosong.. Silahkan ulangi kembali.");
                         redirect('bridging/mms_bone','refresh');
                     }
 
@@ -7941,7 +8809,8 @@ class Bridging extends MY_Controller
             'get_summary' => $this->model_bridging->get_mms_bone_import_customer_summary(),
         ];
         // var_dump($data);die;
-        $this->view($data, false, "result_mms_bone_customer");
+        // $this->view($data, false, "result_mms_bone_customer");
+        $this->render('bridging/result_mms_bone_customer', $data);
     }
 
     public function mms_parepare()
@@ -7953,6 +8822,14 @@ class Bridging extends MY_Controller
             redirect('bridging/dashboard','refresh');
         }
 
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
         $data = [
             "title" => "Bridging Pare-Pare Sales",
             "title_customer" => "Bridging Customer MMS Pare-Pare (Outlet)",
@@ -7962,7 +8839,8 @@ class Bridging extends MY_Controller
             'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
             
         ];
-        $this->view($data, false, "mms_parepare");
+        // $this->view($data, false, "mms_parepare");
+        $this->render('bridging/mms_parepare', $data);
     }
 
     public function mms_parepare_import()
@@ -8012,7 +8890,7 @@ class Bridging extends MY_Controller
         }
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('mms_parepare');        
+        $init_upload = $this->attachment_config('mms_parepare', '');        
         if ($this->upload->do_upload('file')) 
         {
             $upload_data = $this->upload->data();
@@ -8144,6 +9022,15 @@ class Bridging extends MY_Controller
                     $raw_qty3    = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
                     $raw_kecil    = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue());
 
+                    if (!in_array($raw_besar, ['KRT'])) {
+                        if ($raw_qty1 > 0) {
+                            $raw_qty3    = $raw_qty1;
+                            $raw_kecil = $raw_besar;
+                            $raw_qty1    = 0;
+                            $raw_besar = 'KRT';
+                        }
+                    }
+
                     // menghitung result qty
                     $r_qty1 = $raw_qty1 * $m_qty1;
                     $r_qty2 = $raw_qty2 * $m_qty2;
@@ -8267,7 +9154,8 @@ class Bridging extends MY_Controller
             'get_summary'   => $this->model_bridging->get_mms_parepare_import_summary(),
             'params_invalid' => $params_invalid
         ];
-        $this->view($data, false, "preview_mms_parepare");
+        // $this->view($data, false, "preview_mms_parepare");
+        $this->render('bridging/preview_mms_parepare', $data);
     }
 
     public function submit_mms_parepare()
@@ -8322,6 +9210,7 @@ class Bridging extends MY_Controller
         // die;
 
         $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
         $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
         $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
 
@@ -8654,7 +9543,7 @@ class Bridging extends MY_Controller
         $unique_mapping_uli = $this->model_bridging->add_unique_mms_parepare_import_customer('mapping_uli');
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('mms_parepare');        
+        $init_upload = $this->attachment_config('mms_parepare', '');        
         if ($this->upload->do_upload('file_customer')) 
         {
             $upload_data = $this->upload->data();
@@ -8791,8 +9680,8 @@ class Bridging extends MY_Controller
                     $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
                     $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
 
-                    if($nama_site == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "" || $class = "") {
-                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai nama_site or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
+                    if($nama_site == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "" || $class = "" || $spot_id == "") {
+                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai nama_site or customer_id or mapping_uli or spot_id kosong.. Silahkan ulangi kembali.");
                         redirect('bridging/mms_parepare','refresh');
                     }
 
@@ -8904,7 +9793,8 @@ class Bridging extends MY_Controller
             'get_summary' => $this->model_bridging->get_mms_parepare_import_customer_summary(),
         ];
         // var_dump($data);die;
-        $this->view($data, false, "result_mms_parepare_customer");
+        // $this->view($data, false, "result_mms_parepare_customer");
+        $this->render('bridging/result_mms_parepare_customer', $data);
     }
 
     public function pekanbaru_old()
@@ -8960,7 +9850,7 @@ class Bridging extends MY_Controller
         }
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('pekanbaru');        
+        $init_upload = $this->attachment_config('pekanbaru', '');        
         if ($this->upload->do_upload('file')) 
         {
             $upload_data = $this->upload->data();
@@ -9360,6 +10250,14 @@ class Bridging extends MY_Controller
             redirect('bridging/dashboard','refresh');
         }
 
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
         $data = [
             "title" => "Bridging Pekanbaru Sales",
             "title_customer" => "Bridging Customer (Outlet)",
@@ -9369,7 +10267,8 @@ class Bridging extends MY_Controller
             'bridging'  => "pekanbaru",
             'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
         ];
-        $this->view($data, false, "pekanbaru");
+        // $this->view($data, false, "pekanbaru");
+        $this->render('bridging/pekanbaru', $data);
 
     }
 
@@ -9419,7 +10318,7 @@ class Bridging extends MY_Controller
         }
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('pekanbaru');        
+        $init_upload = $this->attachment_config('pekanbaru', '');        
         if ($this->upload->do_upload('file')) 
         {
             $upload_data = $this->upload->data();
@@ -9437,7 +10336,7 @@ class Bridging extends MY_Controller
 
             $highestColumm = $object->setActiveSheetIndex(0)->getHighestColumn();
             // var_dump($highestColumm);die;
-            if ($highestColumm != 'DB') {
+            if ($highestColumm != 'DD') {
                 echo "<script>alert('upload file gagal karena column tidak sesuai'); </script>";
                 redirect('bridging/pekanbaru','refresh');
             }
@@ -9458,8 +10357,8 @@ class Bridging extends MY_Controller
                 $highestRow = $worksheet->getHighestRow();
                 $highestColumn = $worksheet->getHighestColumn();
 
-                if ($highestRow > 5000) {
-                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 5000 ROW.");
+                if ($highestRow > 10000) {
+                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 10000 ROW.");
                     redirect('bridging/pekanbaru','refresh');
                 }
 
@@ -9656,6 +10555,8 @@ class Bridging extends MY_Controller
                     $barkode = trim($worksheet->getCellByColumnAndRow(103, $row)->getValue());
                     $namapof = trim($worksheet->getCellByColumnAndRow(104, $row)->getValue());
                     $jalur = trim($worksheet->getCellByColumnAndRow(105, $row)->getValue());
+                    $DISCISI1_RP = trim($worksheet->getCellByColumnAndRow(106, $row)->getValue());
+                    $DISCISI2_RP = trim($worksheet->getCellByColumnAndRow(107, $row)->getValue());
 
                     
                     $data = [
@@ -9765,6 +10666,8 @@ class Bridging extends MY_Controller
                         'barkode' => $barkode,
                         'namapof' => $namapof,
                         'jalur' => $jalur,
+                        'DISCISI1_RP' => $DISCISI1_RP,
+                        'DISCISI2_RP' => $DISCISI2_RP,
                         'is_valid_kodeprod'=> $is_valid_kodeprod,
                         'is_valid_tanggal' => $is_valid_tanggal,
                         'is_valid_customer'=> $is_valid_customer,
@@ -9813,7 +10716,8 @@ class Bridging extends MY_Controller
             'get_summary'   => $this->model_bridging->get_pekanbaru_import_summary(),
             'params_invalid' => $params_invalid
         ];
-        $this->view($data, false, "preview_pekanbaru");
+        // $this->view($data, false, "preview_pekanbaru");
+        $this->render('bridging/preview_pekanbaru', $data);
     }
 
     public function submit_pekanbaru()
@@ -9868,6 +10772,7 @@ class Bridging extends MY_Controller
         // die;
 
         $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
         $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
         $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
 
@@ -10291,7 +11196,7 @@ class Bridging extends MY_Controller
         $unique_mapping_uli = $this->model_bridging->add_unique_pekanbaru_import_customer('mapping_uli');
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('pekanbaru');        
+        $init_upload = $this->attachment_config('pekanbaru', '');        
         if ($this->upload->do_upload('file_customer')) 
         {
             $upload_data = $this->upload->data();
@@ -10434,7 +11339,7 @@ class Bridging extends MY_Controller
                     $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
                     $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
 
-                    if($nama_site == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "") {
+                    if($nama_site == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "" || $spot_id == "") {
                         $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
                         redirect('bridging/pekanbaru','refresh');
                     }
@@ -10546,7 +11451,8 @@ class Bridging extends MY_Controller
             'get_data' => $this->model_bridging->get_pekanbaru_import_customer(),
             'get_summary' => $this->model_bridging->get_pekanbaru_import_customer_summary(),
         ];
-        $this->view($data, false, "result_pekanbaru_customer");
+        // $this->view($data, false, "result_pekanbaru_customer");
+        $this->render('bridging/result_pekanbaru_customer', $data);
     }
 
     public function update_status($signature, $dp_bridging)
@@ -10594,6 +11500,14 @@ class Bridging extends MY_Controller
             redirect('bridging/dashboard','refresh');
         }
 
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
         $data = [
             "title" => "Bridging SUP Makasar Sales",
             "title_customer" => "Bridging Customer (Outlet)",
@@ -10603,7 +11517,8 @@ class Bridging extends MY_Controller
             'bridging'  => "sup_makasar",
             'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
         ];
-        $this->view($data, false, "sup_makasar");
+        // $this->view($data, false, "sup_makasar");
+        $this->render('bridging/sup_makasar', $data);
 
     }
 
@@ -10653,7 +11568,7 @@ class Bridging extends MY_Controller
         }
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('sup_makasar');        
+        $init_upload = $this->attachment_config('sup_makasar', '');        
         if ($this->upload->do_upload('file')) 
         {
             $upload_data = $this->upload->data();
@@ -10856,7 +11771,8 @@ class Bridging extends MY_Controller
             'get_summary'   => $this->model_bridging->get_sup_makasar_import_summary(),
             'params_invalid' => $params_invalid
         ];
-        $this->view($data, false, "preview_sup_makasar");
+        // $this->view($data, false, "preview_sup_makasar");
+        $this->render('bridging/preview_sup_makasar', $data);
     }
 
     public function submit_sup_makasar()
@@ -11333,7 +12249,7 @@ class Bridging extends MY_Controller
         $unique_mapping_uli = $this->model_bridging->add_unique_sup_makasar_import_customer('mapping_uli');
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('sup_makasar');        
+        $init_upload = $this->attachment_config('sup_makasar', '');        
         if ($this->upload->do_upload('file_customer')) 
         {
             $upload_data = $this->upload->data();
@@ -11583,7 +12499,8 @@ class Bridging extends MY_Controller
             'get_data' => $this->model_bridging->get_sup_makasar_import_customer(),
             'get_summary' => $this->model_bridging->get_sup_makasar_import_customer_summary(),
         ];
-        $this->view($data, false, "result_sup_makasar_customer");
+        // $this->view($data, false, "result_sup_makasar_customer");
+        $this->render('bridging/result_sup_makasar_customer', $data);
     }
 
     public function tarakan()
@@ -11595,6 +12512,14 @@ class Bridging extends MY_Controller
             redirect('bridging/dashboard','refresh');
         }
 
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
         $data = [
             "title" => "Bridging Tarakan Sales",
             "title_customer" => "Bridging Customer Tarakan (Outlet)",
@@ -11603,7 +12528,8 @@ class Bridging extends MY_Controller
             'bridging'  => "tarakan",
             'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
         ];
-        $this->view($data, false, "tarakan");
+        // $this->view($data, false, "tarakan");
+        $this->render('bridging/tarakan', $data);
     }
 
     public function tarakan_import()
@@ -11653,7 +12579,7 @@ class Bridging extends MY_Controller
         }
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('tarakan');        
+        $init_upload = $this->attachment_config('tarakan', '');        
         if ($this->upload->do_upload('file')) 
         {
             $upload_data = $this->upload->data();
@@ -11854,7 +12780,8 @@ class Bridging extends MY_Controller
             'get_summary'   => $this->model_bridging->get_tarakan_import_summary(),
             'params_invalid' => $params_invalid
         ];
-        $this->view($data, false, "preview_tarakan");
+        // $this->view($data, false, "preview_tarakan");
+        $this->render('bridging/preview_tarakan', $data);
     }
 
     public function submit_tarakan()
@@ -11909,6 +12836,7 @@ class Bridging extends MY_Controller
         // die;
 
         $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
         $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
         $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
 
@@ -12329,7 +13257,7 @@ class Bridging extends MY_Controller
         $unique_mapping_uli = $this->model_bridging->add_unique_tarakan_import_customer('mapping_uli');
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('tarakan');        
+        $init_upload = $this->attachment_config('tarakan', '');        
         if ($this->upload->do_upload('file_customer')) 
         {
             $upload_data = $this->upload->data();
@@ -12468,8 +13396,8 @@ class Bridging extends MY_Controller
                     $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
                     $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
 
-                    if($nama_site == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "") {
-                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
+                    if($nama_site == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "" || $spot_id == "") {
+                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli or spot_id kosong.. Silahkan ulangi kembali.");
                         redirect('bridging/tarakan','refresh');
                     }
 
@@ -12581,7 +13509,8 @@ class Bridging extends MY_Controller
             'get_summary' => $this->model_bridging->get_tarakan_import_customer_summary(),
         ];
         // var_dump($data);die;
-        $this->view($data, false, "result_tarakan_customer");
+        // $this->view($data, false, "result_tarakan_customer");
+        $this->render('bridging/result_tarakan_customer', $data);
     }
 
     public function berau()
@@ -12593,6 +13522,14 @@ class Bridging extends MY_Controller
             redirect('bridging/dashboard','refresh');
         }
 
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
         $data = [
             "title" => "Bridging Berau Sales",
             "title_customer" => "Bridging Customer Berau (Outlet)",
@@ -12601,7 +13538,8 @@ class Bridging extends MY_Controller
             'bridging'  => "berau",
             'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
         ];
-        $this->view($data, false, "berau");
+        // $this->view($data, false, "berau");
+        $this->render('bridging/berau', $data);
     }
 
     public function berau_import()
@@ -12651,7 +13589,7 @@ class Bridging extends MY_Controller
         }
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('berau');        
+        $init_upload = $this->attachment_config('berau', '');        
         if ($this->upload->do_upload('file')) 
         {
             $upload_data = $this->upload->data();
@@ -12852,7 +13790,8 @@ class Bridging extends MY_Controller
             'get_summary'   => $this->model_bridging->get_berau_import_summary(),
             'params_invalid' => $params_invalid
         ];
-        $this->view($data, false, "preview_berau");
+        // $this->view($data, false, "preview_berau");
+        $this->render('bridging/preview_berau', $data);
     }
 
     public function submit_berau()
@@ -12907,6 +13846,7 @@ class Bridging extends MY_Controller
         // die;
 
         $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
         $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
         $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
 
@@ -13327,7 +14267,7 @@ class Bridging extends MY_Controller
         $unique_mapping_uli = $this->model_bridging->add_unique_berau_import_customer('mapping_uli');
 
         // inisialisasi upload
-        $init_upload = $this->attachment_config('berau');        
+        $init_upload = $this->attachment_config('berau', '');        
         if ($this->upload->do_upload('file_customer')) 
         {
             $upload_data = $this->upload->data();
@@ -13466,8 +14406,8 @@ class Bridging extends MY_Controller
                     $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
                     $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
 
-                    if($nama_site == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "") {
-                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
+                    if($nama_site == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "" || $spot_id == "") {
+                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli or spot_id kosong.. Silahkan ulangi kembali.");
                         redirect('bridging/berau','refresh');
                     }
 
@@ -13579,8 +14519,6790 @@ class Bridging extends MY_Controller
             'get_summary' => $this->model_bridging->get_berau_import_customer_summary(),
         ];
         // var_dump($data);die;
-        $this->view($data, false, "result_berau_customer");
+        // $this->view($data, false, "result_berau_customer");
+        $this->render('bridging/result_berau_customer', $data);
     }
+
+    public function palu()
+    {
+        $site_code = 'AJP2V';
+        $cek_hak = $this->model_bridging->get_bridging_hak_akses_by_site_code_userid($site_code, $this->userid)->row();
+        if(!$cek_hak) {
+            $this->session->set_flashdata("pesan", "user anda tidak diijinkan mengakses halaman ini");
+            redirect('bridging/dashboard','refresh');
+        }
+
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
+        $data = [
+            "title" => "Bridging Palu Sales",
+            "title_customer" => "Bridging Customer Palu (Outlet)",
+            'url'   => 'bridging/palu_import',
+            'url_customer'   => 'bridging/palu_import_customer',
+            'bridging'  => "palu",
+            'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
+        ];
+        // $this->view($data, false, "palu");
+        $this->render('bridging/palu', $data);
+    }
+
+    public function palu_import()
+    {
+        $month = $this->input->post('month');
+        $bulan = explode('-', $month)[1];
+        $tahun = explode('-', $month)[0];
+
+        $newDate_sebelumnya = date('Y-m', strtotime($month. ' -1 months')); // mencari periode -1 bulan sebelumnya
+        $tahun_sebelumnya = explode('-', $newDate_sebelumnya)[0];
+        $bulan_sebelumnya = explode('-', $newDate_sebelumnya)[1];
+
+        // cek data apakah bulan sebelumnya sudah closing bulanan atau belum
+        $get_mpm_user = $this->model_bridging->get_mpm_user('AJP');
+        $userid = $get_mpm_user->row()->id;
+
+        $get_mpm_upload_bulan_lalu = $this->model_bridging->get_mpm_upload($userid, $bulan_sebelumnya, $tahun_sebelumnya, '1');
+        if ($get_mpm_upload_bulan_lalu->num_rows() > 0) {
+            $status_closing_bulan_lalu = $get_mpm_upload_bulan_lalu->row()->status_closing;
+        } else {
+            $status_closing_bulan_lalu = null; // atau default value lain seperti 0 atau ''
+        }
+
+        if ($status_closing_bulan_lalu == null) {
+            $this->session->set_flashdata("pesan", "upload file gagal, data bulan sebelumnya belum di closing! silahkan upload data closing terlebih dahulu");
+            redirect('bridging/palu','refresh');
+        }
+
+        // cek data apakah sudah closing bulanan atau belum
+        $get_mpm_uplaod = $this->model_bridging->get_mpm_upload($userid, $bulan, $tahun, '');
+
+        if ($get_mpm_uplaod->num_rows() > 0) {
+            $status_closing = $get_mpm_uplaod->row()->status_closing;
+        } else {
+            $status_closing = null; // atau default value lain seperti 0 atau ''
+        }
+        
+        if ($status_closing == '1') {
+            $this->session->set_flashdata("pesan", "upload file gagal, data sudah di closing! silahkan hubungi IT");
+            redirect('bridging/palu','refresh');
+        }
+
+        // create table
+        $create = $this->model_bridging->create_table_palu_import();
+        if(!$create) {
+            $this->session->set_flashdata("pesan", "gagal membuat table bridging_palu_import");
+            redirect('bridging/palu','refresh');
+        }
+
+        // inisialisasi upload
+        $init_upload = $this->attachment_config('palu', '');        
+        if ($this->upload->do_upload('file')) 
+        {
+            $upload_data = $this->upload->data();
+            $filename_excel = $upload_data['file_name'];
+
+            $this->load->library('excel');
+            $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/palu/$filename_excel");
+
+            $jumlahSheet = $object->getSheetCount();
+            if ($jumlahSheet > 1) {
+                echo "jumlah_sheet : ".$jumlahSheet;
+                echo "<script>alert('upload file gagal karena file mempunyai lebih dari 1 sheet'); </script>";
+                redirect('bridging/palu','refresh');
+            }
+
+            $highestColumm = $object->setActiveSheetIndex(0)->getHighestColumn();
+            // var_dump($highestColumm);die;
+            if ($highestColumm != 'BT') {
+                echo "<script>alert('upload file gagal karena column tidak sesuai'); </script>";
+                redirect('bridging/palu','refresh');
+            }
+
+            $input_log_data = [
+                "site_code" => "AJP2V",
+                "bulan" => $month,
+                "filename"  => $filename_excel,
+                "signature" => md5("AJP2V".$month.$this->model_outlet_transaksi->timezone()),
+                "created_at" => $this->model_outlet_transaksi->timezone(),
+                "created_by" => $this->session->userdata('id'),
+            ];
+
+            $id_log = $this->model_bridging->input_bridging_log($input_log_data);
+
+            foreach ($object->getWorksheetIterator() as $worksheet) 
+            {
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+
+                if ($highestRow > 5000) {
+                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 1000 ROW.");
+                    redirect('bridging/palu','refresh');
+                }
+
+                if ($highestRow <= 1) {
+                    $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+                    redirect('bridging/palu','refresh');
+                }
+
+                for ($row = 2; $row <= $highestRow; $row++) 
+                {   
+                    $distributor    = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+                    $cabang         = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
+                    $tipetrans      = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                    $divisi         = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());
+                    $principal      = trim($worksheet->getCellByColumnAndRow(4, $row)->getValue());
+                    $productgroup1  = trim($worksheet->getCellByColumnAndRow(5, $row)->getValue());
+                    $productgroup2  = trim($worksheet->getCellByColumnAndRow(6, $row)->getValue());
+                    $productgroup3  = trim($worksheet->getCellByColumnAndRow(7, $row)->getValue());
+                    $brand          = trim($worksheet->getCellByColumnAndRow(8, $row)->getValue());
+                    $kodeproduk     = trim($worksheet->getCellByColumnAndRow(9, $row)->getValue());
+                    $kodevarian     = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
+                    
+                    // cek kodeproduk mpm
+                    $kodeprodukprincipal = (strlen($temp = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue())) == 5) ? '0' . $temp : $temp;
+                    // echo $kodeprodukprincipal;
+                    // echo '</br>';
+
+                    $get_kodeprod = $this->model_bridging->get_master_product_by_kodeprod($kodeprodukprincipal);
+                    if($get_kodeprod->num_rows() > 0) {
+                        $is_valid_kodeprod = 1;
+                    }else{
+                        $is_valid_kodeprod = 0;
+                    }
+
+                    $namaproduk    = trim($worksheet->getCellByColumnAndRow(12, $row)->getValue());
+                    $packaging    = trim($worksheet->getCellByColumnAndRow(13, $row)->getValue());
+                    $productclass = trim($worksheet->getCellByColumnAndRow(14, $row)->getValue());
+                    $kodecustomer= trim($worksheet->getCellByColumnAndRow(15, $row)->getValue());
+
+                    // cek kodecustomer 
+                    $cek_customer = $this->model_bridging->get_palu_customer($kodecustomer);
+                    if($cek_customer->num_rows() > 0) {
+                        $is_valid_customer = 1;
+                    }else{
+                        $is_valid_customer = 0;
+                    }
+
+                    $namacustomer = trim($worksheet->getCellByColumnAndRow(16, $row)->getValue());
+                    $alamatcustomer = trim($worksheet->getCellByColumnAndRow(17, $row)->getValue());
+                    $area = trim($worksheet->getCellByColumnAndRow(18, $row)->getValue());
+                    $subarea = trim($worksheet->getCellByColumnAndRow(19, $row)->getValue());
+                    $channel = trim($worksheet->getCellByColumnAndRow(20, $row)->getValue());
+                    $subchannel = trim($worksheet->getCellByColumnAndRow(21, $row)->getValue());
+                    $customergroup = trim($worksheet->getCellByColumnAndRow(22, $row)->getValue());
+                    $keyaccount= trim($worksheet->getCellByColumnAndRow(23, $row)->getValue());
+                    $kodesalesman = trim($worksheet->getCellByColumnAndRow(24, $row)->getValue());
+                    $namasalesman = trim($worksheet->getCellByColumnAndRow(25, $row)->getValue());
+                    $kodesalesco = trim($worksheet->getCellByColumnAndRow(26, $row)->getValue());
+                    $namasalesco = trim($worksheet->getCellByColumnAndRow(27, $row)->getValue());
+                    $kodespv = trim($worksheet->getCellByColumnAndRow(28, $row)->getValue());
+                    $namaspv = trim($worksheet->getCellByColumnAndRow(29, $row)->getValue());
+                    $tahunbulan = trim($worksheet->getCellByColumnAndRow(30, $row)->getValue());
+                    $bulan = trim($worksheet->getCellByColumnAndRow(31, $row)->getValue());
+                    
+                    // cek tanggal
+                    $cell = $worksheet->getCellByColumnAndRow(32, $row);
+                    $cellValue = $cell->getValue();
+
+                    // echo $cellValue; echo '<br>';
+                    $is_valid_tanggal = 1; // Nilai default valid
+
+                    if (is_numeric($cellValue)) {
+                        // echo "numeric: " . $cellValue . "<br>";die;
+                        $unixTimestamp = ($cellValue - 25569) * 86400; // 25569 is days between 1900-01-01 and 1970-01-01
+                        $tanggal = date('Y-m-d', $unixTimestamp); // Format as needed
+                        // Ekstrak tahun-bulan dari $tanggal untuk perbandingan
+                        $tanggal_ym = date('Y-m', $unixTimestamp);
+                        // Bandingkan dengan $month
+                        if ($tanggal_ym !== $month) {
+                            $is_valid_tanggal = 0; // Tandai sebagai tidak valid jika bulan berbeda
+                        }
+                    } else {
+                        // echo "string: " . $cellValue . "<br>";die;
+                        $tanggal = $cellValue;
+
+                        $formats = ['d/m/Y', 'd-m-Y', 'Y-m-d'];
+                        $dateObj = false;
+
+                        foreach ($formats as $format) {
+                            $dateObj = DateTime::createFromFormat($format, $tanggal);
+                            if ($dateObj !== false) {
+                                break;
+                            }
+                        }
+
+                        if ($dateObj !== false) {
+
+                            $tanggal = $dateObj->format('Y-m-d');
+                            $tanggal_ym = $dateObj->format('Y-m');
+
+                            if ($tanggal_ym !== $month) {
+                                $is_valid_tanggal = 0;
+                            }
+
+                        } else {
+                            $is_valid_tanggal = 0;
+                        }
+                    }
+                    
+                    $weekno = trim($worksheet->getCellByColumnAndRow(33, $row)->getValue());
+                    $nomornota = trim($worksheet->getCellByColumnAndRow(34, $row)->getValue());
+                    $salesmethod = trim($worksheet->getCellByColumnAndRow(35, $row)->getValue());
+                    $sellingtype = trim($worksheet->getCellByColumnAndRow(36, $row)->getValue());
+                    $qtysold        = trim($worksheet->getCellByColumnAndRow(37, $row)->getValue());
+                    $kartonutuh     = trim($worksheet->getCellByColumnAndRow(38, $row)->getValue());
+                    $qtysoldpcs     = trim($worksheet->getCellByColumnAndRow(39, $row)->getValue());
+                    $freegoodpcs    = trim($worksheet->getCellByColumnAndRow(40, $row)->getValue());
+
+                    $tonnage        = trim($worksheet->getCellByColumnAndRow(41, $row)->getValue());
+                    $volume_ltr     = trim($worksheet->getCellByColumnAndRow(42, $row)->getValue());
+                    $grossamount    = trim($worksheet->getCellByColumnAndRow(43, $row)->getValue());
+
+                    $linediscount1  = trim($worksheet->getCellByColumnAndRow(44, $row)->getValue());
+                    $linediscount2  = trim($worksheet->getCellByColumnAndRow(45, $row)->getValue());
+                    $linediscount3  = trim($worksheet->getCellByColumnAndRow(46, $row)->getValue());
+                    $linediscount4  = trim($worksheet->getCellByColumnAndRow(47, $row)->getValue());
+                    $linediscount5  = trim($worksheet->getCellByColumnAndRow(48, $row)->getValue());
+                    $totallinediscount = trim($worksheet->getCellByColumnAndRow(49, $row)->getValue());
+
+                    $discountnota1  = trim($worksheet->getCellByColumnAndRow(50, $row)->getValue());
+                    $discountnota2  = trim($worksheet->getCellByColumnAndRow(51, $row)->getValue());
+                    $discountnota3  = trim($worksheet->getCellByColumnAndRow(52, $row)->getValue());
+                    $totaldiscountnota = trim($worksheet->getCellByColumnAndRow(53, $row)->getValue());
+
+                    $dpp            = trim($worksheet->getCellByColumnAndRow(54, $row)->getValue());
+                    $ppn            = trim($worksheet->getCellByColumnAndRow(55, $row)->getValue());
+                    $ppnbm          = trim($worksheet->getCellByColumnAndRow(56, $row)->getValue());
+                    $tax3           = trim($worksheet->getCellByColumnAndRow(57, $row)->getValue());
+                    $netamount      = trim($worksheet->getCellByColumnAndRow(58, $row)->getValue());
+
+                    $warehouse      = trim($worksheet->getCellByColumnAndRow(59, $row)->getValue());
+                    $customerpo     = trim($worksheet->getCellByColumnAndRow(60, $row)->getValue());
+                    $customerjoindate = trim($worksheet->getCellByColumnAndRow(61, $row)->getValue());
+                    $nofakturpajak  = trim($worksheet->getCellByColumnAndRow(62, $row)->getValue());
+                    $tglfakturpajak = trim($worksheet->getCellByColumnAndRow(63, $row)->getValue());
+                    $nomorfakturproforma = trim($worksheet->getCellByColumnAndRow(64, $row)->getValue());
+                    $tglfakturproforma = trim($worksheet->getCellByColumnAndRow(65, $row)->getValue());
+
+                    $cogs               = trim($worksheet->getCellByColumnAndRow(66, $row)->getValue());
+                    $case_weight_kg     = trim($worksheet->getCellByColumnAndRow(67, $row)->getValue());
+                    $tslqtysoldnfg      = trim($worksheet->getCellByColumnAndRow(68, $row)->getValue());
+                    $tslconvpcstoctn    = trim($worksheet->getCellByColumnAndRow(69, $row)->getValue());
+                    $tsltonnagesoldfg   = trim($worksheet->getCellByColumnAndRow(70, $row)->getValue());
+                    $end                = trim($worksheet->getCellByColumnAndRow(71, $row)->getValue());
+
+                    $data = [
+                        'distributor'        => $distributor,
+                        'cabang'             => $cabang,
+                        'tipetrans'          => $tipetrans,
+                        'divisi'             => $divisi,
+                        'principal'          => $principal,
+                        'productgroup1'      => $productgroup1,
+                        'productgroup2'      => $productgroup2,
+                        'productgroup3'      => $productgroup3,
+                        'brand'              => $brand,
+                        'kodeproduk'         => $kodeproduk,
+                        'kodevarian'         => $kodevarian,
+                        'kodeprodukprincipal'=> $kodeprodukprincipal,
+                        'namaproduk'         => $namaproduk,
+                        'packaging'          => $packaging,
+                        'productclass'       => $productclass,
+                        'kodecustomer'       => $kodecustomer,
+                        'namacustomer'       => $namacustomer,
+                        'alamatcustomer'     => $alamatcustomer,
+                        'area'               => $area,
+                        'subarea'            => $subarea,
+                        'channel'            => $channel,
+                        'subchannel'         => $subchannel,
+                        'customergroup'      => $customergroup,
+                        'keyaccount'         => $keyaccount,
+                        'kodesalesman'       => $kodesalesman,
+                        'namasalesman'       => $namasalesman,
+                        'kodesalesco'        => $kodesalesco,
+                        'namasalesco'        => $namasalesco,
+                        'kodespv'            => $kodespv,
+                        'namaspv'            => $namaspv,
+                        'tahunbulan'         => $tahunbulan,
+                        'bulan'              => $bulan,
+                        'tanggal'            => $tanggal,
+                        'weekno'             => $weekno,
+                        'nomornota'          => $nomornota,
+                        'salesmethod'        => $salesmethod,
+                        'sellingtype'        => $sellingtype,
+                        'qtysold'            => $qtysold,
+                        'kartonutuh'         => $kartonutuh,
+                        'qtysoldpcs'         => $qtysoldpcs,
+                        'freegoodpcs'        => $freegoodpcs,
+                        'tonnage'            => $tonnage,
+                        'volume_ltr'         => $volume_ltr,
+                        'grossamount'        => $grossamount,
+                        'linediscount1'      => $linediscount1,
+                        'linediscount2'      => $linediscount2,
+                        'linediscount3'      => $linediscount3,
+                        'linediscount4'      => $linediscount4,
+                        'linediscount5'      => $linediscount5,
+                        'totallinediscount'  => $totallinediscount,
+                        'discountnota1'      => $discountnota1,
+                        'discountnota2'      => $discountnota2,
+                        'discountnota3'      => $discountnota3,
+                        'totaldiscountnota'  => $totaldiscountnota,
+                        'dpp'                => $dpp,
+                        'ppn'                => $ppn,
+                        'ppnbm'              => $ppnbm,
+                        'tax3'               => $tax3,
+                        'netamount'          => $netamount,
+                        'warehouse'          => $warehouse,
+                        'customerpo'         => $customerpo,
+                        'customerjoindate'   => $customerjoindate,
+                        'nofakturpajak'      => $nofakturpajak,
+                        'tanggalfakturpajak' => $tglfakturpajak,
+                        'nomorfakturproforma'=> $nomorfakturproforma,
+                        'tanggalfakturproforma'=> $tglfakturproforma,
+                        'cogs'               => $cogs,
+                        'case_weight_kg'     => $case_weight_kg,
+                        'tslqtysoldnfg'      => $tslqtysoldnfg,
+                        'tslconvpcstoctn'    => $tslconvpcstoctn,
+                        'tsltonnagesoldfg'   => $tsltonnagesoldfg,
+                        'end'                => $end,
+                        'is_valid_kodeprod'  => $is_valid_kodeprod,
+                        'is_valid_tanggal'   => $is_valid_tanggal,
+                        'is_valid_customer'  => $is_valid_customer,
+                        'id_bridging_log'    => $id_log
+                    ];
+
+                    $insert = $this->model_bridging->insert_palu_import($data);
+                }
+            }
+            // echo "<pre>"; print_r($data); echo "</pre>"; die;
+            // echo "tanggal : ".$tanggal." - is_valid_tanggal : ".$is_valid_tanggal; die;
+        }else
+        {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+            redirect('bridging/palu','refresh');
+        };
+
+        $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
+        redirect('bridging/preview_palu','refresh');
+    }
+
+    public function preview_palu()
+    {
+        $get_data = $this->model_bridging->get_palu_import();
+        $id_bridging_log = $get_data->row()->id_bridging_log; 
+        // echo "id_bridging_log : ".$id_bridging_log; die;
+
+        $is_invalid = $this->model_bridging->get_palu_import_where_is_valid_false();
+        if($is_invalid->num_rows() > 0)
+        {
+            // echo "is_invalid : ".$is_invalid->num_rows();die;
+            $params_invalid = 1;
+        }else{
+            $params_invalid = 0;
+        }
+
+        $data = [
+            "title"         => "Preview Bridging palu",
+            'url'           => 'bridging/submit_palu',
+            'get_data'      => $get_data,
+            'id_bridging_log'   => $id_bridging_log,
+            'get_summary'   => $this->model_bridging->get_palu_import_summary(),
+            'params_invalid' => $params_invalid
+        ];
+        // $this->view($data, false, "preview_palu");
+        $this->render('bridging/preview_palu', $data);
+    }
+
+    public function download_template_palu()
+    {
+        $query = "
+            select 	'' as distributor,
+                    '' as cabang,
+                    '' as tipetrans,
+                    '' as divisi,
+                    '' as principal,
+                    '' as productgroup1,
+                    '' as productgroup2,
+                    '' as productgroup3,
+                    '' as brand,
+                    '' as kodeproduk,
+                    '' as kodevarian,
+                    '' as kodeprodukprincipal,
+                    '' as namaproduk,
+                    '' as packaging,
+                    '' as productclass,
+                    '' as kodecustomer,
+                    '' as namacustomer,
+                    '' as alamatcustomer,
+                    '' as area,
+                    '' as subarea,
+                    '' as channel,
+                    '' as subchannel,
+                    '' as customergroup,
+                    '' as keyaccount,
+                    '' as kodesalesman,
+                    '' as namasalesman,
+                    '' as kodesalesco,
+                    '' as namasalesco,
+                    '' as kodespv,
+                    '' as namaspv,
+                    '' as tahunbulan,
+                    '' as bulan,
+                    '' as tanggal,
+                    '' as weekno,
+                    '' as nomornota,
+                    '' as salesmethod,
+                    '' as sellingtype,
+                    '' as qtysold,
+                    '' as kartonutuh,
+                    '' as qtysoldpcs,
+                    '' as freegoodpcs,
+                    '' as tonnage,
+                    '' as volume_ltr,
+                    '' as grossamount,
+                    '' as linediscount1,
+                    '' as linediscount2,
+                    '' as linediscount3,
+                    '' as linediscount4,
+                    '' as linediscount5,
+                    '' as totallinediscount,
+                    '' as discountnota1,
+                    '' as discountnota2,
+                    '' as discountnota3,
+                    '' as totaldiscountnota,
+                    '' as dpp,
+                    '' as ppn,
+                    '' as ppnbm,
+                    '' as tax3,
+                    '' as netamount,
+                    '' as warehouse,
+                    '' as customerpo,
+                    '' as customerjoindate,
+                    '' as nofakturpajak,
+                    '' as tanggalfakturpajak,
+                    '' as nomorfakturproforma,
+                    '' as tanggalfakturproforma,
+                    '' as cogs,
+                    '' as case_weight_kg,
+                    '' as tslqtysoldnfg,
+                    '' as tslconvpcstoctn,
+                    '' as tsltonnagesoldfg,
+                    '' as `end`
+        ";
+
+        $hasil = $this->db->query($query);   
+
+        $headers = [
+            'distributor','cabang','tipetrans','divisi','principal','productgroup1','productgroup2','productgroup3','brand','kodeproduk','kodevarian','kodeprodukprincipal',
+            'namaproduk','packaging','productclass','kodecustomer','namacustomer','alamatcustomer','area','subarea','channel','subchannel','customergroup','keyaccount',
+            'kodesalesman','namasalesman','kodesalesco','namasalesco','kodespv','namaspv','tahunbulan','bulan','tanggal','weekno','nomornota','salesmethod','sellingtype',
+            'qtysold','kartonutuh','qtysoldpcs','freegoodpcs','tonnage','volume_ltr','grossamount','linediscount1','linediscount2','linediscount3','linediscount4','linediscount5',
+            'totallinediscount','discountnota1','discountnota2','discountnota3','totaldiscountnota','dpp','ppn','ppnbm','tax3','netamount','warehouse','customerpo',
+            'customerjoindate','nofakturpajak','tanggalfakturpajak','nomorfakturproforma','tanggalfakturproforma','cogs','case_weight_kg','tslqtysoldnfg','tslconvpcstoctn',
+            'tsltonnagesoldfg','end'
+        ];
+
+        $this->excel_generator->set_query($hasil);
+        $this->excel_generator->set_header($headers);
+        $this->excel_generator->set_column($headers);
+        $this->excel_generator->set_width(array_fill(0, count($headers), 10)); 
+        $this->excel_generator->exportTo2007('Download Template Palu'); 
+    }
+
+    public function palu_import_customer()
+    {        
+        // create table
+        $create = $this->model_bridging->create_table_palu_import_customer();
+        if(!$create) {
+            $this->session->set_flashdata("pesan", "gagal membuat table bridging_palu_import_customer");
+            redirect('bridging/palu','refresh');
+        }
+
+        // add unique constraint
+        $unique_customer_id = $this->model_bridging->add_unique_palu_import_customer('customer_id');
+        $unique_mapping_uli = $this->model_bridging->add_unique_palu_import_customer('mapping_uli');
+
+        // echo'disini'; die;
+        // inisialisasi upload
+        $init_upload = $this->attachment_config('palu', ''); 
+        if ($this->upload->do_upload('file_customer')) 
+        {
+            // echo 'disini'; die;
+            $upload_data = $this->upload->data();
+            $filename_excel = $upload_data['file_name'];
+
+            $this->load->library('excel');
+            $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/palu/$filename_excel");
+
+            $jumlahSheet = $object->getSheetCount();
+            if ($jumlahSheet > 1) {
+                echo "jumlah_sheet : ".$jumlahSheet;
+                echo "<script>alert('upload file gagal karena file mempunyai lebih dari 1 sheet'); </script>";
+                redirect('bridging/palu','refresh');
+            }
+
+            foreach ($object->getWorksheetIterator() as $worksheet) 
+            {
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+
+                if ($highestRow > 5000) {
+                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 5000 ROW.");
+                    redirect('bridging/palu','refresh');
+                }
+
+                if ($highestRow <= 1) {
+                    $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+                    redirect('bridging/palu','refresh');
+                }
+
+                for ($row = 2; $row <= $highestRow; $row++) 
+                {  
+                    $kategori    = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+                    $nama_site   = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
+                    $regional    = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                    $customer_id = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());                    
+                    $mapping_uli = trim($worksheet->getCellByColumnAndRow(4, $row)->getValue());
+                    $mapping_nd6 = trim($worksheet->getCellByColumnAndRow(5, $row)->getValue());
+                    $mapping_warung_pintar = trim($worksheet->getCellByColumnAndRow(6, $row)->getValue());
+                    $mapping_pbf = trim($worksheet->getCellByColumnAndRow(7, $row)->getValue());
+                    $prefix = trim($worksheet->getCellByColumnAndRow(8, $row)->getValue());
+                    $nama_customer = trim($worksheet->getCellByColumnAndRow(9, $row)->getValue());
+                    $alamat = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
+                    $tipe_bayar = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue());
+                    $top = trim($worksheet->getCellByColumnAndRow(12, $row)->getValue());
+                    $status_konsinyasi = trim($worksheet->getCellByColumnAndRow(13, $row)->getValue());
+                    $status_fuguh = trim($worksheet->getCellByColumnAndRow(14, $row)->getValue());
+                    $kelurahan_id = trim($worksheet->getCellByColumnAndRow(15, $row)->getValue());
+                    $nama_kelurahan = trim($worksheet->getCellByColumnAndRow(16, $row)->getValue());
+                    $kecamatan_id = trim($worksheet->getCellByColumnAndRow(17, $row)->getValue());
+                    $nama_kecamatan = trim($worksheet->getCellByColumnAndRow(18, $row)->getValue());
+                    $kota_id = trim($worksheet->getCellByColumnAndRow(19, $row)->getValue());
+                    $nama_kota = trim($worksheet->getCellByColumnAndRow(20, $row)->getValue());     
+                    $propinsi_id = trim($worksheet->getCellByColumnAndRow(21, $row)->getValue());
+                    $nama_propinsi = trim($worksheet->getCellByColumnAndRow(22, $row)->getValue());
+                    $kode_pos = trim($worksheet->getCellByColumnAndRow(23, $row)->getValue());
+                    $telp = trim($worksheet->getCellByColumnAndRow(24, $row)->getValue());     
+                    $fax = trim($worksheet->getCellByColumnAndRow(25, $row)->getValue());
+                    $email = trim($worksheet->getCellByColumnAndRow(26, $row)->getValue());
+                    $head_office_id = trim($worksheet->getCellByColumnAndRow(27, $row)->getValue());
+                    $nama_head_office = trim($worksheet->getCellByColumnAndRow(28, $row)->getValue());      
+                    $company_id = trim($worksheet->getCellByColumnAndRow(29, $row)->getValue());
+                    $nama_company = trim($worksheet->getCellByColumnAndRow(30, $row)->getValue());
+                    $branch_id = trim($worksheet->getCellByColumnAndRow(31, $row)->getValue());
+                    $nama_branch_office = trim($worksheet->getCellByColumnAndRow(32, $row)->getValue());
+                    $site_id = trim($worksheet->getCellByColumnAndRow(33, $row)->getValue());
+                    $segment_id = trim($worksheet->getCellByColumnAndRow(34, $row)->getValue());    
+                    $nama_segment = trim($worksheet->getCellByColumnAndRow(35, $row)->getValue());
+                    $type_id = trim($worksheet->getCellByColumnAndRow(36, $row)->getValue());
+
+                    // cek type_id
+                    $cek_type = $this->model_bridging->get_type($type_id);
+                    if(!$cek_type->num_rows() > 0) { // jika tidak ada
+                        $is_valid_type_id = 0;
+                    }else{
+                        $is_valid_type_id = 1;
+                    }
+
+                    $nama_type = trim($worksheet->getCellByColumnAndRow(37, $row)->getValue());
+                    $kodesalur = trim($worksheet->getCellByColumnAndRow(38, $row)->getValue());
+
+                    // cek kodesalur
+                    $cek_class = $this->model_bridging->get_class($kodesalur);
+                    // echo 'cek_class ' .$cek_class;die; 
+                    if(!$cek_class->num_rows() > 0) { // jika tidak ada
+                        $is_valid_class_id = 0;
+                    }else{
+                        $is_valid_class_id = 1;
+                    }
+
+                    $namasalur = trim($worksheet->getCellByColumnAndRow(39, $row)->getValue());
+                    $spot_id = trim($worksheet->getCellByColumnAndRow(40, $row)->getValue());
+                    $no_ktp = trim($worksheet->getCellByColumnAndRow(41, $row)->getValue());
+                    $kartu_keluarga = trim($worksheet->getCellByColumnAndRow(42, $row)->getValue());
+                    $pln = trim($worksheet->getCellByColumnAndRow(43, $row)->getValue());
+                    $nama_penghubung = trim($worksheet->getCellByColumnAndRow(44, $row)->getValue());
+                    $alamat_penghubung = trim($worksheet->getCellByColumnAndRow(45, $row)->getValue());
+                    $telp_penghubung = trim($worksheet->getCellByColumnAndRow(46, $row)->getValue());
+                    $hubungan = trim($worksheet->getCellByColumnAndRow(47, $row)->getValue());
+                    $latitude = trim($worksheet->getCellByColumnAndRow(48, $row)->getValue());
+                    $longitude = trim($worksheet->getCellByColumnAndRow(49, $row)->getValue());
+                    $member = trim($worksheet->getCellByColumnAndRow(50, $row)->getValue());
+                    $black_list = trim($worksheet->getCellByColumnAndRow(51, $row)->getValue());
+                    $aktif = trim($worksheet->getCellByColumnAndRow(52, $row)->getValue());
+                    $show_alamat_pkp = trim($worksheet->getCellByColumnAndRow(53, $row)->getValue());
+                    $data_create = trim($worksheet->getCellByColumnAndRow(54, $row)->getValue());
+                    $pbf_izin_no_tdp_tgl = trim($worksheet->getCellByColumnAndRow(55, $row)->getValue());
+                    $pbf_izin_no_tdp_no = trim($worksheet->getCellByColumnAndRow(56, $row)->getValue());
+                    $pbf_izin_no_siup_tgl = trim($worksheet->getCellByColumnAndRow(57, $row)->getValue());
+                    $pbf_izin_no_siup = trim($worksheet->getCellByColumnAndRow(58, $row)->getValue());
+                    $pbf_izin_no_sito_tgl = trim($worksheet->getCellByColumnAndRow(59, $row)->getValue());
+                    $pbf_izin_no_sito = trim($worksheet->getCellByColumnAndRow(60, $row)->getValue());
+                    $pbf_izin_no_sipa_tgl = trim($worksheet->getCellByColumnAndRow(61, $row)->getValue());
+                    $pbf_izin_no_sipa = trim($worksheet->getCellByColumnAndRow(62, $row)->getValue());
+                    $pbf_izin_no_sia_tgl = trim($worksheet->getCellByColumnAndRow(63, $row)->getValue());
+                    $pbf_izin_no_sia = trim($worksheet->getCellByColumnAndRow(64, $row)->getValue());
+                    $pbf_izin_no_nib_tgl = trim($worksheet->getCellByColumnAndRow(65, $row)->getValue());
+                    $pbf_izin_no_nib = trim($worksheet->getCellByColumnAndRow(66, $row)->getValue());
+                    $pbf_izin_no_cdob_tgl = trim($worksheet->getCellByColumnAndRow(67, $row)->getValue());
+                    $pbf_izin_no_cdob = trim($worksheet->getCellByColumnAndRow(68, $row)->getValue());
+                    $pbf_asis_apoteker_tgl_sipa = trim($worksheet->getCellByColumnAndRow(69, $row)->getValue());
+                    $pbf_asis_apoteker_tgl_lahir = trim($worksheet->getCellByColumnAndRow(70, $row)->getValue());
+                    $pbf_asis_apoteker_telpon = trim($worksheet->getCellByColumnAndRow(71, $row)->getValue());
+                    $pbf_asis_apoteker_no_sipa = trim($worksheet->getCellByColumnAndRow(72, $row)->getValue());
+                    $pbf_asis_apoteker_no_ktp = trim($worksheet->getCellByColumnAndRow(73, $row)->getValue());
+                    $pbf_asis_apoteker_email = trim($worksheet->getCellByColumnAndRow(74, $row)->getValue());
+                    $pbf_asis_apoteker_nama = trim($worksheet->getCellByColumnAndRow(75, $row)->getValue());
+                    $pbf_asis_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(76, $row)->getValue());
+                    $pbf_apoteker_tgl_sipa = trim($worksheet->getCellByColumnAndRow(77, $row)->getValue());
+                    $pbf_apoteker_tgl_lahir = trim($worksheet->getCellByColumnAndRow(78, $row)->getValue());
+                    $pbf_apoteker_telpon = trim($worksheet->getCellByColumnAndRow(79, $row)->getValue());
+                    $pbf_apoteker_no_sipa = trim($worksheet->getCellByColumnAndRow(80, $row)->getValue());
+                    $pbf_apoteker_no_ktp = trim($worksheet->getCellByColumnAndRow(81, $row)->getValue());
+                    $pbf_apoteker_nama = trim($worksheet->getCellByColumnAndRow(82, $row)->getValue());
+                    $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
+                    $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
+
+                    if($nama_site == "" || $spot_id == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $nama_type == "" || $class_id = "" || $class = "") {
+                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
+                        redirect('bridging/palu','refresh');
+                    }
+
+                    $data = [
+                        "kategori"    => $kategori,
+                        "nama_site"   => $nama_site,
+                        "regional"    => $regional,
+                        "customer_id" => $customer_id,
+                        "mapping_uli" => $mapping_uli,
+                        "mapping_nd6" => $mapping_nd6,
+                        "mapping_warung_pintar" => $mapping_warung_pintar,
+                        "mapping_pbf" => $mapping_pbf,
+                        "prefix" => $prefix,
+                        "nama_customer" => $nama_customer,
+                        "alamat" => $alamat,
+                        "tipe_bayar" => $tipe_bayar,
+                        "top" => $top,
+                        "status_konsinyasi" => $status_konsinyasi,
+                        "status_fuguh" => $status_fuguh,
+                        "kelurahan_id" => $kelurahan_id,
+                        "nama_kelurahan" => $nama_kelurahan,
+                        "kecamatan_id" => $kecamatan_id,
+                        "nama_kecamatan" => $nama_kecamatan,
+                        "kota_id" => $kota_id,
+                        "nama_kota" => $nama_kota,
+                        "propinsi_id" => $propinsi_id,
+                        "nama_propinsi" => $nama_propinsi,
+                        "kode_pos" => $kode_pos,
+                        "telp" => $telp,
+                        "fax" => $fax,
+                        "email" => $email,
+                        "head_office_id" => $head_office_id,
+                        "nama_head_office" => $nama_head_office,
+                        "company_id" => $company_id,
+                        "nama_company" => $nama_company,
+                        "branch_id" => $branch_id,
+                        "nama_branch_office" => $nama_branch_office,
+                        "site_id" => $site_id,
+                        "segment_id" => $segment_id,
+                        "nama_segment" => $nama_segment,
+                        "type_id" => $type_id,
+                        "nama_type" => $nama_type,
+                        "class_id" => $kodesalur,
+                        "class" => $namasalur,
+                        "spot_id" => $spot_id,
+                        "no_ktp" => $no_ktp,
+                        "kartu_keluarga" => $kartu_keluarga,
+                        "pln" => $pln,
+                        "nama_penghubung" => $nama_penghubung,
+                        "alamat_penghubung" => $alamat_penghubung,
+                        "telp_penghubung" => $telp_penghubung,
+                        "hubungan" => $hubungan,
+                        "latitude" => $latitude,
+                        "longitude" => $longitude,
+                        "member" => $member,
+                        "black_list" => $black_list,
+                        "aktif" => $aktif,
+                        "show_alamat_pkp" => $show_alamat_pkp,
+                        "data_create" => $data_create,
+                        "pbf_izin_no_tdp_tgl" => $pbf_izin_no_tdp_tgl,
+                        "pbf_izin_no_tdp" => $pbf_izin_no_tdp_no,
+                        "pbf_izin_no_siup_tgl" => $pbf_izin_no_siup_tgl,
+                        "pbf_izin_no_siup" => $pbf_izin_no_siup,
+                        "pbf_izin_no_sito_tgl" => $pbf_izin_no_sito_tgl,
+                        "pbf_izin_no_sito" => $pbf_izin_no_sito,
+                        "pbf_izin_no_sipa_tgl" => $pbf_izin_no_sipa_tgl,
+                        "pbf_izin_no_sipa" => $pbf_izin_no_sipa,
+                        "pbf_izin_no_cdob_tgl" => $pbf_izin_no_cdob_tgl,
+                        "pbf_izin_no_cdob" => $pbf_izin_no_cdob,
+                        "pbf_asis_apoteker_tgl_sipa" => $pbf_asis_apoteker_tgl_sipa,
+                        "pbf_asis_apoteker_tgl_lahir" => $pbf_asis_apoteker_tgl_lahir,
+                        "pbf_asis_apoteker_telpon" => $pbf_asis_apoteker_telpon,
+                        "pbf_asis_apoteker_no_sipa" => $pbf_asis_apoteker_no_sipa,
+                        "pbf_asis_apoteker_no_ktp" => $pbf_asis_apoteker_no_ktp,
+                        "pbf_asis_apoteker_email" => $pbf_asis_apoteker_email,
+                        "pbf_asis_apoteker_nama" => $pbf_asis_apoteker_nama,
+                        "pbf_asis_apoteker_alamat" => $pbf_asis_apoteker_alamat,
+                        "pbf_apoteker_tgl_sipa" => $pbf_apoteker_tgl_sipa,
+                        "pbf_apoteker_tgl_lahir" => $pbf_apoteker_tgl_lahir,
+                        "pbf_apoteker_telpon" => $pbf_apoteker_telpon,
+                        "pbf_apoteker_no_sipa" => $pbf_apoteker_no_sipa,
+                        "pbf_apoteker_no_ktp" => $pbf_apoteker_no_ktp,
+                        "pbf_apoteker_nama" => $pbf_apoteker_nama,
+                        "pbf_apoteker_alamat" => $pbf_apoteker_alamat,
+                        "pbf_apoteker_email" => $pbf_apoteker_email,
+                        "is_valid_type_id" => $is_valid_type_id,
+                        "is_valid_class_id" => $is_valid_class_id                 
+                    ];
+
+                    $insert = $this->model_bridging->insert_palu_import_customer($data);
+                }
+            }
+        }else
+        {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+            // redirect('bridging/palu','refresh');
+        };
+
+        $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
+        redirect('bridging/result_palu_customer','refresh');
+    }
+
+    public function download_template_palu_customer()
+    {
+        $query = "
+            select 	kategori,
+                    nama_site,
+                    regional,
+                    customer_id,
+                    mapping_uli,
+                    mapping_nd6,
+                    mapping_warung_pintar,
+                    mapping_pbf,
+                    prefix,
+                    nama_customer,
+                    alamat,
+                    tipe_bayar,
+                    top,
+                    status_konsinyasi,
+                    status_fuguh,
+                    kelurahan_id,
+                    nama_kelurahan,
+                    kecamatan_id,
+                    nama_kecamatan,
+                    kota_id,
+                    nama_kota,
+                    propinsi_id,
+                    nama_propinsi,
+                    kode_pos,
+                    telp,
+                    fax,
+                    email,
+                    head_office_id,
+                    nama_head_office,
+                    company_id,
+                    nama_company,
+                    branch_id,
+                    nama_branch_office,
+                    site_id,
+                    segment_id,
+                    nama_segment, 
+                    type_id,
+                    nama_type,
+                    class_id,
+                    class,
+                    spot_id,
+                    no_ktp,
+                    kartu_keluarga,
+                    pln,
+                    nama_penghubung,
+                    alamat_penghubung,
+                    telp_penghubung,
+                    hubungan,
+                    latitude,
+                    longitude,
+                    member,
+                    black_list,
+                    aktif,
+                    show_alamat_pkp,
+                    data_create,
+                    pbf_izin_no_tdp_tgl,
+                    pbf_izin_no_tdp,
+                    pbf_izin_no_siup_tgl,
+                    pbf_izin_no_siup,
+                    pbf_izin_no_sito_tgl,
+                    pbf_izin_no_sito,
+                    pbf_izin_no_sipa_tgl,
+                    pbf_izin_no_sipa,
+                    pbf_izin_no_sia_tgl,
+                    pbf_izin_no_sia,
+                    pbf_izin_no_nib_tgl,
+                    pbf_izin_no_nib,
+                    pbf_izin_no_cdob_tgl,
+                    pbf_izin_no_cdob,
+                    pbf_asis_apoteker_tgl_sipa,
+                    pbf_asis_apoteker_tgl_lahir,
+                    pbf_asis_apoteker_telpon,
+                    pbf_asis_apoteker_no_sipa,
+                    pbf_asis_apoteker_no_ktp,
+                    pbf_asis_apoteker_email,
+                    pbf_asis_apoteker_nama,
+                    pbf_asis_apoteker_alamat,
+                    pbf_apoteker_tgl_sipa,
+                    pbf_apoteker_tgl_lahir,
+                    pbf_apoteker_telpon,
+                    pbf_apoteker_no_sipa,
+                    pbf_apoteker_no_ktp,
+                    pbf_apoteker_nama,
+                    pbf_apoteker_alamat,
+                    pbf_apoteker_email
+        from site.bridging_palu_import_customer a
+        ";
+
+        $hasil = $this->db->query($query);   
+    
+        $this->excel_generator->set_query($hasil);
+
+        $this->excel_generator->set_header(array
+        (
+            'kategori',
+            'nama_site',
+            'regional',
+            'customer_id',
+            'mapping_uli',
+            'mapping_nd6',
+            'mapping_warung_pintar',
+            'mapping_pbf',
+            'prefix',
+            'nama_customer',
+            'alamat',
+            'tipe_bayar',
+            'top',
+            'status_konsinyasi',
+            'status_fuguh',
+            'kelurahan_id',
+            'nama_kelurahan',
+            'kecamatan_id',
+            'nama_kecamatan',
+            'kota_id',
+            'nama_kota',
+            'propinsi_id',
+            'nama_propinsi',
+            'kode_pos',
+            'telp',
+            'fax',
+            'email',
+            'head_office_id',
+            'nama_head_office',
+            'company_id',
+            'nama_company',
+            'branch_id',
+            'nama_branch_office',
+            'site_id',
+            'segment_id',
+            'nama_segment', 
+            'type_id',
+            'nama_type',
+            'class_id',
+            'class',
+            'spot_id',
+            'no_ktp',
+            'kartu_keluarga',
+            'pln',
+            'nama_penghubung',
+            'alamat_penghubung',
+            'telp_penghubung',
+            'hubungan',
+            'latitude',
+            'longitude',
+            'member',
+            'black_list',
+            'aktif',
+            'show_alamat_pkp',
+            'data_create',
+            'pbf_izin_no_tdp_tgl',
+            'pbf_izin_no_tdp',
+            'pbf_izin_no_siup_tgl',
+            'pbf_izin_no_siup',
+            'pbf_izin_no_sito_tgl',
+            'pbf_izin_no_sito',
+            'pbf_izin_no_sipa_tgl',
+            'pbf_izin_no_sipa',
+            'pbf_izin_no_sia_tgl',
+            'pbf_izin_no_sia',
+            'pbf_izin_no_nib_tgl',
+            'pbf_izin_no_nib',
+            'pbf_izin_no_cdob_tgl',
+            'pbf_izin_no_cdob',
+            'pbf_asis_apoteker_tgl_sipa',
+            'pbf_asis_apoteker_tgl_lahir',
+            'pbf_asis_apoteker_telpon',
+            'pbf_asis_apoteker_no_sipa',
+            'pbf_asis_apoteker_no_ktp',
+            'pbf_asis_apoteker_email',
+            'pbf_asis_apoteker_nama',
+            'pbf_asis_apoteker_alamat',
+            'pbf_apoteker_tgl_sipa',
+            'pbf_apoteker_tgl_lahir',
+            'pbf_apoteker_telpon',
+            'pbf_apoteker_no_sipa',
+            'pbf_apoteker_no_ktp',
+            'pbf_apoteker_nama',
+            'pbf_apoteker_alamat',
+            'pbf_apoteker_email'
+        ));
+        $this->excel_generator->set_column(array
+        ( 
+            'kategori',
+            'nama_site',
+            'regional',
+            'customer_id',
+            'mapping_uli',
+            'mapping_nd6',
+            'mapping_warung_pintar',
+            'mapping_pbf',
+            'prefix',
+            'nama_customer',
+            'alamat',
+            'tipe_bayar',
+            'top',
+            'status_konsinyasi',
+            'status_fuguh',
+            'kelurahan_id',
+            'nama_kelurahan',
+            'kecamatan_id',
+            'nama_kecamatan',
+            'kota_id',
+            'nama_kota',
+            'propinsi_id',
+            'nama_propinsi',
+            'kode_pos',
+            'telp',
+            'fax',
+            'email',
+            'head_office_id',
+            'nama_head_office',
+            'company_id',
+            'nama_company',
+            'branch_id',
+            'nama_branch_office',
+            'site_id',
+            'segment_id',
+            'nama_segment', 
+            'type_id',
+            'nama_type',
+            'class_id',
+            'class',
+            'spot_id',
+            'no_ktp',
+            'kartu_keluarga',
+            'pln',
+            'nama_penghubung',
+            'alamat_penghubung',
+            'telp_penghubung',
+            'hubungan',
+            'latitude',
+            'longitude',
+            'member',
+            'black_list',
+            'aktif',
+            'show_alamat_pkp',
+            'data_create',
+            'pbf_izin_no_tdp_tgl',
+            'pbf_izin_no_tdp',
+            'pbf_izin_no_siup_tgl',
+            'pbf_izin_no_siup',
+            'pbf_izin_no_sito_tgl',
+            'pbf_izin_no_sito',
+            'pbf_izin_no_sipa_tgl',
+            'pbf_izin_no_sipa',
+            'pbf_izin_no_sia_tgl',
+            'pbf_izin_no_sia',
+            'pbf_izin_no_nib_tgl',
+            'pbf_izin_no_nib',
+            'pbf_izin_no_cdob_tgl',
+            'pbf_izin_no_cdob',
+            'pbf_asis_apoteker_tgl_sipa',
+            'pbf_asis_apoteker_tgl_lahir',
+            'pbf_asis_apoteker_telpon',
+            'pbf_asis_apoteker_no_sipa',
+            'pbf_asis_apoteker_no_ktp',
+            'pbf_asis_apoteker_email',
+            'pbf_asis_apoteker_nama',
+            'pbf_asis_apoteker_alamat',
+            'pbf_apoteker_tgl_sipa',
+            'pbf_apoteker_tgl_lahir',
+            'pbf_apoteker_telpon',
+            'pbf_apoteker_no_sipa',
+            'pbf_apoteker_no_ktp',
+            'pbf_apoteker_nama',
+            'pbf_apoteker_alamat',
+            'pbf_apoteker_email'  
+        ));
+        $this->excel_generator->set_width(array(10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10)); 
+        $this->excel_generator->exportTo2007('Download Template Palu Customer'); 
+    }
+
+    public function result_palu_customer()
+    {
+        $data = [
+            "title" => "Result Bridging palu Customer",
+            'url'   => 'bridging/palu_submit_customer',
+            'get_data' => $this->model_bridging->get_palu_import_customer(),
+            'get_summary' => $this->model_bridging->get_palu_import_customer_summary(),
+        ];
+        // $this->view($data, false, "result_palu_customer");
+        $this->render('bridging/result_palu_customer', $data);
+    }
+
+    public function submit_palu()
+    {
+        $id_bridging_log = $this->input->post('id_bridging_log');
+        // echo  $id_bridging_log; die;
+
+        $get_data_log = $this->model_bridging->get_bridging_log($id_bridging_log);
+        if($get_data_log->num_rows() > 0)
+        {
+            $site_code = $get_data_log->row()->site_code;
+            $kode_comp = substr($site_code, 0, 3);
+            $nocab = substr($site_code, 3, 2);
+
+            $bulan = $get_data_log->row()->bulan;
+
+            $tahun_upload = substr($bulan, 0, 4);
+            $bulan_upload = substr($bulan, 5, 2);
+        }
+
+        $get_userid = $this->model_bridging->get_userid_by_kode_comp($kode_comp);
+        if($get_userid->num_rows() > 0)
+        {
+            $userid = $get_userid->row()->id;
+        }else{
+            $this->session->set_flashdata("pesan", "gagal mendapatkan userid, ".$this->upload->display_errors());
+            redirect('bridging/palu','refresh');
+        }
+
+        $get_last_upload = $this->model_bridging->get_mpm_upload_where_closing_by_userid($userid);
+        if($get_last_upload->num_rows() > 0)
+        {
+            $tahun_last_upload = $get_last_upload->row()->tahun;
+            $bulan_last_upload = $get_last_upload->row()->bulan;
+        }   
+
+        // die;
+
+        if ($tahun_upload < $tahun_last_upload || ($tahun_upload == $tahun_last_upload && $bulan_upload <= $bulan_last_upload)) {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, tahun dan bulan lebih kecil dari tahun dan bulan terakhir diupload");
+            redirect('bridging/palu','refresh');
+        } 
+
+        $delete_fi = $this->model_bridging->delete_fi_palu($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $delete_ri = $this->model_bridging->delete_ri_palu($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        
+        $proses_fi = $this->model_bridging->insert_fi_palu($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $proses_fi = $this->model_bridging->insert_fi_palu_bonus($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $proses_ri = $this->model_bridging->insert_ri_palu($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+
+        $delete_tblang = $this->model_bridging->delete_tblang_palu($tahun_upload, $nocab);
+        $delete_tabsales = $this->model_bridging->delete_tabsales_palu($tahun_upload, $nocab);
+        // $delete_tbkota = $this->model_bridging->delete_tbkota_palu($tahun_upload, $nocab);
+
+        $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
+        $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
+        // $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
+
+
+        // update bridging_log
+        $get_data_result = $this->model_bridging->get_result($site_code, $tahun_upload, $bulan_upload);
+        if($get_data_result->num_rows() > 0)
+        {
+            $total_unit = $get_data_result->row()->total_unit;
+            $total_value = $get_data_result->row()->total_value;
+        }else{
+            $total_unit = 0;
+            $total_value = 0;            
+        }
+
+        $insert_upload = [
+            "userid"        => $userid,
+            "lastupload"    => $this->model_outlet_transaksi->timezone(),
+            "tanggal"       => date('d', strtotime($this->model_outlet_transaksi->timezone())),
+            "filename"      => "",
+            "omzet"         => $total_value,
+            "status"        => 1,
+            "tahun"         => $tahun_upload,
+            "bulan"         => $bulan_upload,
+            "status_closing" => 0
+        ];
+        $id_upload = $this->model_bridging->insert_upload($insert_upload);
+
+        $update_bridging = [
+            'sum_omzet' => $total_value,
+            'sum_unit' => $total_unit,
+            'id_upload' => $id_upload
+        ];
+        $this->model_bridging->update_bridging_log($update_bridging, $id_bridging_log);
+
+        $this->session->set_flashdata("pesan_result_success", "proses upload success");
+        redirect('bridging/palu','refresh');
+        
+    }
+
+    public function mmm_makassar()
+    {
+        $site_code = 'MMRE1';
+        $cek_hak = $this->model_bridging->get_bridging_hak_akses_by_site_code_userid($site_code, $this->userid)->row();
+        if(!$cek_hak) {
+            $this->session->set_flashdata("pesan", "user anda tidak diijinkan mengakses halaman ini");
+            redirect('bridging/dashboard','refresh');
+        }
+
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
+        $data = [
+            "title" => "Bridging mmm_makassar Sales",
+            "title_customer" => "Bridging Customer mmm_makassar (Outlet)",
+            'url'   => 'bridging/mmm_makassar_import',
+            'url_customer'   => 'bridging/mmm_makassar_import_customer',
+            'bridging'  => "mmm_makassar",
+            'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
+        ];
+        // $this->view($data, false, "mmm_makassar");
+        $this->render('bridging/mmm_makassar', $data);
+    }
+
+    public function mmm_makassar_import()
+    {
+        $month = $this->input->post('month');
+        $bulan = explode('-', $month)[1];
+        $tahun = explode('-', $month)[0];
+
+        $newDate_sebelumnya = date('Y-m', strtotime($month. ' -1 months')); // mencari periode -1 bulan sebelumnya
+        $tahun_sebelumnya = explode('-', $newDate_sebelumnya)[0];
+        $bulan_sebelumnya = explode('-', $newDate_sebelumnya)[1];
+
+        // cek data apakah bulan sebelumnya sudah closing bulanan atau belum
+        $get_mpm_user = $this->model_bridging->get_mpm_user('MMR');
+        $userid = $get_mpm_user->row()->id;
+
+        $get_mpm_upload_bulan_lalu = $this->model_bridging->get_mpm_upload($userid, $bulan_sebelumnya, $tahun_sebelumnya, '1');
+        if ($get_mpm_upload_bulan_lalu->num_rows() > 0) {
+            $status_closing_bulan_lalu = $get_mpm_upload_bulan_lalu->row()->status_closing;
+        } else {
+            $status_closing_bulan_lalu = null; // atau default value lain seperti 0 atau ''
+        }
+
+        if ($status_closing_bulan_lalu == null) {
+            $this->session->set_flashdata("pesan", "upload file gagal, data bulan sebelumnya belum di closing! silahkan upload data closing terlebih dahulu");
+            redirect('bridging/mmm_makassar','refresh');
+        }
+
+        // cek data apakah sudah closing bulanan atau belum
+        $get_mpm_uplaod = $this->model_bridging->get_mpm_upload($userid, $bulan, $tahun, '');
+
+        if ($get_mpm_uplaod->num_rows() > 0) {
+            $status_closing = $get_mpm_uplaod->row()->status_closing;
+        } else {
+            $status_closing = null; // atau default value lain seperti 0 atau ''
+        }
+        
+        if ($status_closing == '1') {
+            $this->session->set_flashdata("pesan", "upload file gagal, data sudah di closing! silahkan hubungi IT");
+            redirect('bridging/mmm_makassar','refresh');
+        }
+
+        // create table
+        $create = $this->model_bridging->create_table_mmm_makassar_import();
+        if(!$create) {
+            $this->session->set_flashdata("pesan", "gagal membuat table bridging_mmm_makassar_import");
+            redirect('bridging/mmm_makassar','refresh');
+        }
+
+        // inisialisasi upload
+        $init_upload = $this->attachment_config('mmm_makassar', '');        
+        if ($this->upload->do_upload('file')) 
+        {
+            $upload_data = $this->upload->data();
+            $filename_excel = $upload_data['file_name'];
+
+            $this->load->library('excel');
+            $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/mmm_makassar/$filename_excel");
+
+            $jumlahSheet = $object->getSheetCount();
+            if ($jumlahSheet > 1) {
+                echo "jumlah_sheet : ".$jumlahSheet;
+                echo "<script>alert('upload file gagal karena file mempunyai lebih dari 1 sheet'); </script>";
+                redirect('bridging/mmm_makassar','refresh');
+            }
+
+            $highestColumm = $object->setActiveSheetIndex(0)->getHighestColumn();
+            // var_dump($highestColumm);die;
+            if ($highestColumm != 'BT') {
+                echo "<script>alert('upload file gagal karena column tidak sesuai'); </script>";
+                redirect('bridging/mmm_makassar','refresh');
+            }
+
+            $input_log_data = [
+                "site_code" => "MMRE1",
+                "bulan" => $month,
+                "filename"  => $filename_excel,
+                "signature" => md5("MMRE1".$month.$this->model_outlet_transaksi->timezone()),
+                "created_at" => $this->model_outlet_transaksi->timezone(),
+                "created_by" => $this->session->userdata('id'),
+            ];
+
+            $id_log = $this->model_bridging->input_bridging_log($input_log_data);
+
+            foreach ($object->getWorksheetIterator() as $worksheet) 
+            {
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+
+                if ($highestRow > 5000) {
+                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 1000 ROW.");
+                    redirect('bridging/mmm_makassar','refresh');
+                }
+
+                if ($highestRow <= 1) {
+                    $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+                    redirect('bridging/mmm_makassar','refresh');
+                }
+
+                for ($row = 2; $row <= $highestRow; $row++) 
+                {   
+                    $distributor    = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+                    $cabang         = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
+                    $tipetrans      = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                    $divisi         = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());
+                    $principal      = trim($worksheet->getCellByColumnAndRow(4, $row)->getValue());
+                    $productgroup1  = trim($worksheet->getCellByColumnAndRow(5, $row)->getValue());
+                    $productgroup2  = trim($worksheet->getCellByColumnAndRow(6, $row)->getValue());
+                    $productgroup3  = trim($worksheet->getCellByColumnAndRow(7, $row)->getValue());
+                    $brand          = trim($worksheet->getCellByColumnAndRow(8, $row)->getValue());
+                    $kodeproduk     = trim($worksheet->getCellByColumnAndRow(9, $row)->getValue());
+                    $kodevarian     = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
+                    
+                    // cek kodeproduk mpm
+                    $kodeprodukprincipal = (strlen($temp = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue())) == 5) ? '0' . $temp : $temp;
+                    // echo $kodeprodukprincipal;
+                    // echo '</br>';
+
+                    $get_kodeprod = $this->model_bridging->get_master_product_by_kodeprod($kodeprodukprincipal);
+                    if($get_kodeprod->num_rows() > 0) {
+                        $is_valid_kodeprod = 1;
+                    }else{
+                        $is_valid_kodeprod = 0;
+                    }
+
+                    $namaproduk    = trim($worksheet->getCellByColumnAndRow(12, $row)->getValue());
+                    $packaging    = trim($worksheet->getCellByColumnAndRow(13, $row)->getValue());
+                    $productclass = trim($worksheet->getCellByColumnAndRow(14, $row)->getValue());
+                    $kodecustomer= trim($worksheet->getCellByColumnAndRow(15, $row)->getValue());
+
+                    // cek kodecustomer 
+                    $cek_customer = $this->model_bridging->get_mmm_makassar_customer($kodecustomer);
+                    if($cek_customer->num_rows() > 0) {
+                        $is_valid_customer = 1;
+                    }else{
+                        $is_valid_customer = 0;
+                    }
+
+                    $namacustomer = trim($worksheet->getCellByColumnAndRow(16, $row)->getValue());
+                    $alamatcustomer = trim($worksheet->getCellByColumnAndRow(17, $row)->getValue());
+                    $area = trim($worksheet->getCellByColumnAndRow(18, $row)->getValue());
+                    $subarea = trim($worksheet->getCellByColumnAndRow(19, $row)->getValue());
+                    $channel = trim($worksheet->getCellByColumnAndRow(20, $row)->getValue());
+                    $subchannel = trim($worksheet->getCellByColumnAndRow(21, $row)->getValue());
+                    $customergroup = trim($worksheet->getCellByColumnAndRow(22, $row)->getValue());
+                    $keyaccount= trim($worksheet->getCellByColumnAndRow(23, $row)->getValue());
+                    $kodesalesman = trim($worksheet->getCellByColumnAndRow(24, $row)->getValue());
+                    $namasalesman = trim($worksheet->getCellByColumnAndRow(25, $row)->getValue());
+                    $kodesalesco = trim($worksheet->getCellByColumnAndRow(26, $row)->getValue());
+                    $namasalesco = trim($worksheet->getCellByColumnAndRow(27, $row)->getValue());
+                    $kodespv = trim($worksheet->getCellByColumnAndRow(28, $row)->getValue());
+                    $namaspv = trim($worksheet->getCellByColumnAndRow(29, $row)->getValue());
+                    $tahunbulan = trim($worksheet->getCellByColumnAndRow(30, $row)->getValue());
+                    $bulan = trim($worksheet->getCellByColumnAndRow(31, $row)->getValue());
+                    
+                    // cek tanggal
+                    $cell = $worksheet->getCellByColumnAndRow(32, $row);
+                    $cellValue = $cell->getValue();
+
+                    // echo $cellValue; echo '<br>';
+                    $is_valid_tanggal = 1; // Nilai default valid
+
+                    if (is_numeric($cellValue)) {
+                        // echo "numeric: " . $cellValue . "<br>";die;
+                        $unixTimestamp = ($cellValue - 25569) * 86400; // 25569 is days between 1900-01-01 and 1970-01-01
+                        $tanggal = date('Y-m-d', $unixTimestamp); // Format as needed
+                        // Ekstrak tahun-bulan dari $tanggal untuk perbandingan
+                        $tanggal_ym = date('Y-m', $unixTimestamp);
+                        // Bandingkan dengan $month
+                        if ($tanggal_ym !== $month) {
+                            $is_valid_tanggal = 0; // Tandai sebagai tidak valid jika bulan berbeda
+                        }
+                    } else {
+                        // echo "string: " . $cellValue . "<br>";die;
+                        $tanggal = $cellValue;
+
+                        $formats = ['d/m/Y', 'd-m-Y', 'Y-m-d'];
+                        $dateObj = false;
+
+                        foreach ($formats as $format) {
+                            $dateObj = DateTime::createFromFormat($format, $tanggal);
+                            if ($dateObj !== false) {
+                                break;
+                            }
+                        }
+
+                        if ($dateObj !== false) {
+
+                            $tanggal = $dateObj->format('Y-m-d');
+                            $tanggal_ym = $dateObj->format('Y-m');
+
+                            if ($tanggal_ym !== $month) {
+                                $is_valid_tanggal = 0;
+                            }
+
+                        } else {
+                            $is_valid_tanggal = 0;
+                        }
+                    }
+                    
+                    $weekno = trim($worksheet->getCellByColumnAndRow(33, $row)->getValue());
+                    $nomornota = trim($worksheet->getCellByColumnAndRow(34, $row)->getValue());
+                    $salesmethod = trim($worksheet->getCellByColumnAndRow(35, $row)->getValue());
+                    $sellingtype = trim($worksheet->getCellByColumnAndRow(36, $row)->getValue());
+                    $qtysold        = trim($worksheet->getCellByColumnAndRow(37, $row)->getValue());
+                    $kartonutuh     = trim($worksheet->getCellByColumnAndRow(38, $row)->getValue());
+                    $qtysoldpcs     = trim($worksheet->getCellByColumnAndRow(39, $row)->getValue());
+                    $freegoodpcs    = trim($worksheet->getCellByColumnAndRow(40, $row)->getValue());
+
+                    $tonnage        = trim($worksheet->getCellByColumnAndRow(41, $row)->getValue());
+                    $volume_ltr     = trim($worksheet->getCellByColumnAndRow(42, $row)->getValue());
+                    $grossamount    = trim($worksheet->getCellByColumnAndRow(43, $row)->getValue());
+
+                    $linediscount1  = trim($worksheet->getCellByColumnAndRow(44, $row)->getValue());
+                    $linediscount2  = trim($worksheet->getCellByColumnAndRow(45, $row)->getValue());
+                    $linediscount3  = trim($worksheet->getCellByColumnAndRow(46, $row)->getValue());
+                    $linediscount4  = trim($worksheet->getCellByColumnAndRow(47, $row)->getValue());
+                    $linediscount5  = trim($worksheet->getCellByColumnAndRow(48, $row)->getValue());
+                    $totallinediscount = trim($worksheet->getCellByColumnAndRow(49, $row)->getValue());
+
+                    $discountnota1  = trim($worksheet->getCellByColumnAndRow(50, $row)->getValue());
+                    $discountnota2  = trim($worksheet->getCellByColumnAndRow(51, $row)->getValue());
+                    $discountnota3  = trim($worksheet->getCellByColumnAndRow(52, $row)->getValue());
+                    $totaldiscountnota = trim($worksheet->getCellByColumnAndRow(53, $row)->getValue());
+
+                    $dpp            = trim($worksheet->getCellByColumnAndRow(54, $row)->getValue());
+                    $ppn            = trim($worksheet->getCellByColumnAndRow(55, $row)->getValue());
+                    $ppnbm          = trim($worksheet->getCellByColumnAndRow(56, $row)->getValue());
+                    $tax3           = trim($worksheet->getCellByColumnAndRow(57, $row)->getValue());
+                    $netamount      = trim($worksheet->getCellByColumnAndRow(58, $row)->getValue());
+
+                    $warehouse      = trim($worksheet->getCellByColumnAndRow(59, $row)->getValue());
+                    $customerpo     = trim($worksheet->getCellByColumnAndRow(60, $row)->getValue());
+                    $customerjoindate = trim($worksheet->getCellByColumnAndRow(61, $row)->getValue());
+                    $nofakturpajak  = trim($worksheet->getCellByColumnAndRow(62, $row)->getValue());
+                    $tglfakturpajak = trim($worksheet->getCellByColumnAndRow(63, $row)->getValue());
+                    $nomorfakturproforma = trim($worksheet->getCellByColumnAndRow(64, $row)->getValue());
+                    $tglfakturproforma = trim($worksheet->getCellByColumnAndRow(65, $row)->getValue());
+
+                    $cogs               = trim($worksheet->getCellByColumnAndRow(66, $row)->getValue());
+                    $case_weight_kg     = trim($worksheet->getCellByColumnAndRow(67, $row)->getValue());
+                    $tslqtysoldnfg      = trim($worksheet->getCellByColumnAndRow(68, $row)->getValue());
+                    $tslconvpcstoctn    = trim($worksheet->getCellByColumnAndRow(69, $row)->getValue());
+                    $tsltonnagesoldfg   = trim($worksheet->getCellByColumnAndRow(70, $row)->getValue());
+                    $end                = trim($worksheet->getCellByColumnAndRow(71, $row)->getValue());
+
+                    $data = [
+                        'distributor'        => $distributor,
+                        'cabang'             => $cabang,
+                        'tipetrans'          => $tipetrans,
+                        'divisi'             => $divisi,
+                        'principal'          => $principal,
+                        'productgroup1'      => $productgroup1,
+                        'productgroup2'      => $productgroup2,
+                        'productgroup3'      => $productgroup3,
+                        'brand'              => $brand,
+                        'kodeproduk'         => $kodeproduk,
+                        'kodevarian'         => $kodevarian,
+                        'kodeprodukprincipal'=> $kodeprodukprincipal,
+                        'namaproduk'         => $namaproduk,
+                        'packaging'          => $packaging,
+                        'productclass'       => $productclass,
+                        'kodecustomer'       => $kodecustomer,
+                        'namacustomer'       => $namacustomer,
+                        'alamatcustomer'     => $alamatcustomer,
+                        'area'               => $area,
+                        'subarea'            => $subarea,
+                        'channel'            => $channel,
+                        'subchannel'         => $subchannel,
+                        'customergroup'      => $customergroup,
+                        'keyaccount'         => $keyaccount,
+                        'kodesalesman'       => $kodesalesman,
+                        'namasalesman'       => $namasalesman,
+                        'kodesalesco'        => $kodesalesco,
+                        'namasalesco'        => $namasalesco,
+                        'kodespv'            => $kodespv,
+                        'namaspv'            => $namaspv,
+                        'tahunbulan'         => $tahunbulan,
+                        'bulan'              => $bulan,
+                        'tanggal'            => $tanggal,
+                        'weekno'             => $weekno,
+                        'nomornota'          => $nomornota,
+                        'salesmethod'        => $salesmethod,
+                        'sellingtype'        => $sellingtype,
+                        'qtysold'            => $qtysold,
+                        'kartonutuh'         => $kartonutuh,
+                        'qtysoldpcs'         => $qtysoldpcs,
+                        'freegoodpcs'        => $freegoodpcs,
+                        'tonnage'            => $tonnage,
+                        'volume_ltr'         => $volume_ltr,
+                        'grossamount'        => $grossamount,
+                        'linediscount1'      => $linediscount1,
+                        'linediscount2'      => $linediscount2,
+                        'linediscount3'      => $linediscount3,
+                        'linediscount4'      => $linediscount4,
+                        'linediscount5'      => $linediscount5,
+                        'totallinediscount'  => $totallinediscount,
+                        'discountnota1'      => $discountnota1,
+                        'discountnota2'      => $discountnota2,
+                        'discountnota3'      => $discountnota3,
+                        'totaldiscountnota'  => $totaldiscountnota,
+                        'dpp'                => $dpp,
+                        'ppn'                => $ppn,
+                        'ppnbm'              => $ppnbm,
+                        'tax3'               => $tax3,
+                        'netamount'          => $netamount,
+                        'warehouse'          => $warehouse,
+                        'customerpo'         => $customerpo,
+                        'customerjoindate'   => $customerjoindate,
+                        'nofakturpajak'      => $nofakturpajak,
+                        'tanggalfakturpajak' => $tglfakturpajak,
+                        'nomorfakturproforma'=> $nomorfakturproforma,
+                        'tanggalfakturproforma'=> $tglfakturproforma,
+                        'cogs'               => $cogs,
+                        'case_weight_kg'     => $case_weight_kg,
+                        'tslqtysoldnfg'      => $tslqtysoldnfg,
+                        'tslconvpcstoctn'    => $tslconvpcstoctn,
+                        'tsltonnagesoldfg'   => $tsltonnagesoldfg,
+                        'end'                => $end,
+                        'is_valid_kodeprod'  => $is_valid_kodeprod,
+                        'is_valid_tanggal'   => $is_valid_tanggal,
+                        'is_valid_customer'  => $is_valid_customer,
+                        'id_bridging_log'    => $id_log
+                    ];
+
+                    $insert = $this->model_bridging->insert_mmm_makassar_import($data);
+                }
+            }
+            // echo "<pre>"; print_r($data); echo "</pre>"; die;
+            // echo "tanggal : ".$tanggal." - is_valid_tanggal : ".$is_valid_tanggal; die;
+        }else
+        {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+            redirect('bridging/mmm_makassar','refresh');
+        };
+
+        $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
+        redirect('bridging/preview_mmm_makassar','refresh');
+    }
+
+    public function preview_mmm_makassar()
+    {
+        $get_data = $this->model_bridging->get_mmm_makassar_import();
+        $id_bridging_log = $get_data->row()->id_bridging_log; 
+        // echo "id_bridging_log : ".$id_bridging_log; die;
+
+        $is_invalid = $this->model_bridging->get_mmm_makassar_import_where_is_valid_false();
+        if($is_invalid->num_rows() > 0)
+        {
+            // echo "is_invalid : ".$is_invalid->num_rows();die;
+            $params_invalid = 1;
+        }else{
+            $params_invalid = 0;
+        }
+
+        $data = [
+            "title"         => "Preview Bridging mmm_makassar",
+            'url'           => 'bridging/submit_mmm_makassar',
+            'get_data'      => $get_data,
+            'id_bridging_log'   => $id_bridging_log,
+            'get_summary'   => $this->model_bridging->get_mmm_makassar_import_summary(),
+            'params_invalid' => $params_invalid
+        ];
+        // $this->view($data, false, "preview_mmm_makassar");
+        $this->render('bridging/preview_mmm_makassar', $data);
+    }
+
+    public function download_template_mmm_makassar()
+    {
+        $query = "
+            select 	'' as distributor,
+                    '' as cabang,
+                    '' as tipetrans,
+                    '' as divisi,
+                    '' as principal,
+                    '' as productgroup1,
+                    '' as productgroup2,
+                    '' as productgroup3,
+                    '' as brand,
+                    '' as kodeproduk,
+                    '' as kodevarian,
+                    '' as kodeprodukprincipal,
+                    '' as namaproduk,
+                    '' as packaging,
+                    '' as productclass,
+                    '' as kodecustomer,
+                    '' as namacustomer,
+                    '' as alamatcustomer,
+                    '' as area,
+                    '' as subarea,
+                    '' as channel,
+                    '' as subchannel,
+                    '' as customergroup,
+                    '' as keyaccount,
+                    '' as kodesalesman,
+                    '' as namasalesman,
+                    '' as kodesalesco,
+                    '' as namasalesco,
+                    '' as kodespv,
+                    '' as namaspv,
+                    '' as tahunbulan,
+                    '' as bulan,
+                    '' as tanggal,
+                    '' as weekno,
+                    '' as nomornota,
+                    '' as salesmethod,
+                    '' as sellingtype,
+                    '' as qtysold,
+                    '' as kartonutuh,
+                    '' as qtysoldpcs,
+                    '' as freegoodpcs,
+                    '' as tonnage,
+                    '' as volume_ltr,
+                    '' as grossamount,
+                    '' as linediscount1,
+                    '' as linediscount2,
+                    '' as linediscount3,
+                    '' as linediscount4,
+                    '' as linediscount5,
+                    '' as totallinediscount,
+                    '' as discountnota1,
+                    '' as discountnota2,
+                    '' as discountnota3,
+                    '' as totaldiscountnota,
+                    '' as dpp,
+                    '' as ppn,
+                    '' as ppnbm,
+                    '' as tax3,
+                    '' as netamount,
+                    '' as warehouse,
+                    '' as customerpo,
+                    '' as customerjoindate,
+                    '' as nofakturpajak,
+                    '' as tanggalfakturpajak,
+                    '' as nomorfakturproforma,
+                    '' as tanggalfakturproforma,
+                    '' as cogs,
+                    '' as case_weight_kg,
+                    '' as tslqtysoldnfg,
+                    '' as tslconvpcstoctn,
+                    '' as tsltonnagesoldfg,
+                    '' as `end`
+        ";
+
+        $hasil = $this->db->query($query);   
+
+        $headers = [
+            'distributor','cabang','tipetrans','divisi','principal','productgroup1','productgroup2','productgroup3','brand','kodeproduk','kodevarian','kodeprodukprincipal',
+            'namaproduk','packaging','productclass','kodecustomer','namacustomer','alamatcustomer','area','subarea','channel','subchannel','customergroup','keyaccount',
+            'kodesalesman','namasalesman','kodesalesco','namasalesco','kodespv','namaspv','tahunbulan','bulan','tanggal','weekno','nomornota','salesmethod','sellingtype',
+            'qtysold','kartonutuh','qtysoldpcs','freegoodpcs','tonnage','volume_ltr','grossamount','linediscount1','linediscount2','linediscount3','linediscount4','linediscount5',
+            'totallinediscount','discountnota1','discountnota2','discountnota3','totaldiscountnota','dpp','ppn','ppnbm','tax3','netamount','warehouse','customerpo',
+            'customerjoindate','nofakturpajak','tanggalfakturpajak','nomorfakturproforma','tanggalfakturproforma','cogs','case_weight_kg','tslqtysoldnfg','tslconvpcstoctn',
+            'tsltonnagesoldfg','end'
+        ];
+
+        $this->excel_generator->set_query($hasil);
+        $this->excel_generator->set_header($headers);
+        $this->excel_generator->set_column($headers);
+        $this->excel_generator->set_width(array_fill(0, count($headers), 10)); 
+        $this->excel_generator->exportTo2007('Download Template mmm_makassar'); 
+    }
+
+    public function mmm_makassar_import_customer()
+    {        
+        // create table
+        $create = $this->model_bridging->create_table_mmm_makassar_import_customer();
+        if(!$create) {
+            $this->session->set_flashdata("pesan", "gagal membuat table bridging_mmm_makassar_import_customer");
+            redirect('bridging/mmm_makassar','refresh');
+        }
+
+        // add unique constraint
+        $unique_customer_id = $this->model_bridging->add_unique_mmm_makassar_import_customer('customer_id');
+        $unique_mapping_uli = $this->model_bridging->add_unique_mmm_makassar_import_customer('mapping_uli');
+
+        // echo'disini'; die;
+        // inisialisasi upload
+        $init_upload = $this->attachment_config('mmm_makassar', ''); 
+        if ($this->upload->do_upload('file_customer')) 
+        {
+            // echo 'disini'; die;
+            $upload_data = $this->upload->data();
+            $filename_excel = $upload_data['file_name'];
+
+            $this->load->library('excel');
+            $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/mmm_makassar/$filename_excel");
+
+            $jumlahSheet = $object->getSheetCount();
+            if ($jumlahSheet > 1) {
+                echo "jumlah_sheet : ".$jumlahSheet;
+                echo "<script>alert('upload file gagal karena file mempunyai lebih dari 1 sheet'); </script>";
+                redirect('bridging/mmm_makassar','refresh');
+            }
+
+            foreach ($object->getWorksheetIterator() as $worksheet) 
+            {
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+
+                if ($highestRow > 5000) {
+                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 5000 ROW.");
+                    redirect('bridging/mmm_makassar','refresh');
+                }
+
+                if ($highestRow <= 1) {
+                    $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+                    redirect('bridging/mmm_makassar','refresh');
+                }
+
+                for ($row = 2; $row <= $highestRow; $row++) 
+                {  
+                    $kategori    = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+                    $nama_site   = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
+                    $regional    = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                    $customer_id = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());                    
+                    $mapping_uli = trim($worksheet->getCellByColumnAndRow(4, $row)->getValue());
+                    $mapping_nd6 = trim($worksheet->getCellByColumnAndRow(5, $row)->getValue());
+                    $mapping_warung_pintar = trim($worksheet->getCellByColumnAndRow(6, $row)->getValue());
+                    $mapping_pbf = trim($worksheet->getCellByColumnAndRow(7, $row)->getValue());
+                    $prefix = trim($worksheet->getCellByColumnAndRow(8, $row)->getValue());
+                    $nama_customer = trim($worksheet->getCellByColumnAndRow(9, $row)->getValue());
+                    $alamat = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
+                    $tipe_bayar = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue());
+                    $top = trim($worksheet->getCellByColumnAndRow(12, $row)->getValue());
+                    $status_konsinyasi = trim($worksheet->getCellByColumnAndRow(13, $row)->getValue());
+                    $status_fuguh = trim($worksheet->getCellByColumnAndRow(14, $row)->getValue());
+                    $kelurahan_id = trim($worksheet->getCellByColumnAndRow(15, $row)->getValue());
+                    $nama_kelurahan = trim($worksheet->getCellByColumnAndRow(16, $row)->getValue());
+                    $kecamatan_id = trim($worksheet->getCellByColumnAndRow(17, $row)->getValue());
+                    $nama_kecamatan = trim($worksheet->getCellByColumnAndRow(18, $row)->getValue());
+                    $kota_id = trim($worksheet->getCellByColumnAndRow(19, $row)->getValue());
+                    $nama_kota = trim($worksheet->getCellByColumnAndRow(20, $row)->getValue());     
+                    $propinsi_id = trim($worksheet->getCellByColumnAndRow(21, $row)->getValue());
+                    $nama_propinsi = trim($worksheet->getCellByColumnAndRow(22, $row)->getValue());
+                    $kode_pos = trim($worksheet->getCellByColumnAndRow(23, $row)->getValue());
+                    $telp = trim($worksheet->getCellByColumnAndRow(24, $row)->getValue());     
+                    $fax = trim($worksheet->getCellByColumnAndRow(25, $row)->getValue());
+                    $email = trim($worksheet->getCellByColumnAndRow(26, $row)->getValue());
+                    $head_office_id = trim($worksheet->getCellByColumnAndRow(27, $row)->getValue());
+                    $nama_head_office = trim($worksheet->getCellByColumnAndRow(28, $row)->getValue());      
+                    $company_id = trim($worksheet->getCellByColumnAndRow(29, $row)->getValue());
+                    $nama_company = trim($worksheet->getCellByColumnAndRow(30, $row)->getValue());
+                    $branch_id = trim($worksheet->getCellByColumnAndRow(31, $row)->getValue());
+                    $nama_branch_office = trim($worksheet->getCellByColumnAndRow(32, $row)->getValue());
+                    $site_id = trim($worksheet->getCellByColumnAndRow(33, $row)->getValue());
+                    $segment_id = trim($worksheet->getCellByColumnAndRow(34, $row)->getValue());    
+                    $nama_segment = trim($worksheet->getCellByColumnAndRow(35, $row)->getValue());
+                    $type_id = trim($worksheet->getCellByColumnAndRow(36, $row)->getValue());
+
+                    // cek type_id
+                    $cek_type = $this->model_bridging->get_type($type_id);
+                    if(!$cek_type->num_rows() > 0) { // jika tidak ada
+                        $is_valid_type_id = 0;
+                    }else{
+                        $is_valid_type_id = 1;
+                    }
+
+                    $nama_type = trim($worksheet->getCellByColumnAndRow(37, $row)->getValue());
+                    $kodesalur = trim($worksheet->getCellByColumnAndRow(38, $row)->getValue());
+
+                    // cek kodesalur
+                    $cek_class = $this->model_bridging->get_class($kodesalur);
+                    // echo 'cek_class ' .$cek_class;die; 
+                    if(!$cek_class->num_rows() > 0) { // jika tidak ada
+                        $is_valid_class_id = 0;
+                    }else{
+                        $is_valid_class_id = 1;
+                    }
+
+                    $namasalur = trim($worksheet->getCellByColumnAndRow(39, $row)->getValue());
+                    $spot_id = trim($worksheet->getCellByColumnAndRow(40, $row)->getValue());
+                    $no_ktp = trim($worksheet->getCellByColumnAndRow(41, $row)->getValue());
+                    $kartu_keluarga = trim($worksheet->getCellByColumnAndRow(42, $row)->getValue());
+                    $pln = trim($worksheet->getCellByColumnAndRow(43, $row)->getValue());
+                    $nama_penghubung = trim($worksheet->getCellByColumnAndRow(44, $row)->getValue());
+                    $alamat_penghubung = trim($worksheet->getCellByColumnAndRow(45, $row)->getValue());
+                    $telp_penghubung = trim($worksheet->getCellByColumnAndRow(46, $row)->getValue());
+                    $hubungan = trim($worksheet->getCellByColumnAndRow(47, $row)->getValue());
+                    $latitude = trim($worksheet->getCellByColumnAndRow(48, $row)->getValue());
+                    $longitude = trim($worksheet->getCellByColumnAndRow(49, $row)->getValue());
+                    $member = trim($worksheet->getCellByColumnAndRow(50, $row)->getValue());
+                    $black_list = trim($worksheet->getCellByColumnAndRow(51, $row)->getValue());
+                    $aktif = trim($worksheet->getCellByColumnAndRow(52, $row)->getValue());
+                    $show_alamat_pkp = trim($worksheet->getCellByColumnAndRow(53, $row)->getValue());
+                    $data_create = trim($worksheet->getCellByColumnAndRow(54, $row)->getValue());
+                    $pbf_izin_no_tdp_tgl = trim($worksheet->getCellByColumnAndRow(55, $row)->getValue());
+                    $pbf_izin_no_tdp_no = trim($worksheet->getCellByColumnAndRow(56, $row)->getValue());
+                    $pbf_izin_no_siup_tgl = trim($worksheet->getCellByColumnAndRow(57, $row)->getValue());
+                    $pbf_izin_no_siup = trim($worksheet->getCellByColumnAndRow(58, $row)->getValue());
+                    $pbf_izin_no_sito_tgl = trim($worksheet->getCellByColumnAndRow(59, $row)->getValue());
+                    $pbf_izin_no_sito = trim($worksheet->getCellByColumnAndRow(60, $row)->getValue());
+                    $pbf_izin_no_sipa_tgl = trim($worksheet->getCellByColumnAndRow(61, $row)->getValue());
+                    $pbf_izin_no_sipa = trim($worksheet->getCellByColumnAndRow(62, $row)->getValue());
+                    $pbf_izin_no_sia_tgl = trim($worksheet->getCellByColumnAndRow(63, $row)->getValue());
+                    $pbf_izin_no_sia = trim($worksheet->getCellByColumnAndRow(64, $row)->getValue());
+                    $pbf_izin_no_nib_tgl = trim($worksheet->getCellByColumnAndRow(65, $row)->getValue());
+                    $pbf_izin_no_nib = trim($worksheet->getCellByColumnAndRow(66, $row)->getValue());
+                    $pbf_izin_no_cdob_tgl = trim($worksheet->getCellByColumnAndRow(67, $row)->getValue());
+                    $pbf_izin_no_cdob = trim($worksheet->getCellByColumnAndRow(68, $row)->getValue());
+                    $pbf_asis_apoteker_tgl_sipa = trim($worksheet->getCellByColumnAndRow(69, $row)->getValue());
+                    $pbf_asis_apoteker_tgl_lahir = trim($worksheet->getCellByColumnAndRow(70, $row)->getValue());
+                    $pbf_asis_apoteker_telpon = trim($worksheet->getCellByColumnAndRow(71, $row)->getValue());
+                    $pbf_asis_apoteker_no_sipa = trim($worksheet->getCellByColumnAndRow(72, $row)->getValue());
+                    $pbf_asis_apoteker_no_ktp = trim($worksheet->getCellByColumnAndRow(73, $row)->getValue());
+                    $pbf_asis_apoteker_email = trim($worksheet->getCellByColumnAndRow(74, $row)->getValue());
+                    $pbf_asis_apoteker_nama = trim($worksheet->getCellByColumnAndRow(75, $row)->getValue());
+                    $pbf_asis_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(76, $row)->getValue());
+                    $pbf_apoteker_tgl_sipa = trim($worksheet->getCellByColumnAndRow(77, $row)->getValue());
+                    $pbf_apoteker_tgl_lahir = trim($worksheet->getCellByColumnAndRow(78, $row)->getValue());
+                    $pbf_apoteker_telpon = trim($worksheet->getCellByColumnAndRow(79, $row)->getValue());
+                    $pbf_apoteker_no_sipa = trim($worksheet->getCellByColumnAndRow(80, $row)->getValue());
+                    $pbf_apoteker_no_ktp = trim($worksheet->getCellByColumnAndRow(81, $row)->getValue());
+                    $pbf_apoteker_nama = trim($worksheet->getCellByColumnAndRow(82, $row)->getValue());
+                    $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
+                    $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
+
+                    if($nama_site == "" || $spot_id == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "") {
+                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
+                        redirect('bridging/mmm_makassar','refresh');
+                    }
+
+                    $data = [
+                        "kategori"    => $kategori,
+                        "nama_site"   => $nama_site,
+                        "regional"    => $regional,
+                        "customer_id" => $customer_id,
+                        "mapping_uli" => $mapping_uli,
+                        "mapping_nd6" => $mapping_nd6,
+                        "mapping_warung_pintar" => $mapping_warung_pintar,
+                        "mapping_pbf" => $mapping_pbf,
+                        "prefix" => $prefix,
+                        "nama_customer" => $nama_customer,
+                        "alamat" => $alamat,
+                        "tipe_bayar" => $tipe_bayar,
+                        "top" => $top,
+                        "status_konsinyasi" => $status_konsinyasi,
+                        "status_fuguh" => $status_fuguh,
+                        "kelurahan_id" => $kelurahan_id,
+                        "nama_kelurahan" => $nama_kelurahan,
+                        "kecamatan_id" => $kecamatan_id,
+                        "nama_kecamatan" => $nama_kecamatan,
+                        "kota_id" => $kota_id,
+                        "nama_kota" => $nama_kota,
+                        "propinsi_id" => $propinsi_id,
+                        "nama_propinsi" => $nama_propinsi,
+                        "kode_pos" => $kode_pos,
+                        "telp" => $telp,
+                        "fax" => $fax,
+                        "email" => $email,
+                        "head_office_id" => $head_office_id,
+                        "nama_head_office" => $nama_head_office,
+                        "company_id" => $company_id,
+                        "nama_company" => $nama_company,
+                        "branch_id" => $branch_id,
+                        "nama_branch_office" => $nama_branch_office,
+                        "site_id" => $site_id,
+                        "segment_id" => $segment_id,
+                        "nama_segment" => $nama_segment,
+                        "type_id" => $type_id,
+                        "nama_type" => $nama_type,
+                        "class_id" => $kodesalur,
+                        "class" => $namasalur,
+                        "spot_id" => $spot_id,
+                        "no_ktp" => $no_ktp,
+                        "kartu_keluarga" => $kartu_keluarga,
+                        "pln" => $pln,
+                        "nama_penghubung" => $nama_penghubung,
+                        "alamat_penghubung" => $alamat_penghubung,
+                        "telp_penghubung" => $telp_penghubung,
+                        "hubungan" => $hubungan,
+                        "latitude" => $latitude,
+                        "longitude" => $longitude,
+                        "member" => $member,
+                        "black_list" => $black_list,
+                        "aktif" => $aktif,
+                        "show_alamat_pkp" => $show_alamat_pkp,
+                        "data_create" => $data_create,
+                        "pbf_izin_no_tdp_tgl" => $pbf_izin_no_tdp_tgl,
+                        "pbf_izin_no_tdp" => $pbf_izin_no_tdp_no,
+                        "pbf_izin_no_siup_tgl" => $pbf_izin_no_siup_tgl,
+                        "pbf_izin_no_siup" => $pbf_izin_no_siup,
+                        "pbf_izin_no_sito_tgl" => $pbf_izin_no_sito_tgl,
+                        "pbf_izin_no_sito" => $pbf_izin_no_sito,
+                        "pbf_izin_no_sipa_tgl" => $pbf_izin_no_sipa_tgl,
+                        "pbf_izin_no_sipa" => $pbf_izin_no_sipa,
+                        "pbf_izin_no_cdob_tgl" => $pbf_izin_no_cdob_tgl,
+                        "pbf_izin_no_cdob" => $pbf_izin_no_cdob,
+                        "pbf_asis_apoteker_tgl_sipa" => $pbf_asis_apoteker_tgl_sipa,
+                        "pbf_asis_apoteker_tgl_lahir" => $pbf_asis_apoteker_tgl_lahir,
+                        "pbf_asis_apoteker_telpon" => $pbf_asis_apoteker_telpon,
+                        "pbf_asis_apoteker_no_sipa" => $pbf_asis_apoteker_no_sipa,
+                        "pbf_asis_apoteker_no_ktp" => $pbf_asis_apoteker_no_ktp,
+                        "pbf_asis_apoteker_email" => $pbf_asis_apoteker_email,
+                        "pbf_asis_apoteker_nama" => $pbf_asis_apoteker_nama,
+                        "pbf_asis_apoteker_alamat" => $pbf_asis_apoteker_alamat,
+                        "pbf_apoteker_tgl_sipa" => $pbf_apoteker_tgl_sipa,
+                        "pbf_apoteker_tgl_lahir" => $pbf_apoteker_tgl_lahir,
+                        "pbf_apoteker_telpon" => $pbf_apoteker_telpon,
+                        "pbf_apoteker_no_sipa" => $pbf_apoteker_no_sipa,
+                        "pbf_apoteker_no_ktp" => $pbf_apoteker_no_ktp,
+                        "pbf_apoteker_nama" => $pbf_apoteker_nama,
+                        "pbf_apoteker_alamat" => $pbf_apoteker_alamat,
+                        "pbf_apoteker_email" => $pbf_apoteker_email,
+                        "is_valid_type_id" => $is_valid_type_id,
+                        "is_valid_class_id" => $is_valid_class_id                 
+                    ];
+
+                    $insert = $this->model_bridging->insert_mmm_makassar_import_customer($data);
+                }
+            }
+        }else
+        {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+            // redirect('bridging/mmm_makassar','refresh');
+        };
+
+        $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
+        redirect('bridging/result_mmm_makassar_customer','refresh');
+    }
+
+    public function download_template_mmm_makassar_customer()
+    {
+        $query = "
+            select 	kategori,
+                    nama_site,
+                    regional,
+                    customer_id,
+                    mapping_uli,
+                    mapping_nd6,
+                    mapping_warung_pintar,
+                    mapping_pbf,
+                    prefix,
+                    nama_customer,
+                    alamat,
+                    tipe_bayar,
+                    top,
+                    status_konsinyasi,
+                    status_fuguh,
+                    kelurahan_id,
+                    nama_kelurahan,
+                    kecamatan_id,
+                    nama_kecamatan,
+                    kota_id,
+                    nama_kota,
+                    propinsi_id,
+                    nama_propinsi,
+                    kode_pos,
+                    telp,
+                    fax,
+                    email,
+                    head_office_id,
+                    nama_head_office,
+                    company_id,
+                    nama_company,
+                    branch_id,
+                    nama_branch_office,
+                    site_id,
+                    segment_id,
+                    nama_segment, 
+                    type_id,
+                    nama_type,
+                    class_id,
+                    class,
+                    spot_id,
+                    no_ktp,
+                    kartu_keluarga,
+                    pln,
+                    nama_penghubung,
+                    alamat_penghubung,
+                    telp_penghubung,
+                    hubungan,
+                    latitude,
+                    longitude,
+                    member,
+                    black_list,
+                    aktif,
+                    show_alamat_pkp,
+                    data_create,
+                    pbf_izin_no_tdp_tgl,
+                    pbf_izin_no_tdp,
+                    pbf_izin_no_siup_tgl,
+                    pbf_izin_no_siup,
+                    pbf_izin_no_sito_tgl,
+                    pbf_izin_no_sito,
+                    pbf_izin_no_sipa_tgl,
+                    pbf_izin_no_sipa,
+                    pbf_izin_no_sia_tgl,
+                    pbf_izin_no_sia,
+                    pbf_izin_no_nib_tgl,
+                    pbf_izin_no_nib,
+                    pbf_izin_no_cdob_tgl,
+                    pbf_izin_no_cdob,
+                    pbf_asis_apoteker_tgl_sipa,
+                    pbf_asis_apoteker_tgl_lahir,
+                    pbf_asis_apoteker_telpon,
+                    pbf_asis_apoteker_no_sipa,
+                    pbf_asis_apoteker_no_ktp,
+                    pbf_asis_apoteker_email,
+                    pbf_asis_apoteker_nama,
+                    pbf_asis_apoteker_alamat,
+                    pbf_apoteker_tgl_sipa,
+                    pbf_apoteker_tgl_lahir,
+                    pbf_apoteker_telpon,
+                    pbf_apoteker_no_sipa,
+                    pbf_apoteker_no_ktp,
+                    pbf_apoteker_nama,
+                    pbf_apoteker_alamat,
+                    pbf_apoteker_email
+        from site.bridging_mmm_makassar_import_customer a
+        ";
+
+        $hasil = $this->db->query($query);   
+    
+        $this->excel_generator->set_query($hasil);
+
+        $this->excel_generator->set_header(array
+        (
+            'kategori',
+            'nama_site',
+            'regional',
+            'customer_id',
+            'mapping_uli',
+            'mapping_nd6',
+            'mapping_warung_pintar',
+            'mapping_pbf',
+            'prefix',
+            'nama_customer',
+            'alamat',
+            'tipe_bayar',
+            'top',
+            'status_konsinyasi',
+            'status_fuguh',
+            'kelurahan_id',
+            'nama_kelurahan',
+            'kecamatan_id',
+            'nama_kecamatan',
+            'kota_id',
+            'nama_kota',
+            'propinsi_id',
+            'nama_propinsi',
+            'kode_pos',
+            'telp',
+            'fax',
+            'email',
+            'head_office_id',
+            'nama_head_office',
+            'company_id',
+            'nama_company',
+            'branch_id',
+            'nama_branch_office',
+            'site_id',
+            'segment_id',
+            'nama_segment', 
+            'type_id',
+            'nama_type',
+            'class_id',
+            'class',
+            'spot_id',
+            'no_ktp',
+            'kartu_keluarga',
+            'pln',
+            'nama_penghubung',
+            'alamat_penghubung',
+            'telp_penghubung',
+            'hubungan',
+            'latitude',
+            'longitude',
+            'member',
+            'black_list',
+            'aktif',
+            'show_alamat_pkp',
+            'data_create',
+            'pbf_izin_no_tdp_tgl',
+            'pbf_izin_no_tdp',
+            'pbf_izin_no_siup_tgl',
+            'pbf_izin_no_siup',
+            'pbf_izin_no_sito_tgl',
+            'pbf_izin_no_sito',
+            'pbf_izin_no_sipa_tgl',
+            'pbf_izin_no_sipa',
+            'pbf_izin_no_sia_tgl',
+            'pbf_izin_no_sia',
+            'pbf_izin_no_nib_tgl',
+            'pbf_izin_no_nib',
+            'pbf_izin_no_cdob_tgl',
+            'pbf_izin_no_cdob',
+            'pbf_asis_apoteker_tgl_sipa',
+            'pbf_asis_apoteker_tgl_lahir',
+            'pbf_asis_apoteker_telpon',
+            'pbf_asis_apoteker_no_sipa',
+            'pbf_asis_apoteker_no_ktp',
+            'pbf_asis_apoteker_email',
+            'pbf_asis_apoteker_nama',
+            'pbf_asis_apoteker_alamat',
+            'pbf_apoteker_tgl_sipa',
+            'pbf_apoteker_tgl_lahir',
+            'pbf_apoteker_telpon',
+            'pbf_apoteker_no_sipa',
+            'pbf_apoteker_no_ktp',
+            'pbf_apoteker_nama',
+            'pbf_apoteker_alamat',
+            'pbf_apoteker_email'
+        ));
+        $this->excel_generator->set_column(array
+        ( 
+            'kategori',
+            'nama_site',
+            'regional',
+            'customer_id',
+            'mapping_uli',
+            'mapping_nd6',
+            'mapping_warung_pintar',
+            'mapping_pbf',
+            'prefix',
+            'nama_customer',
+            'alamat',
+            'tipe_bayar',
+            'top',
+            'status_konsinyasi',
+            'status_fuguh',
+            'kelurahan_id',
+            'nama_kelurahan',
+            'kecamatan_id',
+            'nama_kecamatan',
+            'kota_id',
+            'nama_kota',
+            'propinsi_id',
+            'nama_propinsi',
+            'kode_pos',
+            'telp',
+            'fax',
+            'email',
+            'head_office_id',
+            'nama_head_office',
+            'company_id',
+            'nama_company',
+            'branch_id',
+            'nama_branch_office',
+            'site_id',
+            'segment_id',
+            'nama_segment', 
+            'type_id',
+            'nama_type',
+            'class_id',
+            'class',
+            'spot_id',
+            'no_ktp',
+            'kartu_keluarga',
+            'pln',
+            'nama_penghubung',
+            'alamat_penghubung',
+            'telp_penghubung',
+            'hubungan',
+            'latitude',
+            'longitude',
+            'member',
+            'black_list',
+            'aktif',
+            'show_alamat_pkp',
+            'data_create',
+            'pbf_izin_no_tdp_tgl',
+            'pbf_izin_no_tdp',
+            'pbf_izin_no_siup_tgl',
+            'pbf_izin_no_siup',
+            'pbf_izin_no_sito_tgl',
+            'pbf_izin_no_sito',
+            'pbf_izin_no_sipa_tgl',
+            'pbf_izin_no_sipa',
+            'pbf_izin_no_sia_tgl',
+            'pbf_izin_no_sia',
+            'pbf_izin_no_nib_tgl',
+            'pbf_izin_no_nib',
+            'pbf_izin_no_cdob_tgl',
+            'pbf_izin_no_cdob',
+            'pbf_asis_apoteker_tgl_sipa',
+            'pbf_asis_apoteker_tgl_lahir',
+            'pbf_asis_apoteker_telpon',
+            'pbf_asis_apoteker_no_sipa',
+            'pbf_asis_apoteker_no_ktp',
+            'pbf_asis_apoteker_email',
+            'pbf_asis_apoteker_nama',
+            'pbf_asis_apoteker_alamat',
+            'pbf_apoteker_tgl_sipa',
+            'pbf_apoteker_tgl_lahir',
+            'pbf_apoteker_telpon',
+            'pbf_apoteker_no_sipa',
+            'pbf_apoteker_no_ktp',
+            'pbf_apoteker_nama',
+            'pbf_apoteker_alamat',
+            'pbf_apoteker_email'  
+        ));
+        $this->excel_generator->set_width(array(10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10)); 
+        $this->excel_generator->exportTo2007('Download Template mmm_makassar Customer'); 
+    }
+
+    public function result_mmm_makassar_customer()
+    {
+        $data = [
+            "title" => "Result Bridging mmm_makassar Customer",
+            'url'   => 'bridging/mmm_makassar_submit_customer',
+            'get_data' => $this->model_bridging->get_mmm_makassar_import_customer(),
+            'get_summary' => $this->model_bridging->get_mmm_makassar_import_customer_summary(),
+        ];
+        // $this->view($data, false, "result_mmm_makassar_customer");
+        $this->render('bridging/result_mmm_makassar_customer', $data);
+    }
+
+    public function submit_mmm_makassar()
+    {
+        $id_bridging_log = $this->input->post('id_bridging_log');
+        // echo  $id_bridging_log; die;
+
+        $get_data_log = $this->model_bridging->get_bridging_log($id_bridging_log);
+        if($get_data_log->num_rows() > 0)
+        {
+            $site_code = $get_data_log->row()->site_code;
+            $kode_comp = substr($site_code, 0, 3);
+            $nocab = substr($site_code, 3, 2);
+
+            $bulan = $get_data_log->row()->bulan;
+
+            $tahun_upload = substr($bulan, 0, 4);
+            $bulan_upload = substr($bulan, 5, 2);
+        }
+
+        $get_userid = $this->model_bridging->get_userid_by_kode_comp($kode_comp);
+        if($get_userid->num_rows() > 0)
+        {
+            $userid = $get_userid->row()->id;
+        }else{
+            $this->session->set_flashdata("pesan", "gagal mendapatkan userid, ".$this->upload->display_errors());
+            redirect('bridging/mmm_makassar','refresh');
+        }
+
+        $get_last_upload = $this->model_bridging->get_mpm_upload_where_closing_by_userid($userid);
+        if($get_last_upload->num_rows() > 0)
+        {
+            $tahun_last_upload = $get_last_upload->row()->tahun;
+            $bulan_last_upload = $get_last_upload->row()->bulan;
+        }   
+
+        // die;
+
+        if ($tahun_upload < $tahun_last_upload || ($tahun_upload == $tahun_last_upload && $bulan_upload <= $bulan_last_upload)) {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, tahun dan bulan lebih kecil dari tahun dan bulan terakhir diupload");
+            redirect('bridging/mmm_makassar','refresh');
+        } 
+
+        $delete_fi = $this->model_bridging->delete_fi_mmm_makassar($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $delete_ri = $this->model_bridging->delete_ri_mmm_makassar($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        
+        $proses_fi = $this->model_bridging->insert_fi_mmm_makassar($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $proses_fi = $this->model_bridging->insert_fi_mmm_makassar_bonus($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $proses_ri = $this->model_bridging->insert_ri_mmm_makassar($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+
+        $delete_tblang = $this->model_bridging->delete_tblang_mmm_makassar($tahun_upload, $nocab);
+        $delete_tabsales = $this->model_bridging->delete_tabsales_mmm_makassar($tahun_upload, $nocab);
+        // $delete_tbkota = $this->model_bridging->delete_tbkota_mmm_makassar($tahun_upload, $nocab);
+
+        $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
+        $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
+        // $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
+
+
+        // update bridging_log
+        $get_data_result = $this->model_bridging->get_result($site_code, $tahun_upload, $bulan_upload);
+        if($get_data_result->num_rows() > 0)
+        {
+            $total_unit = $get_data_result->row()->total_unit;
+            $total_value = $get_data_result->row()->total_value;
+        }else{
+            $total_unit = 0;
+            $total_value = 0;            
+        }
+
+        $insert_upload = [
+            "userid"        => $userid,
+            "lastupload"    => $this->model_outlet_transaksi->timezone(),
+            "tanggal"       => date('d', strtotime($this->model_outlet_transaksi->timezone())),
+            "filename"      => "",
+            "omzet"         => $total_value,
+            "status"        => 1,
+            "tahun"         => $tahun_upload,
+            "bulan"         => $bulan_upload,
+            "status_closing" => 0
+        ];
+        $id_upload = $this->model_bridging->insert_upload($insert_upload);
+
+        $update_bridging = [
+            'sum_omzet' => $total_value,
+            'sum_unit' => $total_unit,
+            'id_upload' => $id_upload
+        ];
+        $this->model_bridging->update_bridging_log($update_bridging, $id_bridging_log);
+
+        $this->session->set_flashdata("pesan_result_success", "proses upload success");
+        redirect('bridging/mmm_makassar','refresh');
+        
+    }
+
+/// BONE ///
+
+     public function mmm_bone()
+    {
+        $site_code = 'MMBE2';
+        $cek_hak = $this->model_bridging->get_bridging_hak_akses_by_site_code_userid($site_code, $this->userid)->row();
+        if(!$cek_hak) {
+            $this->session->set_flashdata("pesan", "user anda tidak diijinkan mengakses halaman ini");
+            redirect('bridging/dashboard','refresh');
+        }
+
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
+        $data = [
+            "title" => "Bridging mmm_bone Sales",
+            "title_customer" => "Bridging Customer mmm_bone (Outlet)",
+            'url'   => 'bridging/mmm_bone_import',
+            'url_customer'   => 'bridging/mmm_bone_import_customer',
+            'bridging'  => "mmm_bone",
+            'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
+        ];
+        // $this->view($data, false, "mmm_bone");
+        $this->render('bridging/mmm_bone', $data);
+    }
+
+    public function mmm_bone_import()
+    {
+        $month = $this->input->post('month');
+        $bulan = explode('-', $month)[1];
+        $tahun = explode('-', $month)[0];
+
+        $newDate_sebelumnya = date('Y-m', strtotime($month. ' -1 months')); // mencari periode -1 bulan sebelumnya
+        $tahun_sebelumnya = explode('-', $newDate_sebelumnya)[0];
+        $bulan_sebelumnya = explode('-', $newDate_sebelumnya)[1];
+
+        // cek data apakah bulan sebelumnya sudah closing bulanan atau belum
+        $get_mpm_user = $this->model_bridging->get_mpm_user('MMB');
+        $userid = $get_mpm_user->row()->id;
+
+        $get_mpm_upload_bulan_lalu = $this->model_bridging->get_mpm_upload($userid, $bulan_sebelumnya, $tahun_sebelumnya, '1');
+        if ($get_mpm_upload_bulan_lalu->num_rows() > 0) {
+            $status_closing_bulan_lalu = $get_mpm_upload_bulan_lalu->row()->status_closing;
+        } else {
+            $status_closing_bulan_lalu = null; // atau default value lain seperti 0 atau ''
+        }
+
+        if ($status_closing_bulan_lalu == null) {
+            $this->session->set_flashdata("pesan", "upload file gagal, data bulan sebelumnya belum di closing! silahkan upload data closing terlebih dahulu");
+            redirect('bridging/mmm_bone','refresh');
+        }
+
+        // cek data apakah sudah closing bulanan atau belum
+        $get_mpm_uplaod = $this->model_bridging->get_mpm_upload($userid, $bulan, $tahun, '');
+
+        if ($get_mpm_uplaod->num_rows() > 0) {
+            $status_closing = $get_mpm_uplaod->row()->status_closing;
+        } else {
+            $status_closing = null; // atau default value lain seperti 0 atau ''
+        }
+        
+        if ($status_closing == '1') {
+            $this->session->set_flashdata("pesan", "upload file gagal, data sudah di closing! silahkan hubungi IT");
+            redirect('bridging/mmm_bone','refresh');
+        }
+
+        // create table
+        $create = $this->model_bridging->create_table_mmm_bone_import();
+        if(!$create) {
+            $this->session->set_flashdata("pesan", "gagal membuat table bridging_mmm_bone_import");
+            redirect('bridging/mmm_bone','refresh');
+        }
+
+        // inisialisasi upload
+        $init_upload = $this->attachment_config('mmm_bone', '');        
+        if ($this->upload->do_upload('file')) 
+        {
+            $upload_data = $this->upload->data();
+            $filename_excel = $upload_data['file_name'];
+
+            $this->load->library('excel');
+            $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/mmm_bone/$filename_excel");
+
+            $jumlahSheet = $object->getSheetCount();
+            if ($jumlahSheet > 1) {
+                echo "jumlah_sheet : ".$jumlahSheet;
+                echo "<script>alert('upload file gagal karena file mempunyai lebih dari 1 sheet'); </script>";
+                redirect('bridging/mmm_bone','refresh');
+            }
+
+            $highestColumm = $object->setActiveSheetIndex(0)->getHighestColumn();
+            // var_dump($highestColumm);die;
+            if ($highestColumm != 'BT') {
+                echo "<script>alert('upload file gagal karena column tidak sesuai'); </script>";
+                redirect('bridging/mmm_bone','refresh');
+            }
+
+            $input_log_data = [
+                "site_code" => "MMBE2",
+                "bulan" => $month,
+                "filename"  => $filename_excel,
+                "signature" => md5("MMBE2".$month.$this->model_outlet_transaksi->timezone()),
+                "created_at" => $this->model_outlet_transaksi->timezone(),
+                "created_by" => $this->session->userdata('id'),
+            ];
+
+            $id_log = $this->model_bridging->input_bridging_log($input_log_data);
+
+            foreach ($object->getWorksheetIterator() as $worksheet) 
+            {
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+
+                if ($highestRow > 5000) {
+                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 1000 ROW.");
+                    redirect('bridging/mmm_bone','refresh');
+                }
+
+                if ($highestRow <= 1) {
+                    $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+                    redirect('bridging/mmm_bone','refresh');
+                }
+
+                for ($row = 2; $row <= $highestRow; $row++) 
+                {   
+                    $distributor    = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+                    $cabang         = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
+                    $tipetrans      = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                    $divisi         = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());
+                    $principal      = trim($worksheet->getCellByColumnAndRow(4, $row)->getValue());
+                    $productgroup1  = trim($worksheet->getCellByColumnAndRow(5, $row)->getValue());
+                    $productgroup2  = trim($worksheet->getCellByColumnAndRow(6, $row)->getValue());
+                    $productgroup3  = trim($worksheet->getCellByColumnAndRow(7, $row)->getValue());
+                    $brand          = trim($worksheet->getCellByColumnAndRow(8, $row)->getValue());
+                    $kodeproduk     = trim($worksheet->getCellByColumnAndRow(9, $row)->getValue());
+                    $kodevarian     = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
+                    
+                    // cek kodeproduk mpm
+                    $kodeprodukprincipal = (strlen($temp = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue())) == 5) ? '0' . $temp : $temp;
+                    // echo $kodeprodukprincipal;
+                    // echo '</br>';
+
+                    $get_kodeprod = $this->model_bridging->get_master_product_by_kodeprod($kodeprodukprincipal);
+                    if($get_kodeprod->num_rows() > 0) {
+                        $is_valid_kodeprod = 1;
+                    }else{
+                        $is_valid_kodeprod = 0;
+                    }
+
+                    $namaproduk    = trim($worksheet->getCellByColumnAndRow(12, $row)->getValue());
+                    $packaging    = trim($worksheet->getCellByColumnAndRow(13, $row)->getValue());
+                    $productclass = trim($worksheet->getCellByColumnAndRow(14, $row)->getValue());
+                    $kodecustomer= trim($worksheet->getCellByColumnAndRow(15, $row)->getValue());
+
+                    // cek kodecustomer 
+                    $cek_customer = $this->model_bridging->get_mmm_bone_customer($kodecustomer);
+                    if($cek_customer->num_rows() > 0) {
+                        $is_valid_customer = 1;
+                    }else{
+                        $is_valid_customer = 0;
+                    }
+
+                    $namacustomer = trim($worksheet->getCellByColumnAndRow(16, $row)->getValue());
+                    $alamatcustomer = trim($worksheet->getCellByColumnAndRow(17, $row)->getValue());
+                    $area = trim($worksheet->getCellByColumnAndRow(18, $row)->getValue());
+                    $subarea = trim($worksheet->getCellByColumnAndRow(19, $row)->getValue());
+                    $channel = trim($worksheet->getCellByColumnAndRow(20, $row)->getValue());
+                    $subchannel = trim($worksheet->getCellByColumnAndRow(21, $row)->getValue());
+                    $customergroup = trim($worksheet->getCellByColumnAndRow(22, $row)->getValue());
+                    $keyaccount= trim($worksheet->getCellByColumnAndRow(23, $row)->getValue());
+                    $kodesalesman = trim($worksheet->getCellByColumnAndRow(24, $row)->getValue());
+                    $namasalesman = trim($worksheet->getCellByColumnAndRow(25, $row)->getValue());
+                    $kodesalesco = trim($worksheet->getCellByColumnAndRow(26, $row)->getValue());
+                    $namasalesco = trim($worksheet->getCellByColumnAndRow(27, $row)->getValue());
+                    $kodespv = trim($worksheet->getCellByColumnAndRow(28, $row)->getValue());
+                    $namaspv = trim($worksheet->getCellByColumnAndRow(29, $row)->getValue());
+                    $tahunbulan = trim($worksheet->getCellByColumnAndRow(30, $row)->getValue());
+                    $bulan = trim($worksheet->getCellByColumnAndRow(31, $row)->getValue());
+                    
+                    // cek tanggal
+                    $cell = $worksheet->getCellByColumnAndRow(32, $row);
+                    $cellValue = $cell->getValue();
+
+                    // echo $cellValue; echo '<br>';
+                    $is_valid_tanggal = 1; // Nilai default valid
+
+                    if (is_numeric($cellValue)) {
+                        // echo "numeric: " . $cellValue . "<br>";die;
+                        $unixTimestamp = ($cellValue - 25569) * 86400; // 25569 is days between 1900-01-01 and 1970-01-01
+                        $tanggal = date('Y-m-d', $unixTimestamp); // Format as needed
+                        // Ekstrak tahun-bulan dari $tanggal untuk perbandingan
+                        $tanggal_ym = date('Y-m', $unixTimestamp);
+                        // Bandingkan dengan $month
+                        if ($tanggal_ym !== $month) {
+                            $is_valid_tanggal = 0; // Tandai sebagai tidak valid jika bulan berbeda
+                        }
+                    } else {
+                        // echo "string: " . $cellValue . "<br>";die;
+                        $tanggal = $cellValue;
+
+                        $formats = ['d/m/Y', 'd-m-Y', 'Y-m-d'];
+                        $dateObj = false;
+
+                        foreach ($formats as $format) {
+                            $dateObj = DateTime::createFromFormat($format, $tanggal);
+                            if ($dateObj !== false) {
+                                break;
+                            }
+                        }
+
+                        if ($dateObj !== false) {
+
+                            $tanggal = $dateObj->format('Y-m-d');
+                            $tanggal_ym = $dateObj->format('Y-m');
+
+                            if ($tanggal_ym !== $month) {
+                                $is_valid_tanggal = 0;
+                            }
+
+                        } else {
+                            $is_valid_tanggal = 0;
+                        }
+                    }
+                    
+                    $weekno = trim($worksheet->getCellByColumnAndRow(33, $row)->getValue());
+                    $nomornota = trim($worksheet->getCellByColumnAndRow(34, $row)->getValue());
+                    $salesmethod = trim($worksheet->getCellByColumnAndRow(35, $row)->getValue());
+                    $sellingtype = trim($worksheet->getCellByColumnAndRow(36, $row)->getValue());
+                    $qtysold        = trim($worksheet->getCellByColumnAndRow(37, $row)->getValue());
+                    $kartonutuh     = trim($worksheet->getCellByColumnAndRow(38, $row)->getValue());
+                    $qtysoldpcs     = trim($worksheet->getCellByColumnAndRow(39, $row)->getValue());
+                    $freegoodpcs    = trim($worksheet->getCellByColumnAndRow(40, $row)->getValue());
+
+                    $tonnage        = trim($worksheet->getCellByColumnAndRow(41, $row)->getValue());
+                    $volume_ltr     = trim($worksheet->getCellByColumnAndRow(42, $row)->getValue());
+                    $grossamount    = trim($worksheet->getCellByColumnAndRow(43, $row)->getValue());
+
+                    $linediscount1  = trim($worksheet->getCellByColumnAndRow(44, $row)->getValue());
+                    $linediscount2  = trim($worksheet->getCellByColumnAndRow(45, $row)->getValue());
+                    $linediscount3  = trim($worksheet->getCellByColumnAndRow(46, $row)->getValue());
+                    $linediscount4  = trim($worksheet->getCellByColumnAndRow(47, $row)->getValue());
+                    $linediscount5  = trim($worksheet->getCellByColumnAndRow(48, $row)->getValue());
+                    $totallinediscount = trim($worksheet->getCellByColumnAndRow(49, $row)->getValue());
+
+                    $discountnota1  = trim($worksheet->getCellByColumnAndRow(50, $row)->getValue());
+                    $discountnota2  = trim($worksheet->getCellByColumnAndRow(51, $row)->getValue());
+                    $discountnota3  = trim($worksheet->getCellByColumnAndRow(52, $row)->getValue());
+                    $totaldiscountnota = trim($worksheet->getCellByColumnAndRow(53, $row)->getValue());
+
+                    $dpp            = trim($worksheet->getCellByColumnAndRow(54, $row)->getValue());
+                    $ppn            = trim($worksheet->getCellByColumnAndRow(55, $row)->getValue());
+                    $ppnbm          = trim($worksheet->getCellByColumnAndRow(56, $row)->getValue());
+                    $tax3           = trim($worksheet->getCellByColumnAndRow(57, $row)->getValue());
+                    $netamount      = trim($worksheet->getCellByColumnAndRow(58, $row)->getValue());
+
+                    $warehouse      = trim($worksheet->getCellByColumnAndRow(59, $row)->getValue());
+                    $customerpo     = trim($worksheet->getCellByColumnAndRow(60, $row)->getValue());
+                    $customerjoindate = trim($worksheet->getCellByColumnAndRow(61, $row)->getValue());
+                    $nofakturpajak  = trim($worksheet->getCellByColumnAndRow(62, $row)->getValue());
+                    $tglfakturpajak = trim($worksheet->getCellByColumnAndRow(63, $row)->getValue());
+                    $nomorfakturproforma = trim($worksheet->getCellByColumnAndRow(64, $row)->getValue());
+                    $tglfakturproforma = trim($worksheet->getCellByColumnAndRow(65, $row)->getValue());
+
+                    $cogs               = trim($worksheet->getCellByColumnAndRow(66, $row)->getValue());
+                    $case_weight_kg     = trim($worksheet->getCellByColumnAndRow(67, $row)->getValue());
+                    $tslqtysoldnfg      = trim($worksheet->getCellByColumnAndRow(68, $row)->getValue());
+                    $tslconvpcstoctn    = trim($worksheet->getCellByColumnAndRow(69, $row)->getValue());
+                    $tsltonnagesoldfg   = trim($worksheet->getCellByColumnAndRow(70, $row)->getValue());
+                    $end                = trim($worksheet->getCellByColumnAndRow(71, $row)->getValue());
+
+                    $data = [
+                        'distributor'        => $distributor,
+                        'cabang'             => $cabang,
+                        'tipetrans'          => $tipetrans,
+                        'divisi'             => $divisi,
+                        'principal'          => $principal,
+                        'productgroup1'      => $productgroup1,
+                        'productgroup2'      => $productgroup2,
+                        'productgroup3'      => $productgroup3,
+                        'brand'              => $brand,
+                        'kodeproduk'         => $kodeproduk,
+                        'kodevarian'         => $kodevarian,
+                        'kodeprodukprincipal'=> $kodeprodukprincipal,
+                        'namaproduk'         => $namaproduk,
+                        'packaging'          => $packaging,
+                        'productclass'       => $productclass,
+                        'kodecustomer'       => $kodecustomer,
+                        'namacustomer'       => $namacustomer,
+                        'alamatcustomer'     => $alamatcustomer,
+                        'area'               => $area,
+                        'subarea'            => $subarea,
+                        'channel'            => $channel,
+                        'subchannel'         => $subchannel,
+                        'customergroup'      => $customergroup,
+                        'keyaccount'         => $keyaccount,
+                        'kodesalesman'       => $kodesalesman,
+                        'namasalesman'       => $namasalesman,
+                        'kodesalesco'        => $kodesalesco,
+                        'namasalesco'        => $namasalesco,
+                        'kodespv'            => $kodespv,
+                        'namaspv'            => $namaspv,
+                        'tahunbulan'         => $tahunbulan,
+                        'bulan'              => $bulan,
+                        'tanggal'            => $tanggal,
+                        'weekno'             => $weekno,
+                        'nomornota'          => $nomornota,
+                        'salesmethod'        => $salesmethod,
+                        'sellingtype'        => $sellingtype,
+                        'qtysold'            => $qtysold,
+                        'kartonutuh'         => $kartonutuh,
+                        'qtysoldpcs'         => $qtysoldpcs,
+                        'freegoodpcs'        => $freegoodpcs,
+                        'tonnage'            => $tonnage,
+                        'volume_ltr'         => $volume_ltr,
+                        'grossamount'        => $grossamount,
+                        'linediscount1'      => $linediscount1,
+                        'linediscount2'      => $linediscount2,
+                        'linediscount3'      => $linediscount3,
+                        'linediscount4'      => $linediscount4,
+                        'linediscount5'      => $linediscount5,
+                        'totallinediscount'  => $totallinediscount,
+                        'discountnota1'      => $discountnota1,
+                        'discountnota2'      => $discountnota2,
+                        'discountnota3'      => $discountnota3,
+                        'totaldiscountnota'  => $totaldiscountnota,
+                        'dpp'                => $dpp,
+                        'ppn'                => $ppn,
+                        'ppnbm'              => $ppnbm,
+                        'tax3'               => $tax3,
+                        'netamount'          => $netamount,
+                        'warehouse'          => $warehouse,
+                        'customerpo'         => $customerpo,
+                        'customerjoindate'   => $customerjoindate,
+                        'nofakturpajak'      => $nofakturpajak,
+                        'tanggalfakturpajak' => $tglfakturpajak,
+                        'nomorfakturproforma'=> $nomorfakturproforma,
+                        'tanggalfakturproforma'=> $tglfakturproforma,
+                        'cogs'               => $cogs,
+                        'case_weight_kg'     => $case_weight_kg,
+                        'tslqtysoldnfg'      => $tslqtysoldnfg,
+                        'tslconvpcstoctn'    => $tslconvpcstoctn,
+                        'tsltonnagesoldfg'   => $tsltonnagesoldfg,
+                        'end'                => $end,
+                        'is_valid_kodeprod'  => $is_valid_kodeprod,
+                        'is_valid_tanggal'   => $is_valid_tanggal,
+                        'is_valid_customer'  => $is_valid_customer,
+                        'id_bridging_log'    => $id_log
+                    ];
+
+                    $insert = $this->model_bridging->insert_mmm_bone_import($data);
+                }
+            }
+            // echo "<pre>"; print_r($data); echo "</pre>"; die;
+            // echo "tanggal : ".$tanggal." - is_valid_tanggal : ".$is_valid_tanggal; die;
+        }else
+        {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+            redirect('bridging/mmm_bone','refresh');
+        };
+
+        $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
+        redirect('bridging/preview_mmm_bone','refresh');
+    }
+
+    public function preview_mmm_bone()
+    {
+        $get_data = $this->model_bridging->get_mmm_bone_import();
+        $id_bridging_log = $get_data->row()->id_bridging_log; 
+        // echo "id_bridging_log : ".$id_bridging_log; die;
+
+        $is_invalid = $this->model_bridging->get_mmm_bone_import_where_is_valid_false();
+        if($is_invalid->num_rows() > 0)
+        {
+            // echo "is_invalid : ".$is_invalid->num_rows();die;
+            $params_invalid = 1;
+        }else{
+            $params_invalid = 0;
+        }
+
+        $data = [
+            "title"         => "Preview Bridging mmm_bone",
+            'url'           => 'bridging/submit_mmm_bone',
+            'get_data'      => $get_data,
+            'id_bridging_log'   => $id_bridging_log,
+            'get_summary'   => $this->model_bridging->get_mmm_bone_import_summary(),
+            'params_invalid' => $params_invalid
+        ];
+        // $this->view($data, false, "preview_mmm_bone");
+        $this->render('bridging/preview_mmm_bone', $data);
+    }
+
+    public function download_template_mmm_bone()
+    {
+        $query = "
+            select 	'' as distributor,
+                    '' as cabang,
+                    '' as tipetrans,
+                    '' as divisi,
+                    '' as principal,
+                    '' as productgroup1,
+                    '' as productgroup2,
+                    '' as productgroup3,
+                    '' as brand,
+                    '' as kodeproduk,
+                    '' as kodevarian,
+                    '' as kodeprodukprincipal,
+                    '' as namaproduk,
+                    '' as packaging,
+                    '' as productclass,
+                    '' as kodecustomer,
+                    '' as namacustomer,
+                    '' as alamatcustomer,
+                    '' as area,
+                    '' as subarea,
+                    '' as channel,
+                    '' as subchannel,
+                    '' as customergroup,
+                    '' as keyaccount,
+                    '' as kodesalesman,
+                    '' as namasalesman,
+                    '' as kodesalesco,
+                    '' as namasalesco,
+                    '' as kodespv,
+                    '' as namaspv,
+                    '' as tahunbulan,
+                    '' as bulan,
+                    '' as tanggal,
+                    '' as weekno,
+                    '' as nomornota,
+                    '' as salesmethod,
+                    '' as sellingtype,
+                    '' as qtysold,
+                    '' as kartonutuh,
+                    '' as qtysoldpcs,
+                    '' as freegoodpcs,
+                    '' as tonnage,
+                    '' as volume_ltr,
+                    '' as grossamount,
+                    '' as linediscount1,
+                    '' as linediscount2,
+                    '' as linediscount3,
+                    '' as linediscount4,
+                    '' as linediscount5,
+                    '' as totallinediscount,
+                    '' as discountnota1,
+                    '' as discountnota2,
+                    '' as discountnota3,
+                    '' as totaldiscountnota,
+                    '' as dpp,
+                    '' as ppn,
+                    '' as ppnbm,
+                    '' as tax3,
+                    '' as netamount,
+                    '' as warehouse,
+                    '' as customerpo,
+                    '' as customerjoindate,
+                    '' as nofakturpajak,
+                    '' as tanggalfakturpajak,
+                    '' as nomorfakturproforma,
+                    '' as tanggalfakturproforma,
+                    '' as cogs,
+                    '' as case_weight_kg,
+                    '' as tslqtysoldnfg,
+                    '' as tslconvpcstoctn,
+                    '' as tsltonnagesoldfg,
+                    '' as `end`
+        ";
+
+        $hasil = $this->db->query($query);   
+
+        $headers = [
+            'distributor','cabang','tipetrans','divisi','principal','productgroup1','productgroup2','productgroup3','brand','kodeproduk','kodevarian','kodeprodukprincipal',
+            'namaproduk','packaging','productclass','kodecustomer','namacustomer','alamatcustomer','area','subarea','channel','subchannel','customergroup','keyaccount',
+            'kodesalesman','namasalesman','kodesalesco','namasalesco','kodespv','namaspv','tahunbulan','bulan','tanggal','weekno','nomornota','salesmethod','sellingtype',
+            'qtysold','kartonutuh','qtysoldpcs','freegoodpcs','tonnage','volume_ltr','grossamount','linediscount1','linediscount2','linediscount3','linediscount4','linediscount5',
+            'totallinediscount','discountnota1','discountnota2','discountnota3','totaldiscountnota','dpp','ppn','ppnbm','tax3','netamount','warehouse','customerpo',
+            'customerjoindate','nofakturpajak','tanggalfakturpajak','nomorfakturproforma','tanggalfakturproforma','cogs','case_weight_kg','tslqtysoldnfg','tslconvpcstoctn',
+            'tsltonnagesoldfg','end'
+        ];
+
+        $this->excel_generator->set_query($hasil);
+        $this->excel_generator->set_header($headers);
+        $this->excel_generator->set_column($headers);
+        $this->excel_generator->set_width(array_fill(0, count($headers), 10)); 
+        $this->excel_generator->exportTo2007('Download Template mmm_bone'); 
+    }
+
+    public function mmm_bone_import_customer()
+    {        
+        // create table
+        $create = $this->model_bridging->create_table_mmm_bone_import_customer();
+        if(!$create) {
+            $this->session->set_flashdata("pesan", "gagal membuat table bridging_mmm_bone_import_customer");
+            redirect('bridging/mmm_bone','refresh');
+        }
+
+        // add unique constraint
+        $unique_customer_id = $this->model_bridging->add_unique_mmm_bone_import_customer('customer_id');
+        $unique_mapping_uli = $this->model_bridging->add_unique_mmm_bone_import_customer('mapping_uli');
+
+        // echo'disini'; die;
+        // inisialisasi upload
+        $init_upload = $this->attachment_config('mmm_bone', ''); 
+        if ($this->upload->do_upload('file_customer')) 
+        {
+            // echo 'disini'; die;
+            $upload_data = $this->upload->data();
+            $filename_excel = $upload_data['file_name'];
+
+            $this->load->library('excel');
+            $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/mmm_bone/$filename_excel");
+
+            $jumlahSheet = $object->getSheetCount();
+            if ($jumlahSheet > 1) {
+                echo "jumlah_sheet : ".$jumlahSheet;
+                echo "<script>alert('upload file gagal karena file mempunyai lebih dari 1 sheet'); </script>";
+                redirect('bridging/mmm_bone','refresh');
+            }
+
+            foreach ($object->getWorksheetIterator() as $worksheet) 
+            {
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+
+                if ($highestRow > 5000) {
+                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 5000 ROW.");
+                    redirect('bridging/mmm_bone','refresh');
+                }
+
+                if ($highestRow <= 1) {
+                    $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+                    redirect('bridging/mmm_bone','refresh');
+                }
+
+                for ($row = 2; $row <= $highestRow; $row++) 
+                {  
+                    $kategori    = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+                    $nama_site   = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
+                    $regional    = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                    $customer_id = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());                    
+                    $mapping_uli = trim($worksheet->getCellByColumnAndRow(4, $row)->getValue());
+                    $mapping_nd6 = trim($worksheet->getCellByColumnAndRow(5, $row)->getValue());
+                    $mapping_warung_pintar = trim($worksheet->getCellByColumnAndRow(6, $row)->getValue());
+                    $mapping_pbf = trim($worksheet->getCellByColumnAndRow(7, $row)->getValue());
+                    $prefix = trim($worksheet->getCellByColumnAndRow(8, $row)->getValue());
+                    $nama_customer = trim($worksheet->getCellByColumnAndRow(9, $row)->getValue());
+                    $alamat = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
+                    $tipe_bayar = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue());
+                    $top = trim($worksheet->getCellByColumnAndRow(12, $row)->getValue());
+                    $status_konsinyasi = trim($worksheet->getCellByColumnAndRow(13, $row)->getValue());
+                    $status_fuguh = trim($worksheet->getCellByColumnAndRow(14, $row)->getValue());
+                    $kelurahan_id = trim($worksheet->getCellByColumnAndRow(15, $row)->getValue());
+                    $nama_kelurahan = trim($worksheet->getCellByColumnAndRow(16, $row)->getValue());
+                    $kecamatan_id = trim($worksheet->getCellByColumnAndRow(17, $row)->getValue());
+                    $nama_kecamatan = trim($worksheet->getCellByColumnAndRow(18, $row)->getValue());
+                    $kota_id = trim($worksheet->getCellByColumnAndRow(19, $row)->getValue());
+                    $nama_kota = trim($worksheet->getCellByColumnAndRow(20, $row)->getValue());     
+                    $propinsi_id = trim($worksheet->getCellByColumnAndRow(21, $row)->getValue());
+                    $nama_propinsi = trim($worksheet->getCellByColumnAndRow(22, $row)->getValue());
+                    $kode_pos = trim($worksheet->getCellByColumnAndRow(23, $row)->getValue());
+                    $telp = trim($worksheet->getCellByColumnAndRow(24, $row)->getValue());     
+                    $fax = trim($worksheet->getCellByColumnAndRow(25, $row)->getValue());
+                    $email = trim($worksheet->getCellByColumnAndRow(26, $row)->getValue());
+                    $head_office_id = trim($worksheet->getCellByColumnAndRow(27, $row)->getValue());
+                    $nama_head_office = trim($worksheet->getCellByColumnAndRow(28, $row)->getValue());      
+                    $company_id = trim($worksheet->getCellByColumnAndRow(29, $row)->getValue());
+                    $nama_company = trim($worksheet->getCellByColumnAndRow(30, $row)->getValue());
+                    $branch_id = trim($worksheet->getCellByColumnAndRow(31, $row)->getValue());
+                    $nama_branch_office = trim($worksheet->getCellByColumnAndRow(32, $row)->getValue());
+                    $site_id = trim($worksheet->getCellByColumnAndRow(33, $row)->getValue());
+                    $segment_id = trim($worksheet->getCellByColumnAndRow(34, $row)->getValue());    
+                    $nama_segment = trim($worksheet->getCellByColumnAndRow(35, $row)->getValue());
+                    $type_id = trim($worksheet->getCellByColumnAndRow(36, $row)->getValue());
+
+                    // cek type_id
+                    $cek_type = $this->model_bridging->get_type($type_id);
+                    if(!$cek_type->num_rows() > 0) { // jika tidak ada
+                        $is_valid_type_id = 0;
+                    }else{
+                        $is_valid_type_id = 1;
+                    }
+
+                    $nama_type = trim($worksheet->getCellByColumnAndRow(37, $row)->getValue());
+                    $kodesalur = trim($worksheet->getCellByColumnAndRow(38, $row)->getValue());
+
+                    // cek kodesalur
+                    $cek_class = $this->model_bridging->get_class($kodesalur);
+                    // echo 'cek_class ' .$cek_class;die; 
+                    if(!$cek_class->num_rows() > 0) { // jika tidak ada
+                        $is_valid_class_id = 0;
+                    }else{
+                        $is_valid_class_id = 1;
+                    }
+
+                    $namasalur = trim($worksheet->getCellByColumnAndRow(39, $row)->getValue());
+                    $spot_id = trim($worksheet->getCellByColumnAndRow(40, $row)->getValue());
+                    $no_ktp = trim($worksheet->getCellByColumnAndRow(41, $row)->getValue());
+                    $kartu_keluarga = trim($worksheet->getCellByColumnAndRow(42, $row)->getValue());
+                    $pln = trim($worksheet->getCellByColumnAndRow(43, $row)->getValue());
+                    $nama_penghubung = trim($worksheet->getCellByColumnAndRow(44, $row)->getValue());
+                    $alamat_penghubung = trim($worksheet->getCellByColumnAndRow(45, $row)->getValue());
+                    $telp_penghubung = trim($worksheet->getCellByColumnAndRow(46, $row)->getValue());
+                    $hubungan = trim($worksheet->getCellByColumnAndRow(47, $row)->getValue());
+                    $latitude = trim($worksheet->getCellByColumnAndRow(48, $row)->getValue());
+                    $longitude = trim($worksheet->getCellByColumnAndRow(49, $row)->getValue());
+                    $member = trim($worksheet->getCellByColumnAndRow(50, $row)->getValue());
+                    $black_list = trim($worksheet->getCellByColumnAndRow(51, $row)->getValue());
+                    $aktif = trim($worksheet->getCellByColumnAndRow(52, $row)->getValue());
+                    $show_alamat_pkp = trim($worksheet->getCellByColumnAndRow(53, $row)->getValue());
+                    $data_create = trim($worksheet->getCellByColumnAndRow(54, $row)->getValue());
+                    $pbf_izin_no_tdp_tgl = trim($worksheet->getCellByColumnAndRow(55, $row)->getValue());
+                    $pbf_izin_no_tdp_no = trim($worksheet->getCellByColumnAndRow(56, $row)->getValue());
+                    $pbf_izin_no_siup_tgl = trim($worksheet->getCellByColumnAndRow(57, $row)->getValue());
+                    $pbf_izin_no_siup = trim($worksheet->getCellByColumnAndRow(58, $row)->getValue());
+                    $pbf_izin_no_sito_tgl = trim($worksheet->getCellByColumnAndRow(59, $row)->getValue());
+                    $pbf_izin_no_sito = trim($worksheet->getCellByColumnAndRow(60, $row)->getValue());
+                    $pbf_izin_no_sipa_tgl = trim($worksheet->getCellByColumnAndRow(61, $row)->getValue());
+                    $pbf_izin_no_sipa = trim($worksheet->getCellByColumnAndRow(62, $row)->getValue());
+                    $pbf_izin_no_sia_tgl = trim($worksheet->getCellByColumnAndRow(63, $row)->getValue());
+                    $pbf_izin_no_sia = trim($worksheet->getCellByColumnAndRow(64, $row)->getValue());
+                    $pbf_izin_no_nib_tgl = trim($worksheet->getCellByColumnAndRow(65, $row)->getValue());
+                    $pbf_izin_no_nib = trim($worksheet->getCellByColumnAndRow(66, $row)->getValue());
+                    $pbf_izin_no_cdob_tgl = trim($worksheet->getCellByColumnAndRow(67, $row)->getValue());
+                    $pbf_izin_no_cdob = trim($worksheet->getCellByColumnAndRow(68, $row)->getValue());
+                    $pbf_asis_apoteker_tgl_sipa = trim($worksheet->getCellByColumnAndRow(69, $row)->getValue());
+                    $pbf_asis_apoteker_tgl_lahir = trim($worksheet->getCellByColumnAndRow(70, $row)->getValue());
+                    $pbf_asis_apoteker_telpon = trim($worksheet->getCellByColumnAndRow(71, $row)->getValue());
+                    $pbf_asis_apoteker_no_sipa = trim($worksheet->getCellByColumnAndRow(72, $row)->getValue());
+                    $pbf_asis_apoteker_no_ktp = trim($worksheet->getCellByColumnAndRow(73, $row)->getValue());
+                    $pbf_asis_apoteker_email = trim($worksheet->getCellByColumnAndRow(74, $row)->getValue());
+                    $pbf_asis_apoteker_nama = trim($worksheet->getCellByColumnAndRow(75, $row)->getValue());
+                    $pbf_asis_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(76, $row)->getValue());
+                    $pbf_apoteker_tgl_sipa = trim($worksheet->getCellByColumnAndRow(77, $row)->getValue());
+                    $pbf_apoteker_tgl_lahir = trim($worksheet->getCellByColumnAndRow(78, $row)->getValue());
+                    $pbf_apoteker_telpon = trim($worksheet->getCellByColumnAndRow(79, $row)->getValue());
+                    $pbf_apoteker_no_sipa = trim($worksheet->getCellByColumnAndRow(80, $row)->getValue());
+                    $pbf_apoteker_no_ktp = trim($worksheet->getCellByColumnAndRow(81, $row)->getValue());
+                    $pbf_apoteker_nama = trim($worksheet->getCellByColumnAndRow(82, $row)->getValue());
+                    $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
+                    $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
+
+                    if($nama_site == "" || $spot_id == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "") {
+                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
+                        redirect('bridging/mmm_bone','refresh');
+                    }
+
+                    $data = [
+                        "kategori"    => $kategori,
+                        "nama_site"   => $nama_site,
+                        "regional"    => $regional,
+                        "customer_id" => $customer_id,
+                        "mapping_uli" => $mapping_uli,
+                        "mapping_nd6" => $mapping_nd6,
+                        "mapping_warung_pintar" => $mapping_warung_pintar,
+                        "mapping_pbf" => $mapping_pbf,
+                        "prefix" => $prefix,
+                        "nama_customer" => $nama_customer,
+                        "alamat" => $alamat,
+                        "tipe_bayar" => $tipe_bayar,
+                        "top" => $top,
+                        "status_konsinyasi" => $status_konsinyasi,
+                        "status_fuguh" => $status_fuguh,
+                        "kelurahan_id" => $kelurahan_id,
+                        "nama_kelurahan" => $nama_kelurahan,
+                        "kecamatan_id" => $kecamatan_id,
+                        "nama_kecamatan" => $nama_kecamatan,
+                        "kota_id" => $kota_id,
+                        "nama_kota" => $nama_kota,
+                        "propinsi_id" => $propinsi_id,
+                        "nama_propinsi" => $nama_propinsi,
+                        "kode_pos" => $kode_pos,
+                        "telp" => $telp,
+                        "fax" => $fax,
+                        "email" => $email,
+                        "head_office_id" => $head_office_id,
+                        "nama_head_office" => $nama_head_office,
+                        "company_id" => $company_id,
+                        "nama_company" => $nama_company,
+                        "branch_id" => $branch_id,
+                        "nama_branch_office" => $nama_branch_office,
+                        "site_id" => $site_id,
+                        "segment_id" => $segment_id,
+                        "nama_segment" => $nama_segment,
+                        "type_id" => $type_id,
+                        "nama_type" => $nama_type,
+                        "class_id" => $kodesalur,
+                        "class" => $namasalur,
+                        "spot_id" => $spot_id,
+                        "no_ktp" => $no_ktp,
+                        "kartu_keluarga" => $kartu_keluarga,
+                        "pln" => $pln,
+                        "nama_penghubung" => $nama_penghubung,
+                        "alamat_penghubung" => $alamat_penghubung,
+                        "telp_penghubung" => $telp_penghubung,
+                        "hubungan" => $hubungan,
+                        "latitude" => $latitude,
+                        "longitude" => $longitude,
+                        "member" => $member,
+                        "black_list" => $black_list,
+                        "aktif" => $aktif,
+                        "show_alamat_pkp" => $show_alamat_pkp,
+                        "data_create" => $data_create,
+                        "pbf_izin_no_tdp_tgl" => $pbf_izin_no_tdp_tgl,
+                        "pbf_izin_no_tdp" => $pbf_izin_no_tdp_no,
+                        "pbf_izin_no_siup_tgl" => $pbf_izin_no_siup_tgl,
+                        "pbf_izin_no_siup" => $pbf_izin_no_siup,
+                        "pbf_izin_no_sito_tgl" => $pbf_izin_no_sito_tgl,
+                        "pbf_izin_no_sito" => $pbf_izin_no_sito,
+                        "pbf_izin_no_sipa_tgl" => $pbf_izin_no_sipa_tgl,
+                        "pbf_izin_no_sipa" => $pbf_izin_no_sipa,
+                        "pbf_izin_no_cdob_tgl" => $pbf_izin_no_cdob_tgl,
+                        "pbf_izin_no_cdob" => $pbf_izin_no_cdob,
+                        "pbf_asis_apoteker_tgl_sipa" => $pbf_asis_apoteker_tgl_sipa,
+                        "pbf_asis_apoteker_tgl_lahir" => $pbf_asis_apoteker_tgl_lahir,
+                        "pbf_asis_apoteker_telpon" => $pbf_asis_apoteker_telpon,
+                        "pbf_asis_apoteker_no_sipa" => $pbf_asis_apoteker_no_sipa,
+                        "pbf_asis_apoteker_no_ktp" => $pbf_asis_apoteker_no_ktp,
+                        "pbf_asis_apoteker_email" => $pbf_asis_apoteker_email,
+                        "pbf_asis_apoteker_nama" => $pbf_asis_apoteker_nama,
+                        "pbf_asis_apoteker_alamat" => $pbf_asis_apoteker_alamat,
+                        "pbf_apoteker_tgl_sipa" => $pbf_apoteker_tgl_sipa,
+                        "pbf_apoteker_tgl_lahir" => $pbf_apoteker_tgl_lahir,
+                        "pbf_apoteker_telpon" => $pbf_apoteker_telpon,
+                        "pbf_apoteker_no_sipa" => $pbf_apoteker_no_sipa,
+                        "pbf_apoteker_no_ktp" => $pbf_apoteker_no_ktp,
+                        "pbf_apoteker_nama" => $pbf_apoteker_nama,
+                        "pbf_apoteker_alamat" => $pbf_apoteker_alamat,
+                        "pbf_apoteker_email" => $pbf_apoteker_email,
+                        "is_valid_type_id" => $is_valid_type_id,
+                        "is_valid_class_id" => $is_valid_class_id                 
+                    ];
+
+                    $insert = $this->model_bridging->insert_mmm_bone_import_customer($data);
+                }
+            }
+        }else
+        {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+            // redirect('bridging/mmm_bone','refresh');
+        };
+
+        $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
+        redirect('bridging/result_mmm_bone_customer','refresh');
+    }
+
+    public function download_template_mmm_bone_customer()
+    {
+        $query = "
+            select 	kategori,
+                    nama_site,
+                    regional,
+                    customer_id,
+                    mapping_uli,
+                    mapping_nd6,
+                    mapping_warung_pintar,
+                    mapping_pbf,
+                    prefix,
+                    nama_customer,
+                    alamat,
+                    tipe_bayar,
+                    top,
+                    status_konsinyasi,
+                    status_fuguh,
+                    kelurahan_id,
+                    nama_kelurahan,
+                    kecamatan_id,
+                    nama_kecamatan,
+                    kota_id,
+                    nama_kota,
+                    propinsi_id,
+                    nama_propinsi,
+                    kode_pos,
+                    telp,
+                    fax,
+                    email,
+                    head_office_id,
+                    nama_head_office,
+                    company_id,
+                    nama_company,
+                    branch_id,
+                    nama_branch_office,
+                    site_id,
+                    segment_id,
+                    nama_segment, 
+                    type_id,
+                    nama_type,
+                    class_id,
+                    class,
+                    spot_id,
+                    no_ktp,
+                    kartu_keluarga,
+                    pln,
+                    nama_penghubung,
+                    alamat_penghubung,
+                    telp_penghubung,
+                    hubungan,
+                    latitude,
+                    longitude,
+                    member,
+                    black_list,
+                    aktif,
+                    show_alamat_pkp,
+                    data_create,
+                    pbf_izin_no_tdp_tgl,
+                    pbf_izin_no_tdp,
+                    pbf_izin_no_siup_tgl,
+                    pbf_izin_no_siup,
+                    pbf_izin_no_sito_tgl,
+                    pbf_izin_no_sito,
+                    pbf_izin_no_sipa_tgl,
+                    pbf_izin_no_sipa,
+                    pbf_izin_no_sia_tgl,
+                    pbf_izin_no_sia,
+                    pbf_izin_no_nib_tgl,
+                    pbf_izin_no_nib,
+                    pbf_izin_no_cdob_tgl,
+                    pbf_izin_no_cdob,
+                    pbf_asis_apoteker_tgl_sipa,
+                    pbf_asis_apoteker_tgl_lahir,
+                    pbf_asis_apoteker_telpon,
+                    pbf_asis_apoteker_no_sipa,
+                    pbf_asis_apoteker_no_ktp,
+                    pbf_asis_apoteker_email,
+                    pbf_asis_apoteker_nama,
+                    pbf_asis_apoteker_alamat,
+                    pbf_apoteker_tgl_sipa,
+                    pbf_apoteker_tgl_lahir,
+                    pbf_apoteker_telpon,
+                    pbf_apoteker_no_sipa,
+                    pbf_apoteker_no_ktp,
+                    pbf_apoteker_nama,
+                    pbf_apoteker_alamat,
+                    pbf_apoteker_email
+        from site.bridging_mmm_bone_import_customer a
+        ";
+
+        $hasil = $this->db->query($query);   
+    
+        $this->excel_generator->set_query($hasil);
+
+        $this->excel_generator->set_header(array
+        (
+            'kategori',
+            'nama_site',
+            'regional',
+            'customer_id',
+            'mapping_uli',
+            'mapping_nd6',
+            'mapping_warung_pintar',
+            'mapping_pbf',
+            'prefix',
+            'nama_customer',
+            'alamat',
+            'tipe_bayar',
+            'top',
+            'status_konsinyasi',
+            'status_fuguh',
+            'kelurahan_id',
+            'nama_kelurahan',
+            'kecamatan_id',
+            'nama_kecamatan',
+            'kota_id',
+            'nama_kota',
+            'propinsi_id',
+            'nama_propinsi',
+            'kode_pos',
+            'telp',
+            'fax',
+            'email',
+            'head_office_id',
+            'nama_head_office',
+            'company_id',
+            'nama_company',
+            'branch_id',
+            'nama_branch_office',
+            'site_id',
+            'segment_id',
+            'nama_segment', 
+            'type_id',
+            'nama_type',
+            'class_id',
+            'class',
+            'spot_id',
+            'no_ktp',
+            'kartu_keluarga',
+            'pln',
+            'nama_penghubung',
+            'alamat_penghubung',
+            'telp_penghubung',
+            'hubungan',
+            'latitude',
+            'longitude',
+            'member',
+            'black_list',
+            'aktif',
+            'show_alamat_pkp',
+            'data_create',
+            'pbf_izin_no_tdp_tgl',
+            'pbf_izin_no_tdp',
+            'pbf_izin_no_siup_tgl',
+            'pbf_izin_no_siup',
+            'pbf_izin_no_sito_tgl',
+            'pbf_izin_no_sito',
+            'pbf_izin_no_sipa_tgl',
+            'pbf_izin_no_sipa',
+            'pbf_izin_no_sia_tgl',
+            'pbf_izin_no_sia',
+            'pbf_izin_no_nib_tgl',
+            'pbf_izin_no_nib',
+            'pbf_izin_no_cdob_tgl',
+            'pbf_izin_no_cdob',
+            'pbf_asis_apoteker_tgl_sipa',
+            'pbf_asis_apoteker_tgl_lahir',
+            'pbf_asis_apoteker_telpon',
+            'pbf_asis_apoteker_no_sipa',
+            'pbf_asis_apoteker_no_ktp',
+            'pbf_asis_apoteker_email',
+            'pbf_asis_apoteker_nama',
+            'pbf_asis_apoteker_alamat',
+            'pbf_apoteker_tgl_sipa',
+            'pbf_apoteker_tgl_lahir',
+            'pbf_apoteker_telpon',
+            'pbf_apoteker_no_sipa',
+            'pbf_apoteker_no_ktp',
+            'pbf_apoteker_nama',
+            'pbf_apoteker_alamat',
+            'pbf_apoteker_email'
+        ));
+        $this->excel_generator->set_column(array
+        ( 
+            'kategori',
+            'nama_site',
+            'regional',
+            'customer_id',
+            'mapping_uli',
+            'mapping_nd6',
+            'mapping_warung_pintar',
+            'mapping_pbf',
+            'prefix',
+            'nama_customer',
+            'alamat',
+            'tipe_bayar',
+            'top',
+            'status_konsinyasi',
+            'status_fuguh',
+            'kelurahan_id',
+            'nama_kelurahan',
+            'kecamatan_id',
+            'nama_kecamatan',
+            'kota_id',
+            'nama_kota',
+            'propinsi_id',
+            'nama_propinsi',
+            'kode_pos',
+            'telp',
+            'fax',
+            'email',
+            'head_office_id',
+            'nama_head_office',
+            'company_id',
+            'nama_company',
+            'branch_id',
+            'nama_branch_office',
+            'site_id',
+            'segment_id',
+            'nama_segment', 
+            'type_id',
+            'nama_type',
+            'class_id',
+            'class',
+            'spot_id',
+            'no_ktp',
+            'kartu_keluarga',
+            'pln',
+            'nama_penghubung',
+            'alamat_penghubung',
+            'telp_penghubung',
+            'hubungan',
+            'latitude',
+            'longitude',
+            'member',
+            'black_list',
+            'aktif',
+            'show_alamat_pkp',
+            'data_create',
+            'pbf_izin_no_tdp_tgl',
+            'pbf_izin_no_tdp',
+            'pbf_izin_no_siup_tgl',
+            'pbf_izin_no_siup',
+            'pbf_izin_no_sito_tgl',
+            'pbf_izin_no_sito',
+            'pbf_izin_no_sipa_tgl',
+            'pbf_izin_no_sipa',
+            'pbf_izin_no_sia_tgl',
+            'pbf_izin_no_sia',
+            'pbf_izin_no_nib_tgl',
+            'pbf_izin_no_nib',
+            'pbf_izin_no_cdob_tgl',
+            'pbf_izin_no_cdob',
+            'pbf_asis_apoteker_tgl_sipa',
+            'pbf_asis_apoteker_tgl_lahir',
+            'pbf_asis_apoteker_telpon',
+            'pbf_asis_apoteker_no_sipa',
+            'pbf_asis_apoteker_no_ktp',
+            'pbf_asis_apoteker_email',
+            'pbf_asis_apoteker_nama',
+            'pbf_asis_apoteker_alamat',
+            'pbf_apoteker_tgl_sipa',
+            'pbf_apoteker_tgl_lahir',
+            'pbf_apoteker_telpon',
+            'pbf_apoteker_no_sipa',
+            'pbf_apoteker_no_ktp',
+            'pbf_apoteker_nama',
+            'pbf_apoteker_alamat',
+            'pbf_apoteker_email'  
+        ));
+        $this->excel_generator->set_width(array(10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10)); 
+        $this->excel_generator->exportTo2007('Download Template mmm_bone Customer'); 
+    }
+
+    public function result_mmm_bone_customer()
+    {
+        $data = [
+            "title" => "Result Bridging mmm_bone Customer",
+            'url'   => 'bridging/mmm_bone_submit_customer',
+            'get_data' => $this->model_bridging->get_mmm_bone_import_customer(),
+            'get_summary' => $this->model_bridging->get_mmm_bone_import_customer_summary(),
+        ];
+        // $this->view($data, false, "result_mmm_bone_customer");
+        $this->render('bridging/result_mmm_bone_customer', $data);
+    }
+
+    public function submit_mmm_bone()
+    {
+        $id_bridging_log = $this->input->post('id_bridging_log');
+        // echo  $id_bridging_log; die;
+
+        $get_data_log = $this->model_bridging->get_bridging_log($id_bridging_log);
+        if($get_data_log->num_rows() > 0)
+        {
+            $site_code = $get_data_log->row()->site_code;
+            $kode_comp = substr($site_code, 0, 3);
+            $nocab = substr($site_code, 3, 2);
+
+            $bulan = $get_data_log->row()->bulan;
+
+            $tahun_upload = substr($bulan, 0, 4);
+            $bulan_upload = substr($bulan, 5, 2);
+        }
+
+        $get_userid = $this->model_bridging->get_userid_by_kode_comp($kode_comp);
+        if($get_userid->num_rows() > 0)
+        {
+            $userid = $get_userid->row()->id;
+        }else{
+            $this->session->set_flashdata("pesan", "gagal mendapatkan userid, ".$this->upload->display_errors());
+            redirect('bridging/mmm_bone','refresh');
+        }
+
+        $get_last_upload = $this->model_bridging->get_mpm_upload_where_closing_by_userid($userid);
+        if($get_last_upload->num_rows() > 0)
+        {
+            $tahun_last_upload = $get_last_upload->row()->tahun;
+            $bulan_last_upload = $get_last_upload->row()->bulan;
+        }   
+
+        // die;
+
+        if ($tahun_upload < $tahun_last_upload || ($tahun_upload == $tahun_last_upload && $bulan_upload <= $bulan_last_upload)) {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, tahun dan bulan lebih kecil dari tahun dan bulan terakhir diupload");
+            redirect('bridging/mmm_bone','refresh');
+        } 
+
+        $delete_fi = $this->model_bridging->delete_fi_mmm_bone($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $delete_ri = $this->model_bridging->delete_ri_mmm_bone($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        
+        $proses_fi = $this->model_bridging->insert_fi_mmm_bone($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $proses_fi = $this->model_bridging->insert_fi_mmm_bone_bonus($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $proses_ri = $this->model_bridging->insert_ri_mmm_bone($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+
+        $delete_tblang = $this->model_bridging->delete_tblang_mmm_bone($tahun_upload, $nocab);
+        $delete_tabsales = $this->model_bridging->delete_tabsales_mmm_bone($tahun_upload, $nocab);
+        // $delete_tbkota = $this->model_bridging->delete_tbkota_mmm_bone($tahun_upload, $nocab);
+
+        $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
+        $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
+        // $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
+
+
+        // update bridging_log
+        $get_data_result = $this->model_bridging->get_result($site_code, $tahun_upload, $bulan_upload);
+        if($get_data_result->num_rows() > 0)
+        {
+            $total_unit = $get_data_result->row()->total_unit;
+            $total_value = $get_data_result->row()->total_value;
+        }else{
+            $total_unit = 0;
+            $total_value = 0;            
+        }
+
+        $insert_upload = [
+            "userid"        => $userid,
+            "lastupload"    => $this->model_outlet_transaksi->timezone(),
+            "tanggal"       => date('d', strtotime($this->model_outlet_transaksi->timezone())),
+            "filename"      => "",
+            "omzet"         => $total_value,
+            "status"        => 1,
+            "tahun"         => $tahun_upload,
+            "bulan"         => $bulan_upload,
+            "status_closing" => 0
+        ];
+        $id_upload = $this->model_bridging->insert_upload($insert_upload);
+
+        $update_bridging = [
+            'sum_omzet' => $total_value,
+            'sum_unit' => $total_unit,
+            'id_upload' => $id_upload
+        ];
+        $this->model_bridging->update_bridging_log($update_bridging, $id_bridging_log);
+
+        $this->session->set_flashdata("pesan_result_success", "proses upload success");
+        redirect('bridging/mmm_bone','refresh');
+        
+    }
+
+/// PARE-PARE ///
+     public function mmm_pare()
+    {
+        $site_code = 'PAME3';
+        $cek_hak = $this->model_bridging->get_bridging_hak_akses_by_site_code_userid($site_code, $this->userid)->row();
+        if(!$cek_hak) {
+            $this->session->set_flashdata("pesan", "user anda tidak diijinkan mengakses halaman ini");
+            redirect('bridging/dashboard','refresh');
+        }
+
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
+        $data = [
+            "title" => "Bridging mmm_pare Sales",
+            "title_customer" => "Bridging Customer mmm_pare (Outlet)",
+            'url'   => 'bridging/mmm_pare_import',
+            'url_customer'   => 'bridging/mmm_pare_import_customer',
+            'bridging'  => "mmm_pare",
+            'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
+        ];
+        // $this->view($data, false, "mmm_pare");
+        $this->render('bridging/mmm_pare', $data);
+    }
+
+    public function mmm_pare_import()
+    {
+        $month = $this->input->post('month');
+        $bulan = explode('-', $month)[1];
+        $tahun = explode('-', $month)[0];
+
+        $newDate_sebelumnya = date('Y-m', strtotime($month. ' -1 months')); // mencari periode -1 bulan sebelumnya
+        $tahun_sebelumnya = explode('-', $newDate_sebelumnya)[0];
+        $bulan_sebelumnya = explode('-', $newDate_sebelumnya)[1];
+
+        // cek data apakah bulan sebelumnya sudah closing bulanan atau belum
+        $get_mpm_user = $this->model_bridging->get_mpm_user('PAM');
+        $userid = $get_mpm_user->row()->id;
+
+        $get_mpm_upload_bulan_lalu = $this->model_bridging->get_mpm_upload($userid, $bulan_sebelumnya, $tahun_sebelumnya, '1');
+        if ($get_mpm_upload_bulan_lalu->num_rows() > 0) {
+            $status_closing_bulan_lalu = $get_mpm_upload_bulan_lalu->row()->status_closing;
+        } else {
+            $status_closing_bulan_lalu = null; // atau default value lain seperti 0 atau ''
+        }
+
+        if ($status_closing_bulan_lalu == null) {
+            $this->session->set_flashdata("pesan", "upload file gagal, data bulan sebelumnya belum di closing! silahkan upload data closing terlebih dahulu");
+            redirect('bridging/mmm_pare','refresh');
+        }
+
+        // cek data apakah sudah closing bulanan atau belum
+        $get_mpm_uplaod = $this->model_bridging->get_mpm_upload($userid, $bulan, $tahun, '');
+
+        if ($get_mpm_uplaod->num_rows() > 0) {
+            $status_closing = $get_mpm_uplaod->row()->status_closing;
+        } else {
+            $status_closing = null; // atau default value lain seperti 0 atau ''
+        }
+        
+        if ($status_closing == '1') {
+            $this->session->set_flashdata("pesan", "upload file gagal, data sudah di closing! silahkan hubungi IT");
+            redirect('bridging/mmm_pare','refresh');
+        }
+
+        // create table
+        $create = $this->model_bridging->create_table_mmm_pare_import();
+        if(!$create) {
+            $this->session->set_flashdata("pesan", "gagal membuat table bridging_mmm_pare_import");
+            redirect('bridging/mmm_pare','refresh');
+        }
+
+        // inisialisasi upload
+        $init_upload = $this->attachment_config('mmm_pare', '');        
+        if ($this->upload->do_upload('file')) 
+        {
+            $upload_data = $this->upload->data();
+            $filename_excel = $upload_data['file_name'];
+
+            $this->load->library('excel');
+            $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/mmm_pare/$filename_excel");
+
+            $jumlahSheet = $object->getSheetCount();
+            if ($jumlahSheet > 1) {
+                echo "jumlah_sheet : ".$jumlahSheet;
+                echo "<script>alert('upload file gagal karena file mempunyai lebih dari 1 sheet'); </script>";
+                redirect('bridging/mmm_pare','refresh');
+            }
+
+            $highestColumm = $object->setActiveSheetIndex(0)->getHighestColumn();
+            // var_dump($highestColumm);die;
+            if ($highestColumm != 'BT') {
+                echo "<script>alert('upload file gagal karena column tidak sesuai'); </script>";
+                redirect('bridging/mmm_pare','refresh');
+            }
+
+            $input_log_data = [
+                "site_code" => "PAME3",
+                "bulan" => $month,
+                "filename"  => $filename_excel,
+                "signature" => md5("PAME3".$month.$this->model_outlet_transaksi->timezone()),
+                "created_at" => $this->model_outlet_transaksi->timezone(),
+                "created_by" => $this->session->userdata('id'),
+            ];
+
+            $id_log = $this->model_bridging->input_bridging_log($input_log_data);
+
+            foreach ($object->getWorksheetIterator() as $worksheet) 
+            {
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+
+                if ($highestRow > 5000) {
+                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 1000 ROW.");
+                    redirect('bridging/mmm_pare','refresh');
+                }
+
+                if ($highestRow <= 1) {
+                    $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+                    redirect('bridging/mmm_pare','refresh');
+                }
+
+                for ($row = 2; $row <= $highestRow; $row++) 
+                {   
+                    $distributor    = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+                    $cabang         = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
+                    $tipetrans      = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                    $divisi         = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());
+                    $principal      = trim($worksheet->getCellByColumnAndRow(4, $row)->getValue());
+                    $productgroup1  = trim($worksheet->getCellByColumnAndRow(5, $row)->getValue());
+                    $productgroup2  = trim($worksheet->getCellByColumnAndRow(6, $row)->getValue());
+                    $productgroup3  = trim($worksheet->getCellByColumnAndRow(7, $row)->getValue());
+                    $brand          = trim($worksheet->getCellByColumnAndRow(8, $row)->getValue());
+                    $kodeproduk     = trim($worksheet->getCellByColumnAndRow(9, $row)->getValue());
+                    $kodevarian     = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
+                    
+                    // cek kodeproduk mpm
+                    $kodeprodukprincipal = (strlen($temp = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue())) == 5) ? '0' . $temp : $temp;
+                    // echo $kodeprodukprincipal;
+                    // echo '</br>';
+
+                    $get_kodeprod = $this->model_bridging->get_master_product_by_kodeprod($kodeprodukprincipal);
+                    if($get_kodeprod->num_rows() > 0) {
+                        $is_valid_kodeprod = 1;
+                    }else{
+                        $is_valid_kodeprod = 0;
+                    }
+
+                    $namaproduk    = trim($worksheet->getCellByColumnAndRow(12, $row)->getValue());
+                    $packaging    = trim($worksheet->getCellByColumnAndRow(13, $row)->getValue());
+                    $productclass = trim($worksheet->getCellByColumnAndRow(14, $row)->getValue());
+                    $kodecustomer= trim($worksheet->getCellByColumnAndRow(15, $row)->getValue());
+
+                    // cek kodecustomer 
+                    $cek_customer = $this->model_bridging->get_mmm_pare_customer($kodecustomer);
+                    if($cek_customer->num_rows() > 0) {
+                        $is_valid_customer = 1;
+                    }else{
+                        $is_valid_customer = 0;
+                    }
+
+                    $namacustomer = trim($worksheet->getCellByColumnAndRow(16, $row)->getValue());
+                    $alamatcustomer = trim($worksheet->getCellByColumnAndRow(17, $row)->getValue());
+                    $area = trim($worksheet->getCellByColumnAndRow(18, $row)->getValue());
+                    $subarea = trim($worksheet->getCellByColumnAndRow(19, $row)->getValue());
+                    $channel = trim($worksheet->getCellByColumnAndRow(20, $row)->getValue());
+                    $subchannel = trim($worksheet->getCellByColumnAndRow(21, $row)->getValue());
+                    $customergroup = trim($worksheet->getCellByColumnAndRow(22, $row)->getValue());
+                    $keyaccount= trim($worksheet->getCellByColumnAndRow(23, $row)->getValue());
+                    $kodesalesman = trim($worksheet->getCellByColumnAndRow(24, $row)->getValue());
+                    $namasalesman = trim($worksheet->getCellByColumnAndRow(25, $row)->getValue());
+                    $kodesalesco = trim($worksheet->getCellByColumnAndRow(26, $row)->getValue());
+                    $namasalesco = trim($worksheet->getCellByColumnAndRow(27, $row)->getValue());
+                    $kodespv = trim($worksheet->getCellByColumnAndRow(28, $row)->getValue());
+                    $namaspv = trim($worksheet->getCellByColumnAndRow(29, $row)->getValue());
+                    $tahunbulan = trim($worksheet->getCellByColumnAndRow(30, $row)->getValue());
+                    $bulan = trim($worksheet->getCellByColumnAndRow(31, $row)->getValue());
+                    
+                    // cek tanggal
+                    $cell = $worksheet->getCellByColumnAndRow(32, $row);
+                    $cellValue = $cell->getValue();
+
+                    // echo $cellValue; echo '<br>';
+                    $is_valid_tanggal = 1; // Nilai default valid
+
+                    if (is_numeric($cellValue)) {
+                        // echo "numeric: " . $cellValue . "<br>";die;
+                        $unixTimestamp = ($cellValue - 25569) * 86400; // 25569 is days between 1900-01-01 and 1970-01-01
+                        $tanggal = date('Y-m-d', $unixTimestamp); // Format as needed
+                        // Ekstrak tahun-bulan dari $tanggal untuk perbandingan
+                        $tanggal_ym = date('Y-m', $unixTimestamp);
+                        // Bandingkan dengan $month
+                        if ($tanggal_ym !== $month) {
+                            $is_valid_tanggal = 0; // Tandai sebagai tidak valid jika bulan berbeda
+                        }
+                    } else {
+                        // echo "string: " . $cellValue . "<br>";die;
+                        $tanggal = $cellValue;
+
+                        $formats = ['d/m/Y', 'd-m-Y', 'Y-m-d'];
+                        $dateObj = false;
+
+                        foreach ($formats as $format) {
+                            $dateObj = DateTime::createFromFormat($format, $tanggal);
+                            if ($dateObj !== false) {
+                                break;
+                            }
+                        }
+
+                        if ($dateObj !== false) {
+
+                            $tanggal = $dateObj->format('Y-m-d');
+                            $tanggal_ym = $dateObj->format('Y-m');
+
+                            if ($tanggal_ym !== $month) {
+                                $is_valid_tanggal = 0;
+                            }
+
+                        } else {
+                            $is_valid_tanggal = 0;
+                        }
+                    }
+                    
+                    $weekno = trim($worksheet->getCellByColumnAndRow(33, $row)->getValue());
+                    $nomornota = trim($worksheet->getCellByColumnAndRow(34, $row)->getValue());
+                    $salesmethod = trim($worksheet->getCellByColumnAndRow(35, $row)->getValue());
+                    $sellingtype = trim($worksheet->getCellByColumnAndRow(36, $row)->getValue());
+                    $qtysold        = trim($worksheet->getCellByColumnAndRow(37, $row)->getValue());
+                    $kartonutuh     = trim($worksheet->getCellByColumnAndRow(38, $row)->getValue());
+                    $qtysoldpcs     = trim($worksheet->getCellByColumnAndRow(39, $row)->getValue());
+                    $freegoodpcs    = trim($worksheet->getCellByColumnAndRow(40, $row)->getValue());
+
+                    $tonnage        = trim($worksheet->getCellByColumnAndRow(41, $row)->getValue());
+                    $volume_ltr     = trim($worksheet->getCellByColumnAndRow(42, $row)->getValue());
+                    $grossamount    = trim($worksheet->getCellByColumnAndRow(43, $row)->getValue());
+
+                    $linediscount1  = trim($worksheet->getCellByColumnAndRow(44, $row)->getValue());
+                    $linediscount2  = trim($worksheet->getCellByColumnAndRow(45, $row)->getValue());
+                    $linediscount3  = trim($worksheet->getCellByColumnAndRow(46, $row)->getValue());
+                    $linediscount4  = trim($worksheet->getCellByColumnAndRow(47, $row)->getValue());
+                    $linediscount5  = trim($worksheet->getCellByColumnAndRow(48, $row)->getValue());
+                    $totallinediscount = trim($worksheet->getCellByColumnAndRow(49, $row)->getValue());
+
+                    $discountnota1  = trim($worksheet->getCellByColumnAndRow(50, $row)->getValue());
+                    $discountnota2  = trim($worksheet->getCellByColumnAndRow(51, $row)->getValue());
+                    $discountnota3  = trim($worksheet->getCellByColumnAndRow(52, $row)->getValue());
+                    $totaldiscountnota = trim($worksheet->getCellByColumnAndRow(53, $row)->getValue());
+
+                    $dpp            = trim($worksheet->getCellByColumnAndRow(54, $row)->getValue());
+                    $ppn            = trim($worksheet->getCellByColumnAndRow(55, $row)->getValue());
+                    $ppnbm          = trim($worksheet->getCellByColumnAndRow(56, $row)->getValue());
+                    $tax3           = trim($worksheet->getCellByColumnAndRow(57, $row)->getValue());
+                    $netamount      = trim($worksheet->getCellByColumnAndRow(58, $row)->getValue());
+
+                    $warehouse      = trim($worksheet->getCellByColumnAndRow(59, $row)->getValue());
+                    $customerpo     = trim($worksheet->getCellByColumnAndRow(60, $row)->getValue());
+                    $customerjoindate = trim($worksheet->getCellByColumnAndRow(61, $row)->getValue());
+                    $nofakturpajak  = trim($worksheet->getCellByColumnAndRow(62, $row)->getValue());
+                    $tglfakturpajak = trim($worksheet->getCellByColumnAndRow(63, $row)->getValue());
+                    $nomorfakturproforma = trim($worksheet->getCellByColumnAndRow(64, $row)->getValue());
+                    $tglfakturproforma = trim($worksheet->getCellByColumnAndRow(65, $row)->getValue());
+
+                    $cogs               = trim($worksheet->getCellByColumnAndRow(66, $row)->getValue());
+                    $case_weight_kg     = trim($worksheet->getCellByColumnAndRow(67, $row)->getValue());
+                    $tslqtysoldnfg      = trim($worksheet->getCellByColumnAndRow(68, $row)->getValue());
+                    $tslconvpcstoctn    = trim($worksheet->getCellByColumnAndRow(69, $row)->getValue());
+                    $tsltonnagesoldfg   = trim($worksheet->getCellByColumnAndRow(70, $row)->getValue());
+                    $end                = trim($worksheet->getCellByColumnAndRow(71, $row)->getValue());
+
+                    $data = [
+                        'distributor'        => $distributor,
+                        'cabang'             => $cabang,
+                        'tipetrans'          => $tipetrans,
+                        'divisi'             => $divisi,
+                        'principal'          => $principal,
+                        'productgroup1'      => $productgroup1,
+                        'productgroup2'      => $productgroup2,
+                        'productgroup3'      => $productgroup3,
+                        'brand'              => $brand,
+                        'kodeproduk'         => $kodeproduk,
+                        'kodevarian'         => $kodevarian,
+                        'kodeprodukprincipal'=> $kodeprodukprincipal,
+                        'namaproduk'         => $namaproduk,
+                        'packaging'          => $packaging,
+                        'productclass'       => $productclass,
+                        'kodecustomer'       => $kodecustomer,
+                        'namacustomer'       => $namacustomer,
+                        'alamatcustomer'     => $alamatcustomer,
+                        'area'               => $area,
+                        'subarea'            => $subarea,
+                        'channel'            => $channel,
+                        'subchannel'         => $subchannel,
+                        'customergroup'      => $customergroup,
+                        'keyaccount'         => $keyaccount,
+                        'kodesalesman'       => $kodesalesman,
+                        'namasalesman'       => $namasalesman,
+                        'kodesalesco'        => $kodesalesco,
+                        'namasalesco'        => $namasalesco,
+                        'kodespv'            => $kodespv,
+                        'namaspv'            => $namaspv,
+                        'tahunbulan'         => $tahunbulan,
+                        'bulan'              => $bulan,
+                        'tanggal'            => $tanggal,
+                        'weekno'             => $weekno,
+                        'nomornota'          => $nomornota,
+                        'salesmethod'        => $salesmethod,
+                        'sellingtype'        => $sellingtype,
+                        'qtysold'            => $qtysold,
+                        'kartonutuh'         => $kartonutuh,
+                        'qtysoldpcs'         => $qtysoldpcs,
+                        'freegoodpcs'        => $freegoodpcs,
+                        'tonnage'            => $tonnage,
+                        'volume_ltr'         => $volume_ltr,
+                        'grossamount'        => $grossamount,
+                        'linediscount1'      => $linediscount1,
+                        'linediscount2'      => $linediscount2,
+                        'linediscount3'      => $linediscount3,
+                        'linediscount4'      => $linediscount4,
+                        'linediscount5'      => $linediscount5,
+                        'totallinediscount'  => $totallinediscount,
+                        'discountnota1'      => $discountnota1,
+                        'discountnota2'      => $discountnota2,
+                        'discountnota3'      => $discountnota3,
+                        'totaldiscountnota'  => $totaldiscountnota,
+                        'dpp'                => $dpp,
+                        'ppn'                => $ppn,
+                        'ppnbm'              => $ppnbm,
+                        'tax3'               => $tax3,
+                        'netamount'          => $netamount,
+                        'warehouse'          => $warehouse,
+                        'customerpo'         => $customerpo,
+                        'customerjoindate'   => $customerjoindate,
+                        'nofakturpajak'      => $nofakturpajak,
+                        'tanggalfakturpajak' => $tglfakturpajak,
+                        'nomorfakturproforma'=> $nomorfakturproforma,
+                        'tanggalfakturproforma'=> $tglfakturproforma,
+                        'cogs'               => $cogs,
+                        'case_weight_kg'     => $case_weight_kg,
+                        'tslqtysoldnfg'      => $tslqtysoldnfg,
+                        'tslconvpcstoctn'    => $tslconvpcstoctn,
+                        'tsltonnagesoldfg'   => $tsltonnagesoldfg,
+                        'end'                => $end,
+                        'is_valid_kodeprod'  => $is_valid_kodeprod,
+                        'is_valid_tanggal'   => $is_valid_tanggal,
+                        'is_valid_customer'  => $is_valid_customer,
+                        'id_bridging_log'    => $id_log
+                    ];
+
+                    $insert = $this->model_bridging->insert_mmm_pare_import($data);
+                }
+            }
+            // echo "<pre>"; print_r($data); echo "</pre>"; die;
+            // echo "tanggal : ".$tanggal." - is_valid_tanggal : ".$is_valid_tanggal; die;
+        }else
+        {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+            redirect('bridging/mmm_pare','refresh');
+        };
+
+        $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
+        redirect('bridging/preview_mmm_pare','refresh');
+    }
+
+    public function preview_mmm_pare()
+    {
+        $get_data = $this->model_bridging->get_mmm_pare_import();
+        $id_bridging_log = $get_data->row()->id_bridging_log; 
+        // echo "id_bridging_log : ".$id_bridging_log; die;
+
+        $is_invalid = $this->model_bridging->get_mmm_pare_import_where_is_valid_false();
+        if($is_invalid->num_rows() > 0)
+        {
+            // echo "is_invalid : ".$is_invalid->num_rows();die;
+            $params_invalid = 1;
+        }else{
+            $params_invalid = 0;
+        }
+
+        $data = [
+            "title"         => "Preview Bridging mmm_pare",
+            'url'           => 'bridging/submit_mmm_pare',
+            'get_data'      => $get_data,
+            'id_bridging_log'   => $id_bridging_log,
+            'get_summary'   => $this->model_bridging->get_mmm_pare_import_summary(),
+            'params_invalid' => $params_invalid
+        ];
+        // $this->view($data, false, "preview_mmm_pare");
+        $this->render('bridging/preview_mmm_pare', $data);
+    }
+
+    public function download_template_mmm_pare()
+    {
+        $query = "
+            select 	'' as distributor,
+                    '' as cabang,
+                    '' as tipetrans,
+                    '' as divisi,
+                    '' as principal,
+                    '' as productgroup1,
+                    '' as productgroup2,
+                    '' as productgroup3,
+                    '' as brand,
+                    '' as kodeproduk,
+                    '' as kodevarian,
+                    '' as kodeprodukprincipal,
+                    '' as namaproduk,
+                    '' as packaging,
+                    '' as productclass,
+                    '' as kodecustomer,
+                    '' as namacustomer,
+                    '' as alamatcustomer,
+                    '' as area,
+                    '' as subarea,
+                    '' as channel,
+                    '' as subchannel,
+                    '' as customergroup,
+                    '' as keyaccount,
+                    '' as kodesalesman,
+                    '' as namasalesman,
+                    '' as kodesalesco,
+                    '' as namasalesco,
+                    '' as kodespv,
+                    '' as namaspv,
+                    '' as tahunbulan,
+                    '' as bulan,
+                    '' as tanggal,
+                    '' as weekno,
+                    '' as nomornota,
+                    '' as salesmethod,
+                    '' as sellingtype,
+                    '' as qtysold,
+                    '' as kartonutuh,
+                    '' as qtysoldpcs,
+                    '' as freegoodpcs,
+                    '' as tonnage,
+                    '' as volume_ltr,
+                    '' as grossamount,
+                    '' as linediscount1,
+                    '' as linediscount2,
+                    '' as linediscount3,
+                    '' as linediscount4,
+                    '' as linediscount5,
+                    '' as totallinediscount,
+                    '' as discountnota1,
+                    '' as discountnota2,
+                    '' as discountnota3,
+                    '' as totaldiscountnota,
+                    '' as dpp,
+                    '' as ppn,
+                    '' as ppnbm,
+                    '' as tax3,
+                    '' as netamount,
+                    '' as warehouse,
+                    '' as customerpo,
+                    '' as customerjoindate,
+                    '' as nofakturpajak,
+                    '' as tanggalfakturpajak,
+                    '' as nomorfakturproforma,
+                    '' as tanggalfakturproforma,
+                    '' as cogs,
+                    '' as case_weight_kg,
+                    '' as tslqtysoldnfg,
+                    '' as tslconvpcstoctn,
+                    '' as tsltonnagesoldfg,
+                    '' as `end`
+        ";
+
+        $hasil = $this->db->query($query);   
+
+        $headers = [
+            'distributor','cabang','tipetrans','divisi','principal','productgroup1','productgroup2','productgroup3','brand','kodeproduk','kodevarian','kodeprodukprincipal',
+            'namaproduk','packaging','productclass','kodecustomer','namacustomer','alamatcustomer','area','subarea','channel','subchannel','customergroup','keyaccount',
+            'kodesalesman','namasalesman','kodesalesco','namasalesco','kodespv','namaspv','tahunbulan','bulan','tanggal','weekno','nomornota','salesmethod','sellingtype',
+            'qtysold','kartonutuh','qtysoldpcs','freegoodpcs','tonnage','volume_ltr','grossamount','linediscount1','linediscount2','linediscount3','linediscount4','linediscount5',
+            'totallinediscount','discountnota1','discountnota2','discountnota3','totaldiscountnota','dpp','ppn','ppnbm','tax3','netamount','warehouse','customerpo',
+            'customerjoindate','nofakturpajak','tanggalfakturpajak','nomorfakturproforma','tanggalfakturproforma','cogs','case_weight_kg','tslqtysoldnfg','tslconvpcstoctn',
+            'tsltonnagesoldfg','end'
+        ];
+
+        $this->excel_generator->set_query($hasil);
+        $this->excel_generator->set_header($headers);
+        $this->excel_generator->set_column($headers);
+        $this->excel_generator->set_width(array_fill(0, count($headers), 10)); 
+        $this->excel_generator->exportTo2007('Download Template mmm_pare'); 
+    }
+
+    public function mmm_pare_import_customer()
+    {        
+        // create table
+        $create = $this->model_bridging->create_table_mmm_pare_import_customer();
+        if(!$create) {
+            $this->session->set_flashdata("pesan", "gagal membuat table bridging_mmm_pare_import_customer");
+            redirect('bridging/mmm_pare','refresh');
+        }
+
+        // add unique constraint
+        $unique_customer_id = $this->model_bridging->add_unique_mmm_pare_import_customer('customer_id');
+        $unique_mapping_uli = $this->model_bridging->add_unique_mmm_pare_import_customer('mapping_uli');
+
+        // echo'disini'; die;
+        // inisialisasi upload
+        $init_upload = $this->attachment_config('mmm_pare', ''); 
+        if ($this->upload->do_upload('file_customer')) 
+        {
+            // echo 'disini'; die;
+            $upload_data = $this->upload->data();
+            $filename_excel = $upload_data['file_name'];
+
+            $this->load->library('excel');
+            $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/mmm_pare/$filename_excel");
+
+            $jumlahSheet = $object->getSheetCount();
+            if ($jumlahSheet > 1) {
+                echo "jumlah_sheet : ".$jumlahSheet;
+                echo "<script>alert('upload file gagal karena file mempunyai lebih dari 1 sheet'); </script>";
+                redirect('bridging/mmm_pare','refresh');
+            }
+
+            foreach ($object->getWorksheetIterator() as $worksheet) 
+            {
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+
+                if ($highestRow > 5000) {
+                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 5000 ROW.");
+                    redirect('bridging/mmm_pare','refresh');
+                }
+
+                if ($highestRow <= 1) {
+                    $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+                    redirect('bridging/mmm_pare','refresh');
+                }
+
+                for ($row = 2; $row <= $highestRow; $row++) 
+                {  
+                    $kategori    = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+                    $nama_site   = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
+                    $regional    = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                    $customer_id = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());                    
+                    $mapping_uli = trim($worksheet->getCellByColumnAndRow(4, $row)->getValue());
+                    $mapping_nd6 = trim($worksheet->getCellByColumnAndRow(5, $row)->getValue());
+                    $mapping_warung_pintar = trim($worksheet->getCellByColumnAndRow(6, $row)->getValue());
+                    $mapping_pbf = trim($worksheet->getCellByColumnAndRow(7, $row)->getValue());
+                    $prefix = trim($worksheet->getCellByColumnAndRow(8, $row)->getValue());
+                    $nama_customer = trim($worksheet->getCellByColumnAndRow(9, $row)->getValue());
+                    $alamat = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
+                    $tipe_bayar = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue());
+                    $top = trim($worksheet->getCellByColumnAndRow(12, $row)->getValue());
+                    $status_konsinyasi = trim($worksheet->getCellByColumnAndRow(13, $row)->getValue());
+                    $status_fuguh = trim($worksheet->getCellByColumnAndRow(14, $row)->getValue());
+                    $kelurahan_id = trim($worksheet->getCellByColumnAndRow(15, $row)->getValue());
+                    $nama_kelurahan = trim($worksheet->getCellByColumnAndRow(16, $row)->getValue());
+                    $kecamatan_id = trim($worksheet->getCellByColumnAndRow(17, $row)->getValue());
+                    $nama_kecamatan = trim($worksheet->getCellByColumnAndRow(18, $row)->getValue());
+                    $kota_id = trim($worksheet->getCellByColumnAndRow(19, $row)->getValue());
+                    $nama_kota = trim($worksheet->getCellByColumnAndRow(20, $row)->getValue());     
+                    $propinsi_id = trim($worksheet->getCellByColumnAndRow(21, $row)->getValue());
+                    $nama_propinsi = trim($worksheet->getCellByColumnAndRow(22, $row)->getValue());
+                    $kode_pos = trim($worksheet->getCellByColumnAndRow(23, $row)->getValue());
+                    $telp = trim($worksheet->getCellByColumnAndRow(24, $row)->getValue());     
+                    $fax = trim($worksheet->getCellByColumnAndRow(25, $row)->getValue());
+                    $email = trim($worksheet->getCellByColumnAndRow(26, $row)->getValue());
+                    $head_office_id = trim($worksheet->getCellByColumnAndRow(27, $row)->getValue());
+                    $nama_head_office = trim($worksheet->getCellByColumnAndRow(28, $row)->getValue());      
+                    $company_id = trim($worksheet->getCellByColumnAndRow(29, $row)->getValue());
+                    $nama_company = trim($worksheet->getCellByColumnAndRow(30, $row)->getValue());
+                    $branch_id = trim($worksheet->getCellByColumnAndRow(31, $row)->getValue());
+                    $nama_branch_office = trim($worksheet->getCellByColumnAndRow(32, $row)->getValue());
+                    $site_id = trim($worksheet->getCellByColumnAndRow(33, $row)->getValue());
+                    $segment_id = trim($worksheet->getCellByColumnAndRow(34, $row)->getValue());    
+                    $nama_segment = trim($worksheet->getCellByColumnAndRow(35, $row)->getValue());
+                    $type_id = trim($worksheet->getCellByColumnAndRow(36, $row)->getValue());
+
+                    // cek type_id
+                    $cek_type = $this->model_bridging->get_type($type_id);
+                    if(!$cek_type->num_rows() > 0) { // jika tidak ada
+                        $is_valid_type_id = 0;
+                    }else{
+                        $is_valid_type_id = 1;
+                    }
+
+                    $nama_type = trim($worksheet->getCellByColumnAndRow(37, $row)->getValue());
+                    $kodesalur = trim($worksheet->getCellByColumnAndRow(38, $row)->getValue());
+
+                    // cek kodesalur
+                    $cek_class = $this->model_bridging->get_class($kodesalur);
+                    // echo 'cek_class ' .$cek_class;die; 
+                    if(!$cek_class->num_rows() > 0) { // jika tidak ada
+                        $is_valid_class_id = 0;
+                    }else{
+                        $is_valid_class_id = 1;
+                    }
+
+                    $namasalur = trim($worksheet->getCellByColumnAndRow(39, $row)->getValue());
+                    $spot_id = trim($worksheet->getCellByColumnAndRow(40, $row)->getValue());
+                    $no_ktp = trim($worksheet->getCellByColumnAndRow(41, $row)->getValue());
+                    $kartu_keluarga = trim($worksheet->getCellByColumnAndRow(42, $row)->getValue());
+                    $pln = trim($worksheet->getCellByColumnAndRow(43, $row)->getValue());
+                    $nama_penghubung = trim($worksheet->getCellByColumnAndRow(44, $row)->getValue());
+                    $alamat_penghubung = trim($worksheet->getCellByColumnAndRow(45, $row)->getValue());
+                    $telp_penghubung = trim($worksheet->getCellByColumnAndRow(46, $row)->getValue());
+                    $hubungan = trim($worksheet->getCellByColumnAndRow(47, $row)->getValue());
+                    $latitude = trim($worksheet->getCellByColumnAndRow(48, $row)->getValue());
+                    $longitude = trim($worksheet->getCellByColumnAndRow(49, $row)->getValue());
+                    $member = trim($worksheet->getCellByColumnAndRow(50, $row)->getValue());
+                    $black_list = trim($worksheet->getCellByColumnAndRow(51, $row)->getValue());
+                    $aktif = trim($worksheet->getCellByColumnAndRow(52, $row)->getValue());
+                    $show_alamat_pkp = trim($worksheet->getCellByColumnAndRow(53, $row)->getValue());
+                    $data_create = trim($worksheet->getCellByColumnAndRow(54, $row)->getValue());
+                    $pbf_izin_no_tdp_tgl = trim($worksheet->getCellByColumnAndRow(55, $row)->getValue());
+                    $pbf_izin_no_tdp_no = trim($worksheet->getCellByColumnAndRow(56, $row)->getValue());
+                    $pbf_izin_no_siup_tgl = trim($worksheet->getCellByColumnAndRow(57, $row)->getValue());
+                    $pbf_izin_no_siup = trim($worksheet->getCellByColumnAndRow(58, $row)->getValue());
+                    $pbf_izin_no_sito_tgl = trim($worksheet->getCellByColumnAndRow(59, $row)->getValue());
+                    $pbf_izin_no_sito = trim($worksheet->getCellByColumnAndRow(60, $row)->getValue());
+                    $pbf_izin_no_sipa_tgl = trim($worksheet->getCellByColumnAndRow(61, $row)->getValue());
+                    $pbf_izin_no_sipa = trim($worksheet->getCellByColumnAndRow(62, $row)->getValue());
+                    $pbf_izin_no_sia_tgl = trim($worksheet->getCellByColumnAndRow(63, $row)->getValue());
+                    $pbf_izin_no_sia = trim($worksheet->getCellByColumnAndRow(64, $row)->getValue());
+                    $pbf_izin_no_nib_tgl = trim($worksheet->getCellByColumnAndRow(65, $row)->getValue());
+                    $pbf_izin_no_nib = trim($worksheet->getCellByColumnAndRow(66, $row)->getValue());
+                    $pbf_izin_no_cdob_tgl = trim($worksheet->getCellByColumnAndRow(67, $row)->getValue());
+                    $pbf_izin_no_cdob = trim($worksheet->getCellByColumnAndRow(68, $row)->getValue());
+                    $pbf_asis_apoteker_tgl_sipa = trim($worksheet->getCellByColumnAndRow(69, $row)->getValue());
+                    $pbf_asis_apoteker_tgl_lahir = trim($worksheet->getCellByColumnAndRow(70, $row)->getValue());
+                    $pbf_asis_apoteker_telpon = trim($worksheet->getCellByColumnAndRow(71, $row)->getValue());
+                    $pbf_asis_apoteker_no_sipa = trim($worksheet->getCellByColumnAndRow(72, $row)->getValue());
+                    $pbf_asis_apoteker_no_ktp = trim($worksheet->getCellByColumnAndRow(73, $row)->getValue());
+                    $pbf_asis_apoteker_email = trim($worksheet->getCellByColumnAndRow(74, $row)->getValue());
+                    $pbf_asis_apoteker_nama = trim($worksheet->getCellByColumnAndRow(75, $row)->getValue());
+                    $pbf_asis_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(76, $row)->getValue());
+                    $pbf_apoteker_tgl_sipa = trim($worksheet->getCellByColumnAndRow(77, $row)->getValue());
+                    $pbf_apoteker_tgl_lahir = trim($worksheet->getCellByColumnAndRow(78, $row)->getValue());
+                    $pbf_apoteker_telpon = trim($worksheet->getCellByColumnAndRow(79, $row)->getValue());
+                    $pbf_apoteker_no_sipa = trim($worksheet->getCellByColumnAndRow(80, $row)->getValue());
+                    $pbf_apoteker_no_ktp = trim($worksheet->getCellByColumnAndRow(81, $row)->getValue());
+                    $pbf_apoteker_nama = trim($worksheet->getCellByColumnAndRow(82, $row)->getValue());
+                    $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
+                    $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
+
+                    if($nama_site == "" || $spot_id == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "") {
+                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
+                        redirect('bridging/mmm_pare','refresh');
+                    }
+
+                    $data = [
+                        "kategori"    => $kategori,
+                        "nama_site"   => $nama_site,
+                        "regional"    => $regional,
+                        "customer_id" => $customer_id,
+                        "mapping_uli" => $mapping_uli,
+                        "mapping_nd6" => $mapping_nd6,
+                        "mapping_warung_pintar" => $mapping_warung_pintar,
+                        "mapping_pbf" => $mapping_pbf,
+                        "prefix" => $prefix,
+                        "nama_customer" => $nama_customer,
+                        "alamat" => $alamat,
+                        "tipe_bayar" => $tipe_bayar,
+                        "top" => $top,
+                        "status_konsinyasi" => $status_konsinyasi,
+                        "status_fuguh" => $status_fuguh,
+                        "kelurahan_id" => $kelurahan_id,
+                        "nama_kelurahan" => $nama_kelurahan,
+                        "kecamatan_id" => $kecamatan_id,
+                        "nama_kecamatan" => $nama_kecamatan,
+                        "kota_id" => $kota_id,
+                        "nama_kota" => $nama_kota,
+                        "propinsi_id" => $propinsi_id,
+                        "nama_propinsi" => $nama_propinsi,
+                        "kode_pos" => $kode_pos,
+                        "telp" => $telp,
+                        "fax" => $fax,
+                        "email" => $email,
+                        "head_office_id" => $head_office_id,
+                        "nama_head_office" => $nama_head_office,
+                        "company_id" => $company_id,
+                        "nama_company" => $nama_company,
+                        "branch_id" => $branch_id,
+                        "nama_branch_office" => $nama_branch_office,
+                        "site_id" => $site_id,
+                        "segment_id" => $segment_id,
+                        "nama_segment" => $nama_segment,
+                        "type_id" => $type_id,
+                        "nama_type" => $nama_type,
+                        "class_id" => $kodesalur,
+                        "class" => $namasalur,
+                        "spot_id" => $spot_id,
+                        "no_ktp" => $no_ktp,
+                        "kartu_keluarga" => $kartu_keluarga,
+                        "pln" => $pln,
+                        "nama_penghubung" => $nama_penghubung,
+                        "alamat_penghubung" => $alamat_penghubung,
+                        "telp_penghubung" => $telp_penghubung,
+                        "hubungan" => $hubungan,
+                        "latitude" => $latitude,
+                        "longitude" => $longitude,
+                        "member" => $member,
+                        "black_list" => $black_list,
+                        "aktif" => $aktif,
+                        "show_alamat_pkp" => $show_alamat_pkp,
+                        "data_create" => $data_create,
+                        "pbf_izin_no_tdp_tgl" => $pbf_izin_no_tdp_tgl,
+                        "pbf_izin_no_tdp" => $pbf_izin_no_tdp_no,
+                        "pbf_izin_no_siup_tgl" => $pbf_izin_no_siup_tgl,
+                        "pbf_izin_no_siup" => $pbf_izin_no_siup,
+                        "pbf_izin_no_sito_tgl" => $pbf_izin_no_sito_tgl,
+                        "pbf_izin_no_sito" => $pbf_izin_no_sito,
+                        "pbf_izin_no_sipa_tgl" => $pbf_izin_no_sipa_tgl,
+                        "pbf_izin_no_sipa" => $pbf_izin_no_sipa,
+                        "pbf_izin_no_cdob_tgl" => $pbf_izin_no_cdob_tgl,
+                        "pbf_izin_no_cdob" => $pbf_izin_no_cdob,
+                        "pbf_asis_apoteker_tgl_sipa" => $pbf_asis_apoteker_tgl_sipa,
+                        "pbf_asis_apoteker_tgl_lahir" => $pbf_asis_apoteker_tgl_lahir,
+                        "pbf_asis_apoteker_telpon" => $pbf_asis_apoteker_telpon,
+                        "pbf_asis_apoteker_no_sipa" => $pbf_asis_apoteker_no_sipa,
+                        "pbf_asis_apoteker_no_ktp" => $pbf_asis_apoteker_no_ktp,
+                        "pbf_asis_apoteker_email" => $pbf_asis_apoteker_email,
+                        "pbf_asis_apoteker_nama" => $pbf_asis_apoteker_nama,
+                        "pbf_asis_apoteker_alamat" => $pbf_asis_apoteker_alamat,
+                        "pbf_apoteker_tgl_sipa" => $pbf_apoteker_tgl_sipa,
+                        "pbf_apoteker_tgl_lahir" => $pbf_apoteker_tgl_lahir,
+                        "pbf_apoteker_telpon" => $pbf_apoteker_telpon,
+                        "pbf_apoteker_no_sipa" => $pbf_apoteker_no_sipa,
+                        "pbf_apoteker_no_ktp" => $pbf_apoteker_no_ktp,
+                        "pbf_apoteker_nama" => $pbf_apoteker_nama,
+                        "pbf_apoteker_alamat" => $pbf_apoteker_alamat,
+                        "pbf_apoteker_email" => $pbf_apoteker_email,
+                        "is_valid_type_id" => $is_valid_type_id,
+                        "is_valid_class_id" => $is_valid_class_id                 
+                    ];
+
+                    $insert = $this->model_bridging->insert_mmm_pare_import_customer($data);
+                }
+            }
+        }else
+        {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+            // redirect('bridging/mmm_pare','refresh');
+        };
+
+        $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
+        redirect('bridging/result_mmm_pare_customer','refresh');
+    }
+
+    public function download_template_mmm_pare_customer()
+    {
+        $query = "
+            select 	kategori,
+                    nama_site,
+                    regional,
+                    customer_id,
+                    mapping_uli,
+                    mapping_nd6,
+                    mapping_warung_pintar,
+                    mapping_pbf,
+                    prefix,
+                    nama_customer,
+                    alamat,
+                    tipe_bayar,
+                    top,
+                    status_konsinyasi,
+                    status_fuguh,
+                    kelurahan_id,
+                    nama_kelurahan,
+                    kecamatan_id,
+                    nama_kecamatan,
+                    kota_id,
+                    nama_kota,
+                    propinsi_id,
+                    nama_propinsi,
+                    kode_pos,
+                    telp,
+                    fax,
+                    email,
+                    head_office_id,
+                    nama_head_office,
+                    company_id,
+                    nama_company,
+                    branch_id,
+                    nama_branch_office,
+                    site_id,
+                    segment_id,
+                    nama_segment, 
+                    type_id,
+                    nama_type,
+                    class_id,
+                    class,
+                    spot_id,
+                    no_ktp,
+                    kartu_keluarga,
+                    pln,
+                    nama_penghubung,
+                    alamat_penghubung,
+                    telp_penghubung,
+                    hubungan,
+                    latitude,
+                    longitude,
+                    member,
+                    black_list,
+                    aktif,
+                    show_alamat_pkp,
+                    data_create,
+                    pbf_izin_no_tdp_tgl,
+                    pbf_izin_no_tdp,
+                    pbf_izin_no_siup_tgl,
+                    pbf_izin_no_siup,
+                    pbf_izin_no_sito_tgl,
+                    pbf_izin_no_sito,
+                    pbf_izin_no_sipa_tgl,
+                    pbf_izin_no_sipa,
+                    pbf_izin_no_sia_tgl,
+                    pbf_izin_no_sia,
+                    pbf_izin_no_nib_tgl,
+                    pbf_izin_no_nib,
+                    pbf_izin_no_cdob_tgl,
+                    pbf_izin_no_cdob,
+                    pbf_asis_apoteker_tgl_sipa,
+                    pbf_asis_apoteker_tgl_lahir,
+                    pbf_asis_apoteker_telpon,
+                    pbf_asis_apoteker_no_sipa,
+                    pbf_asis_apoteker_no_ktp,
+                    pbf_asis_apoteker_email,
+                    pbf_asis_apoteker_nama,
+                    pbf_asis_apoteker_alamat,
+                    pbf_apoteker_tgl_sipa,
+                    pbf_apoteker_tgl_lahir,
+                    pbf_apoteker_telpon,
+                    pbf_apoteker_no_sipa,
+                    pbf_apoteker_no_ktp,
+                    pbf_apoteker_nama,
+                    pbf_apoteker_alamat,
+                    pbf_apoteker_email
+        from site.bridging_mmm_pare_import_customer a
+        ";
+
+        $hasil = $this->db->query($query);   
+    
+        $this->excel_generator->set_query($hasil);
+
+        $this->excel_generator->set_header(array
+        (
+            'kategori',
+            'nama_site',
+            'regional',
+            'customer_id',
+            'mapping_uli',
+            'mapping_nd6',
+            'mapping_warung_pintar',
+            'mapping_pbf',
+            'prefix',
+            'nama_customer',
+            'alamat',
+            'tipe_bayar',
+            'top',
+            'status_konsinyasi',
+            'status_fuguh',
+            'kelurahan_id',
+            'nama_kelurahan',
+            'kecamatan_id',
+            'nama_kecamatan',
+            'kota_id',
+            'nama_kota',
+            'propinsi_id',
+            'nama_propinsi',
+            'kode_pos',
+            'telp',
+            'fax',
+            'email',
+            'head_office_id',
+            'nama_head_office',
+            'company_id',
+            'nama_company',
+            'branch_id',
+            'nama_branch_office',
+            'site_id',
+            'segment_id',
+            'nama_segment', 
+            'type_id',
+            'nama_type',
+            'class_id',
+            'class',
+            'spot_id',
+            'no_ktp',
+            'kartu_keluarga',
+            'pln',
+            'nama_penghubung',
+            'alamat_penghubung',
+            'telp_penghubung',
+            'hubungan',
+            'latitude',
+            'longitude',
+            'member',
+            'black_list',
+            'aktif',
+            'show_alamat_pkp',
+            'data_create',
+            'pbf_izin_no_tdp_tgl',
+            'pbf_izin_no_tdp',
+            'pbf_izin_no_siup_tgl',
+            'pbf_izin_no_siup',
+            'pbf_izin_no_sito_tgl',
+            'pbf_izin_no_sito',
+            'pbf_izin_no_sipa_tgl',
+            'pbf_izin_no_sipa',
+            'pbf_izin_no_sia_tgl',
+            'pbf_izin_no_sia',
+            'pbf_izin_no_nib_tgl',
+            'pbf_izin_no_nib',
+            'pbf_izin_no_cdob_tgl',
+            'pbf_izin_no_cdob',
+            'pbf_asis_apoteker_tgl_sipa',
+            'pbf_asis_apoteker_tgl_lahir',
+            'pbf_asis_apoteker_telpon',
+            'pbf_asis_apoteker_no_sipa',
+            'pbf_asis_apoteker_no_ktp',
+            'pbf_asis_apoteker_email',
+            'pbf_asis_apoteker_nama',
+            'pbf_asis_apoteker_alamat',
+            'pbf_apoteker_tgl_sipa',
+            'pbf_apoteker_tgl_lahir',
+            'pbf_apoteker_telpon',
+            'pbf_apoteker_no_sipa',
+            'pbf_apoteker_no_ktp',
+            'pbf_apoteker_nama',
+            'pbf_apoteker_alamat',
+            'pbf_apoteker_email'
+        ));
+        $this->excel_generator->set_column(array
+        ( 
+            'kategori',
+            'nama_site',
+            'regional',
+            'customer_id',
+            'mapping_uli',
+            'mapping_nd6',
+            'mapping_warung_pintar',
+            'mapping_pbf',
+            'prefix',
+            'nama_customer',
+            'alamat',
+            'tipe_bayar',
+            'top',
+            'status_konsinyasi',
+            'status_fuguh',
+            'kelurahan_id',
+            'nama_kelurahan',
+            'kecamatan_id',
+            'nama_kecamatan',
+            'kota_id',
+            'nama_kota',
+            'propinsi_id',
+            'nama_propinsi',
+            'kode_pos',
+            'telp',
+            'fax',
+            'email',
+            'head_office_id',
+            'nama_head_office',
+            'company_id',
+            'nama_company',
+            'branch_id',
+            'nama_branch_office',
+            'site_id',
+            'segment_id',
+            'nama_segment', 
+            'type_id',
+            'nama_type',
+            'class_id',
+            'class',
+            'spot_id',
+            'no_ktp',
+            'kartu_keluarga',
+            'pln',
+            'nama_penghubung',
+            'alamat_penghubung',
+            'telp_penghubung',
+            'hubungan',
+            'latitude',
+            'longitude',
+            'member',
+            'black_list',
+            'aktif',
+            'show_alamat_pkp',
+            'data_create',
+            'pbf_izin_no_tdp_tgl',
+            'pbf_izin_no_tdp',
+            'pbf_izin_no_siup_tgl',
+            'pbf_izin_no_siup',
+            'pbf_izin_no_sito_tgl',
+            'pbf_izin_no_sito',
+            'pbf_izin_no_sipa_tgl',
+            'pbf_izin_no_sipa',
+            'pbf_izin_no_sia_tgl',
+            'pbf_izin_no_sia',
+            'pbf_izin_no_nib_tgl',
+            'pbf_izin_no_nib',
+            'pbf_izin_no_cdob_tgl',
+            'pbf_izin_no_cdob',
+            'pbf_asis_apoteker_tgl_sipa',
+            'pbf_asis_apoteker_tgl_lahir',
+            'pbf_asis_apoteker_telpon',
+            'pbf_asis_apoteker_no_sipa',
+            'pbf_asis_apoteker_no_ktp',
+            'pbf_asis_apoteker_email',
+            'pbf_asis_apoteker_nama',
+            'pbf_asis_apoteker_alamat',
+            'pbf_apoteker_tgl_sipa',
+            'pbf_apoteker_tgl_lahir',
+            'pbf_apoteker_telpon',
+            'pbf_apoteker_no_sipa',
+            'pbf_apoteker_no_ktp',
+            'pbf_apoteker_nama',
+            'pbf_apoteker_alamat',
+            'pbf_apoteker_email'  
+        ));
+        $this->excel_generator->set_width(array(10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10)); 
+        $this->excel_generator->exportTo2007('Download Template mmm_pare Customer'); 
+    }
+
+    public function result_mmm_pare_customer()
+    {
+        $data = [
+            "title" => "Result Bridging mmm_pare Customer",
+            'url'   => 'bridging/mmm_pare_submit_customer',
+            'get_data' => $this->model_bridging->get_mmm_pare_import_customer(),
+            'get_summary' => $this->model_bridging->get_mmm_pare_import_customer_summary(),
+        ];
+        // $this->view($data, false, "result_mmm_pare_customer");
+        $this->render('bridging/result_mmm_pare_customer', $data);
+    }
+
+    public function submit_mmm_pare()
+    {
+        $id_bridging_log = $this->input->post('id_bridging_log');
+        // echo  $id_bridging_log; die;
+
+        $get_data_log = $this->model_bridging->get_bridging_log($id_bridging_log);
+        if($get_data_log->num_rows() > 0)
+        {
+            $site_code = $get_data_log->row()->site_code;
+            $kode_comp = substr($site_code, 0, 3);
+            $nocab = substr($site_code, 3, 2);
+
+            $bulan = $get_data_log->row()->bulan;
+
+            $tahun_upload = substr($bulan, 0, 4);
+            $bulan_upload = substr($bulan, 5, 2);
+        }
+
+        $get_userid = $this->model_bridging->get_userid_by_kode_comp($kode_comp);
+        if($get_userid->num_rows() > 0)
+        {
+            $userid = $get_userid->row()->id;
+        }else{
+            $this->session->set_flashdata("pesan", "gagal mendapatkan userid, ".$this->upload->display_errors());
+            redirect('bridging/mmm_pare','refresh');
+        }
+
+        $get_last_upload = $this->model_bridging->get_mpm_upload_where_closing_by_userid($userid);
+        if($get_last_upload->num_rows() > 0)
+        {
+            $tahun_last_upload = $get_last_upload->row()->tahun;
+            $bulan_last_upload = $get_last_upload->row()->bulan;
+        }   
+
+        // die;
+
+        if ($tahun_upload < $tahun_last_upload || ($tahun_upload == $tahun_last_upload && $bulan_upload <= $bulan_last_upload)) {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, tahun dan bulan lebih kecil dari tahun dan bulan terakhir diupload");
+            redirect('bridging/mmm_pare','refresh');
+        } 
+
+        $delete_fi = $this->model_bridging->delete_fi_mmm_pare($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $delete_ri = $this->model_bridging->delete_ri_mmm_pare($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        
+        $proses_fi = $this->model_bridging->insert_fi_mmm_pare($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $proses_fi = $this->model_bridging->insert_fi_mmm_pare_bonus($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $proses_ri = $this->model_bridging->insert_ri_mmm_pare($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+
+        $delete_tblang = $this->model_bridging->delete_tblang_mmm_pare($tahun_upload, $nocab);
+        $delete_tabsales = $this->model_bridging->delete_tabsales_mmm_pare($tahun_upload, $nocab);
+        // $delete_tbkota = $this->model_bridging->delete_tbkota_mmm_pare($tahun_upload, $nocab);
+
+        $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
+        $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
+        // $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
+
+
+        // update bridging_log
+        $get_data_result = $this->model_bridging->get_result($site_code, $tahun_upload, $bulan_upload);
+        if($get_data_result->num_rows() > 0)
+        {
+            $total_unit = $get_data_result->row()->total_unit;
+            $total_value = $get_data_result->row()->total_value;
+        }else{
+            $total_unit = 0;
+            $total_value = 0;            
+        }
+
+        $insert_upload = [
+            "userid"        => $userid,
+            "lastupload"    => $this->model_outlet_transaksi->timezone(),
+            "tanggal"       => date('d', strtotime($this->model_outlet_transaksi->timezone())),
+            "filename"      => "",
+            "omzet"         => $total_value,
+            "status"        => 1,
+            "tahun"         => $tahun_upload,
+            "bulan"         => $bulan_upload,
+            "status_closing" => 0
+        ];
+        $id_upload = $this->model_bridging->insert_upload($insert_upload);
+
+        $update_bridging = [
+            'sum_omzet' => $total_value,
+            'sum_unit' => $total_unit,
+            'id_upload' => $id_upload
+        ];
+        $this->model_bridging->update_bridging_log($update_bridging, $id_bridging_log);
+
+        $this->session->set_flashdata("pesan_result_success", "proses upload success");
+        redirect('bridging/mmm_pare','refresh');
+        
+    }
+
+/// PALOPO ///
+     public function mmm_palopo()
+    {
+        $site_code = 'MMPE4';
+        $cek_hak = $this->model_bridging->get_bridging_hak_akses_by_site_code_userid($site_code, $this->userid)->row();
+        if(!$cek_hak) {
+            $this->session->set_flashdata("pesan", "user anda tidak diijinkan mengakses halaman ini");
+            redirect('bridging/dashboard','refresh');
+        }
+
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
+        $data = [
+            "title" => "Bridging mmm_palopo Sales",
+            "title_customer" => "Bridging Customer mmm_palopo (Outlet)",
+            'url'   => 'bridging/mmm_palopo_import',
+            'url_customer'   => 'bridging/mmm_palopo_import_customer',
+            'bridging'  => "mmm_palopo",
+            'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
+        ];
+        // $this->view($data, false, "mmm_palopo");
+        $this->render('bridging/mmm_palopo', $data);
+    }
+
+    public function mmm_palopo_import()
+    {
+        $month = $this->input->post('month');
+        $bulan = explode('-', $month)[1];
+        $tahun = explode('-', $month)[0];
+
+        $newDate_sebelumnya = date('Y-m', strtotime($month. ' -1 months')); // mencari periode -1 bulan sebelumnya
+        $tahun_sebelumnya = explode('-', $newDate_sebelumnya)[0];
+        $bulan_sebelumnya = explode('-', $newDate_sebelumnya)[1];
+
+        // cek data apakah bulan sebelumnya sudah closing bulanan atau belum
+        $get_mpm_user = $this->model_bridging->get_mpm_user('MMP');
+        $userid = $get_mpm_user->row()->id;
+
+        $get_mpm_upload_bulan_lalu = $this->model_bridging->get_mpm_upload($userid, $bulan_sebelumnya, $tahun_sebelumnya, '1');
+        if ($get_mpm_upload_bulan_lalu->num_rows() > 0) {
+            $status_closing_bulan_lalu = $get_mpm_upload_bulan_lalu->row()->status_closing;
+        } else {
+            $status_closing_bulan_lalu = null; // atau default value lain seperti 0 atau ''
+        }
+
+        if ($status_closing_bulan_lalu == null) {
+            $this->session->set_flashdata("pesan", "upload file gagal, data bulan sebelumnya belum di closing! silahkan upload data closing terlebih dahulu");
+            redirect('bridging/mmm_palopo','refresh');
+        }
+
+        // cek data apakah sudah closing bulanan atau belum
+        $get_mpm_uplaod = $this->model_bridging->get_mpm_upload($userid, $bulan, $tahun, '');
+
+        if ($get_mpm_uplaod->num_rows() > 0) {
+            $status_closing = $get_mpm_uplaod->row()->status_closing;
+        } else {
+            $status_closing = null; // atau default value lain seperti 0 atau ''
+        }
+        
+        if ($status_closing == '1') {
+            $this->session->set_flashdata("pesan", "upload file gagal, data sudah di closing! silahkan hubungi IT");
+            redirect('bridging/mmm_palopo','refresh');
+        }
+
+        // create table
+        $create = $this->model_bridging->create_table_mmm_palopo_import();
+        if(!$create) {
+            $this->session->set_flashdata("pesan", "gagal membuat table bridging_mmm_palopo_import");
+            redirect('bridging/mmm_palopo','refresh');
+        }
+
+        // inisialisasi upload
+        $init_upload = $this->attachment_config('mmm_palopo', '');        
+        if ($this->upload->do_upload('file')) 
+        {
+            $upload_data = $this->upload->data();
+            $filename_excel = $upload_data['file_name'];
+
+            $this->load->library('excel');
+            $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/mmm_palopo/$filename_excel");
+
+            $jumlahSheet = $object->getSheetCount();
+            if ($jumlahSheet > 1) {
+                echo "jumlah_sheet : ".$jumlahSheet;
+                echo "<script>alert('upload file gagal karena file mempunyai lebih dari 1 sheet'); </script>";
+                redirect('bridging/mmm_palopo','refresh');
+            }
+
+            $highestColumm = $object->setActiveSheetIndex(0)->getHighestColumn();
+            // var_dump($highestColumm);die;
+            if ($highestColumm != 'BT') {
+                echo "<script>alert('upload file gagal karena column tidak sesuai'); </script>";
+                redirect('bridging/mmm_palopo','refresh');
+            }
+
+            $input_log_data = [
+                "site_code" => "MMPE4",
+                "bulan" => $month,
+                "filename"  => $filename_excel,
+                "signature" => md5("MMPE4".$month.$this->model_outlet_transaksi->timezone()),
+                "created_at" => $this->model_outlet_transaksi->timezone(),
+                "created_by" => $this->session->userdata('id'),
+            ];
+
+            $id_log = $this->model_bridging->input_bridging_log($input_log_data);
+
+            foreach ($object->getWorksheetIterator() as $worksheet) 
+            {
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+
+                if ($highestRow > 5000) {
+                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 1000 ROW.");
+                    redirect('bridging/mmm_palopo','refresh');
+                }
+
+                if ($highestRow <= 1) {
+                    $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+                    redirect('bridging/mmm_palopo','refresh');
+                }
+
+                for ($row = 2; $row <= $highestRow; $row++) 
+                {   
+                    $distributor    = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+                    $cabang         = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
+                    $tipetrans      = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                    $divisi         = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());
+                    $principal      = trim($worksheet->getCellByColumnAndRow(4, $row)->getValue());
+                    $productgroup1  = trim($worksheet->getCellByColumnAndRow(5, $row)->getValue());
+                    $productgroup2  = trim($worksheet->getCellByColumnAndRow(6, $row)->getValue());
+                    $productgroup3  = trim($worksheet->getCellByColumnAndRow(7, $row)->getValue());
+                    $brand          = trim($worksheet->getCellByColumnAndRow(8, $row)->getValue());
+                    $kodeproduk     = trim($worksheet->getCellByColumnAndRow(9, $row)->getValue());
+                    $kodevarian     = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
+                    
+                    // cek kodeproduk mpm
+                    $kodeprodukprincipal = (strlen($temp = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue())) == 5) ? '0' . $temp : $temp;
+                    // echo $kodeprodukprincipal;
+                    // echo '</br>';
+
+                    $get_kodeprod = $this->model_bridging->get_master_product_by_kodeprod($kodeprodukprincipal);
+                    if($get_kodeprod->num_rows() > 0) {
+                        $is_valid_kodeprod = 1;
+                    }else{
+                        $is_valid_kodeprod = 0;
+                    }
+
+                    $namaproduk    = trim($worksheet->getCellByColumnAndRow(12, $row)->getValue());
+                    $packaging    = trim($worksheet->getCellByColumnAndRow(13, $row)->getValue());
+                    $productclass = trim($worksheet->getCellByColumnAndRow(14, $row)->getValue());
+                    $kodecustomer= trim($worksheet->getCellByColumnAndRow(15, $row)->getValue());
+
+                    // cek kodecustomer 
+                    $cek_customer = $this->model_bridging->get_mmm_palopo_customer($kodecustomer);
+                    if($cek_customer->num_rows() > 0) {
+                        $is_valid_customer = 1;
+                    }else{
+                        $is_valid_customer = 0;
+                    }
+
+                    $namacustomer = trim($worksheet->getCellByColumnAndRow(16, $row)->getValue());
+                    $alamatcustomer = trim($worksheet->getCellByColumnAndRow(17, $row)->getValue());
+                    $area = trim($worksheet->getCellByColumnAndRow(18, $row)->getValue());
+                    $subarea = trim($worksheet->getCellByColumnAndRow(19, $row)->getValue());
+                    $channel = trim($worksheet->getCellByColumnAndRow(20, $row)->getValue());
+                    $subchannel = trim($worksheet->getCellByColumnAndRow(21, $row)->getValue());
+                    $customergroup = trim($worksheet->getCellByColumnAndRow(22, $row)->getValue());
+                    $keyaccount= trim($worksheet->getCellByColumnAndRow(23, $row)->getValue());
+                    $kodesalesman = trim($worksheet->getCellByColumnAndRow(24, $row)->getValue());
+                    $namasalesman = trim($worksheet->getCellByColumnAndRow(25, $row)->getValue());
+                    $kodesalesco = trim($worksheet->getCellByColumnAndRow(26, $row)->getValue());
+                    $namasalesco = trim($worksheet->getCellByColumnAndRow(27, $row)->getValue());
+                    $kodespv = trim($worksheet->getCellByColumnAndRow(28, $row)->getValue());
+                    $namaspv = trim($worksheet->getCellByColumnAndRow(29, $row)->getValue());
+                    $tahunbulan = trim($worksheet->getCellByColumnAndRow(30, $row)->getValue());
+                    $bulan = trim($worksheet->getCellByColumnAndRow(31, $row)->getValue());
+                    
+                    // cek tanggal
+                    $cell = $worksheet->getCellByColumnAndRow(32, $row);
+                    $cellValue = $cell->getValue();
+
+                    // echo $cellValue; echo '<br>';
+                    $is_valid_tanggal = 1; // Nilai default valid
+
+                    if (is_numeric($cellValue)) {
+                        // echo "numeric: " . $cellValue . "<br>";die;
+                        $unixTimestamp = ($cellValue - 25569) * 86400; // 25569 is days between 1900-01-01 and 1970-01-01
+                        $tanggal = date('Y-m-d', $unixTimestamp); // Format as needed
+                        // Ekstrak tahun-bulan dari $tanggal untuk perbandingan
+                        $tanggal_ym = date('Y-m', $unixTimestamp);
+                        // Bandingkan dengan $month
+                        if ($tanggal_ym !== $month) {
+                            $is_valid_tanggal = 0; // Tandai sebagai tidak valid jika bulan berbeda
+                        }
+                    } else {
+                        // echo "string: " . $cellValue . "<br>";die;
+                        $tanggal = $cellValue;
+
+                        $formats = ['d/m/Y', 'd-m-Y', 'Y-m-d'];
+                        $dateObj = false;
+
+                        foreach ($formats as $format) {
+                            $dateObj = DateTime::createFromFormat($format, $tanggal);
+                            if ($dateObj !== false) {
+                                break;
+                            }
+                        }
+
+                        if ($dateObj !== false) {
+
+                            $tanggal = $dateObj->format('Y-m-d');
+                            $tanggal_ym = $dateObj->format('Y-m');
+
+                            if ($tanggal_ym !== $month) {
+                                $is_valid_tanggal = 0;
+                            }
+
+                        } else {
+                            $is_valid_tanggal = 0;
+                        }
+                    }
+                    
+                    $weekno = trim($worksheet->getCellByColumnAndRow(33, $row)->getValue());
+                    $nomornota = trim($worksheet->getCellByColumnAndRow(34, $row)->getValue());
+                    $salesmethod = trim($worksheet->getCellByColumnAndRow(35, $row)->getValue());
+                    $sellingtype = trim($worksheet->getCellByColumnAndRow(36, $row)->getValue());
+                    $qtysold        = trim($worksheet->getCellByColumnAndRow(37, $row)->getValue());
+                    $kartonutuh     = trim($worksheet->getCellByColumnAndRow(38, $row)->getValue());
+                    $qtysoldpcs     = trim($worksheet->getCellByColumnAndRow(39, $row)->getValue());
+                    $freegoodpcs    = trim($worksheet->getCellByColumnAndRow(40, $row)->getValue());
+
+                    $tonnage        = trim($worksheet->getCellByColumnAndRow(41, $row)->getValue());
+                    $volume_ltr     = trim($worksheet->getCellByColumnAndRow(42, $row)->getValue());
+                    $grossamount    = trim($worksheet->getCellByColumnAndRow(43, $row)->getValue());
+
+                    $linediscount1  = trim($worksheet->getCellByColumnAndRow(44, $row)->getValue());
+                    $linediscount2  = trim($worksheet->getCellByColumnAndRow(45, $row)->getValue());
+                    $linediscount3  = trim($worksheet->getCellByColumnAndRow(46, $row)->getValue());
+                    $linediscount4  = trim($worksheet->getCellByColumnAndRow(47, $row)->getValue());
+                    $linediscount5  = trim($worksheet->getCellByColumnAndRow(48, $row)->getValue());
+                    $totallinediscount = trim($worksheet->getCellByColumnAndRow(49, $row)->getValue());
+
+                    $discountnota1  = trim($worksheet->getCellByColumnAndRow(50, $row)->getValue());
+                    $discountnota2  = trim($worksheet->getCellByColumnAndRow(51, $row)->getValue());
+                    $discountnota3  = trim($worksheet->getCellByColumnAndRow(52, $row)->getValue());
+                    $totaldiscountnota = trim($worksheet->getCellByColumnAndRow(53, $row)->getValue());
+
+                    $dpp            = trim($worksheet->getCellByColumnAndRow(54, $row)->getValue());
+                    $ppn            = trim($worksheet->getCellByColumnAndRow(55, $row)->getValue());
+                    $ppnbm          = trim($worksheet->getCellByColumnAndRow(56, $row)->getValue());
+                    $tax3           = trim($worksheet->getCellByColumnAndRow(57, $row)->getValue());
+                    $netamount      = trim($worksheet->getCellByColumnAndRow(58, $row)->getValue());
+
+                    $warehouse      = trim($worksheet->getCellByColumnAndRow(59, $row)->getValue());
+                    $customerpo     = trim($worksheet->getCellByColumnAndRow(60, $row)->getValue());
+                    $customerjoindate = trim($worksheet->getCellByColumnAndRow(61, $row)->getValue());
+                    $nofakturpajak  = trim($worksheet->getCellByColumnAndRow(62, $row)->getValue());
+                    $tglfakturpajak = trim($worksheet->getCellByColumnAndRow(63, $row)->getValue());
+                    $nomorfakturproforma = trim($worksheet->getCellByColumnAndRow(64, $row)->getValue());
+                    $tglfakturproforma = trim($worksheet->getCellByColumnAndRow(65, $row)->getValue());
+
+                    $cogs               = trim($worksheet->getCellByColumnAndRow(66, $row)->getValue());
+                    $case_weight_kg     = trim($worksheet->getCellByColumnAndRow(67, $row)->getValue());
+                    $tslqtysoldnfg      = trim($worksheet->getCellByColumnAndRow(68, $row)->getValue());
+                    $tslconvpcstoctn    = trim($worksheet->getCellByColumnAndRow(69, $row)->getValue());
+                    $tsltonnagesoldfg   = trim($worksheet->getCellByColumnAndRow(70, $row)->getValue());
+                    $end                = trim($worksheet->getCellByColumnAndRow(71, $row)->getValue());
+
+                    $data = [
+                        'distributor'        => $distributor,
+                        'cabang'             => $cabang,
+                        'tipetrans'          => $tipetrans,
+                        'divisi'             => $divisi,
+                        'principal'          => $principal,
+                        'productgroup1'      => $productgroup1,
+                        'productgroup2'      => $productgroup2,
+                        'productgroup3'      => $productgroup3,
+                        'brand'              => $brand,
+                        'kodeproduk'         => $kodeproduk,
+                        'kodevarian'         => $kodevarian,
+                        'kodeprodukprincipal'=> $kodeprodukprincipal,
+                        'namaproduk'         => $namaproduk,
+                        'packaging'          => $packaging,
+                        'productclass'       => $productclass,
+                        'kodecustomer'       => $kodecustomer,
+                        'namacustomer'       => $namacustomer,
+                        'alamatcustomer'     => $alamatcustomer,
+                        'area'               => $area,
+                        'subarea'            => $subarea,
+                        'channel'            => $channel,
+                        'subchannel'         => $subchannel,
+                        'customergroup'      => $customergroup,
+                        'keyaccount'         => $keyaccount,
+                        'kodesalesman'       => $kodesalesman,
+                        'namasalesman'       => $namasalesman,
+                        'kodesalesco'        => $kodesalesco,
+                        'namasalesco'        => $namasalesco,
+                        'kodespv'            => $kodespv,
+                        'namaspv'            => $namaspv,
+                        'tahunbulan'         => $tahunbulan,
+                        'bulan'              => $bulan,
+                        'tanggal'            => $tanggal,
+                        'weekno'             => $weekno,
+                        'nomornota'          => $nomornota,
+                        'salesmethod'        => $salesmethod,
+                        'sellingtype'        => $sellingtype,
+                        'qtysold'            => $qtysold,
+                        'kartonutuh'         => $kartonutuh,
+                        'qtysoldpcs'         => $qtysoldpcs,
+                        'freegoodpcs'        => $freegoodpcs,
+                        'tonnage'            => $tonnage,
+                        'volume_ltr'         => $volume_ltr,
+                        'grossamount'        => $grossamount,
+                        'linediscount1'      => $linediscount1,
+                        'linediscount2'      => $linediscount2,
+                        'linediscount3'      => $linediscount3,
+                        'linediscount4'      => $linediscount4,
+                        'linediscount5'      => $linediscount5,
+                        'totallinediscount'  => $totallinediscount,
+                        'discountnota1'      => $discountnota1,
+                        'discountnota2'      => $discountnota2,
+                        'discountnota3'      => $discountnota3,
+                        'totaldiscountnota'  => $totaldiscountnota,
+                        'dpp'                => $dpp,
+                        'ppn'                => $ppn,
+                        'ppnbm'              => $ppnbm,
+                        'tax3'               => $tax3,
+                        'netamount'          => $netamount,
+                        'warehouse'          => $warehouse,
+                        'customerpo'         => $customerpo,
+                        'customerjoindate'   => $customerjoindate,
+                        'nofakturpajak'      => $nofakturpajak,
+                        'tanggalfakturpajak' => $tglfakturpajak,
+                        'nomorfakturproforma'=> $nomorfakturproforma,
+                        'tanggalfakturproforma'=> $tglfakturproforma,
+                        'cogs'               => $cogs,
+                        'case_weight_kg'     => $case_weight_kg,
+                        'tslqtysoldnfg'      => $tslqtysoldnfg,
+                        'tslconvpcstoctn'    => $tslconvpcstoctn,
+                        'tsltonnagesoldfg'   => $tsltonnagesoldfg,
+                        'end'                => $end,
+                        'is_valid_kodeprod'  => $is_valid_kodeprod,
+                        'is_valid_tanggal'   => $is_valid_tanggal,
+                        'is_valid_customer'  => $is_valid_customer,
+                        'id_bridging_log'    => $id_log
+                    ];
+
+                    $insert = $this->model_bridging->insert_mmm_palopo_import($data);
+                }
+            }
+            // echo "<pre>"; print_r($data); echo "</pre>"; die;
+            // echo "tanggal : ".$tanggal." - is_valid_tanggal : ".$is_valid_tanggal; die;
+        }else
+        {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+            redirect('bridging/mmm_palopo','refresh');
+        };
+
+        $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
+        redirect('bridging/preview_mmm_palopo','refresh');
+    }
+
+    public function preview_mmm_palopo()
+    {
+        $get_data = $this->model_bridging->get_mmm_palopo_import();
+        $id_bridging_log = $get_data->row()->id_bridging_log; 
+        // echo "id_bridging_log : ".$id_bridging_log; die;
+
+        $is_invalid = $this->model_bridging->get_mmm_palopo_import_where_is_valid_false();
+        if($is_invalid->num_rows() > 0)
+        {
+            // echo "is_invalid : ".$is_invalid->num_rows();die;
+            $params_invalid = 1;
+        }else{
+            $params_invalid = 0;
+        }
+
+        $data = [
+            "title"         => "Preview Bridging mmm_palopo",
+            'url'           => 'bridging/submit_mmm_palopo',
+            'get_data'      => $get_data,
+            'id_bridging_log'   => $id_bridging_log,
+            'get_summary'   => $this->model_bridging->get_mmm_palopo_import_summary(),
+            'params_invalid' => $params_invalid
+        ];
+        // $this->view($data, false, "preview_mmm_palopo");
+        $this->render('bridging/preview_mmm_palopo', $data);
+    }
+
+    public function download_template_mmm_palopo()
+    {
+        $query = "
+            select 	'' as distributor,
+                    '' as cabang,
+                    '' as tipetrans,
+                    '' as divisi,
+                    '' as principal,
+                    '' as productgroup1,
+                    '' as productgroup2,
+                    '' as productgroup3,
+                    '' as brand,
+                    '' as kodeproduk,
+                    '' as kodevarian,
+                    '' as kodeprodukprincipal,
+                    '' as namaproduk,
+                    '' as packaging,
+                    '' as productclass,
+                    '' as kodecustomer,
+                    '' as namacustomer,
+                    '' as alamatcustomer,
+                    '' as area,
+                    '' as subarea,
+                    '' as channel,
+                    '' as subchannel,
+                    '' as customergroup,
+                    '' as keyaccount,
+                    '' as kodesalesman,
+                    '' as namasalesman,
+                    '' as kodesalesco,
+                    '' as namasalesco,
+                    '' as kodespv,
+                    '' as namaspv,
+                    '' as tahunbulan,
+                    '' as bulan,
+                    '' as tanggal,
+                    '' as weekno,
+                    '' as nomornota,
+                    '' as salesmethod,
+                    '' as sellingtype,
+                    '' as qtysold,
+                    '' as kartonutuh,
+                    '' as qtysoldpcs,
+                    '' as freegoodpcs,
+                    '' as tonnage,
+                    '' as volume_ltr,
+                    '' as grossamount,
+                    '' as linediscount1,
+                    '' as linediscount2,
+                    '' as linediscount3,
+                    '' as linediscount4,
+                    '' as linediscount5,
+                    '' as totallinediscount,
+                    '' as discountnota1,
+                    '' as discountnota2,
+                    '' as discountnota3,
+                    '' as totaldiscountnota,
+                    '' as dpp,
+                    '' as ppn,
+                    '' as ppnbm,
+                    '' as tax3,
+                    '' as netamount,
+                    '' as warehouse,
+                    '' as customerpo,
+                    '' as customerjoindate,
+                    '' as nofakturpajak,
+                    '' as tanggalfakturpajak,
+                    '' as nomorfakturproforma,
+                    '' as tanggalfakturproforma,
+                    '' as cogs,
+                    '' as case_weight_kg,
+                    '' as tslqtysoldnfg,
+                    '' as tslconvpcstoctn,
+                    '' as tsltonnagesoldfg,
+                    '' as `end`
+        ";
+
+        $hasil = $this->db->query($query);   
+
+        $headers = [
+            'distributor','cabang','tipetrans','divisi','principal','productgroup1','productgroup2','productgroup3','brand','kodeproduk','kodevarian','kodeprodukprincipal',
+            'namaproduk','packaging','productclass','kodecustomer','namacustomer','alamatcustomer','area','subarea','channel','subchannel','customergroup','keyaccount',
+            'kodesalesman','namasalesman','kodesalesco','namasalesco','kodespv','namaspv','tahunbulan','bulan','tanggal','weekno','nomornota','salesmethod','sellingtype',
+            'qtysold','kartonutuh','qtysoldpcs','freegoodpcs','tonnage','volume_ltr','grossamount','linediscount1','linediscount2','linediscount3','linediscount4','linediscount5',
+            'totallinediscount','discountnota1','discountnota2','discountnota3','totaldiscountnota','dpp','ppn','ppnbm','tax3','netamount','warehouse','customerpo',
+            'customerjoindate','nofakturpajak','tanggalfakturpajak','nomorfakturproforma','tanggalfakturproforma','cogs','case_weight_kg','tslqtysoldnfg','tslconvpcstoctn',
+            'tsltonnagesoldfg','end'
+        ];
+
+        $this->excel_generator->set_query($hasil);
+        $this->excel_generator->set_header($headers);
+        $this->excel_generator->set_column($headers);
+        $this->excel_generator->set_width(array_fill(0, count($headers), 10)); 
+        $this->excel_generator->exportTo2007('Download Template mmm_palopo'); 
+    }
+
+    public function mmm_palopo_import_customer()
+    {        
+        // create table
+        $create = $this->model_bridging->create_table_mmm_palopo_import_customer();
+        if(!$create) {
+            $this->session->set_flashdata("pesan", "gagal membuat table bridging_mmm_palopo_import_customer");
+            redirect('bridging/mmm_palopo','refresh');
+        }
+
+        // add unique constraint
+        $unique_customer_id = $this->model_bridging->add_unique_mmm_palopo_import_customer('customer_id');
+        $unique_mapping_uli = $this->model_bridging->add_unique_mmm_palopo_import_customer('mapping_uli');
+
+        // echo'disini'; die;
+        // inisialisasi upload
+        $init_upload = $this->attachment_config('mmm_palopo', ''); 
+        if ($this->upload->do_upload('file_customer')) 
+        {
+            // echo 'disini'; die;
+            $upload_data = $this->upload->data();
+            $filename_excel = $upload_data['file_name'];
+
+            $this->load->library('excel');
+            $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/mmm_palopo/$filename_excel");
+
+            $jumlahSheet = $object->getSheetCount();
+            if ($jumlahSheet > 1) {
+                echo "jumlah_sheet : ".$jumlahSheet;
+                echo "<script>alert('upload file gagal karena file mempunyai lebih dari 1 sheet'); </script>";
+                redirect('bridging/mmm_palopo','refresh');
+            }
+
+            foreach ($object->getWorksheetIterator() as $worksheet) 
+            {
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+
+                if ($highestRow > 5000) {
+                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 5000 ROW.");
+                    redirect('bridging/mmm_palopo','refresh');
+                }
+
+                if ($highestRow <= 1) {
+                    $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+                    redirect('bridging/mmm_palopo','refresh');
+                }
+
+                for ($row = 2; $row <= $highestRow; $row++) 
+                {  
+                    $kategori    = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+                    $nama_site   = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
+                    $regional    = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                    $customer_id = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());                    
+                    $mapping_uli = trim($worksheet->getCellByColumnAndRow(4, $row)->getValue());
+                    $mapping_nd6 = trim($worksheet->getCellByColumnAndRow(5, $row)->getValue());
+                    $mapping_warung_pintar = trim($worksheet->getCellByColumnAndRow(6, $row)->getValue());
+                    $mapping_pbf = trim($worksheet->getCellByColumnAndRow(7, $row)->getValue());
+                    $prefix = trim($worksheet->getCellByColumnAndRow(8, $row)->getValue());
+                    $nama_customer = trim($worksheet->getCellByColumnAndRow(9, $row)->getValue());
+                    $alamat = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
+                    $tipe_bayar = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue());
+                    $top = trim($worksheet->getCellByColumnAndRow(12, $row)->getValue());
+                    $status_konsinyasi = trim($worksheet->getCellByColumnAndRow(13, $row)->getValue());
+                    $status_fuguh = trim($worksheet->getCellByColumnAndRow(14, $row)->getValue());
+                    $kelurahan_id = trim($worksheet->getCellByColumnAndRow(15, $row)->getValue());
+                    $nama_kelurahan = trim($worksheet->getCellByColumnAndRow(16, $row)->getValue());
+                    $kecamatan_id = trim($worksheet->getCellByColumnAndRow(17, $row)->getValue());
+                    $nama_kecamatan = trim($worksheet->getCellByColumnAndRow(18, $row)->getValue());
+                    $kota_id = trim($worksheet->getCellByColumnAndRow(19, $row)->getValue());
+                    $nama_kota = trim($worksheet->getCellByColumnAndRow(20, $row)->getValue());     
+                    $propinsi_id = trim($worksheet->getCellByColumnAndRow(21, $row)->getValue());
+                    $nama_propinsi = trim($worksheet->getCellByColumnAndRow(22, $row)->getValue());
+                    $kode_pos = trim($worksheet->getCellByColumnAndRow(23, $row)->getValue());
+                    $telp = trim($worksheet->getCellByColumnAndRow(24, $row)->getValue());     
+                    $fax = trim($worksheet->getCellByColumnAndRow(25, $row)->getValue());
+                    $email = trim($worksheet->getCellByColumnAndRow(26, $row)->getValue());
+                    $head_office_id = trim($worksheet->getCellByColumnAndRow(27, $row)->getValue());
+                    $nama_head_office = trim($worksheet->getCellByColumnAndRow(28, $row)->getValue());      
+                    $company_id = trim($worksheet->getCellByColumnAndRow(29, $row)->getValue());
+                    $nama_company = trim($worksheet->getCellByColumnAndRow(30, $row)->getValue());
+                    $branch_id = trim($worksheet->getCellByColumnAndRow(31, $row)->getValue());
+                    $nama_branch_office = trim($worksheet->getCellByColumnAndRow(32, $row)->getValue());
+                    $site_id = trim($worksheet->getCellByColumnAndRow(33, $row)->getValue());
+                    $segment_id = trim($worksheet->getCellByColumnAndRow(34, $row)->getValue());    
+                    $nama_segment = trim($worksheet->getCellByColumnAndRow(35, $row)->getValue());
+                    $type_id = trim($worksheet->getCellByColumnAndRow(36, $row)->getValue());
+
+                    // cek type_id
+                    $cek_type = $this->model_bridging->get_type($type_id);
+                    if(!$cek_type->num_rows() > 0) { // jika tidak ada
+                        $is_valid_type_id = 0;
+                    }else{
+                        $is_valid_type_id = 1;
+                    }
+
+                    $nama_type = trim($worksheet->getCellByColumnAndRow(37, $row)->getValue());
+                    $kodesalur = trim($worksheet->getCellByColumnAndRow(38, $row)->getValue());
+
+                    // cek kodesalur
+                    $cek_class = $this->model_bridging->get_class($kodesalur);
+                    // echo 'cek_class ' .$cek_class;die; 
+                    if(!$cek_class->num_rows() > 0) { // jika tidak ada
+                        $is_valid_class_id = 0;
+                    }else{
+                        $is_valid_class_id = 1;
+                    }
+
+                    $namasalur = trim($worksheet->getCellByColumnAndRow(39, $row)->getValue());
+                    $spot_id = trim($worksheet->getCellByColumnAndRow(40, $row)->getValue());
+                    $no_ktp = trim($worksheet->getCellByColumnAndRow(41, $row)->getValue());
+                    $kartu_keluarga = trim($worksheet->getCellByColumnAndRow(42, $row)->getValue());
+                    $pln = trim($worksheet->getCellByColumnAndRow(43, $row)->getValue());
+                    $nama_penghubung = trim($worksheet->getCellByColumnAndRow(44, $row)->getValue());
+                    $alamat_penghubung = trim($worksheet->getCellByColumnAndRow(45, $row)->getValue());
+                    $telp_penghubung = trim($worksheet->getCellByColumnAndRow(46, $row)->getValue());
+                    $hubungan = trim($worksheet->getCellByColumnAndRow(47, $row)->getValue());
+                    $latitude = trim($worksheet->getCellByColumnAndRow(48, $row)->getValue());
+                    $longitude = trim($worksheet->getCellByColumnAndRow(49, $row)->getValue());
+                    $member = trim($worksheet->getCellByColumnAndRow(50, $row)->getValue());
+                    $black_list = trim($worksheet->getCellByColumnAndRow(51, $row)->getValue());
+                    $aktif = trim($worksheet->getCellByColumnAndRow(52, $row)->getValue());
+                    $show_alamat_pkp = trim($worksheet->getCellByColumnAndRow(53, $row)->getValue());
+                    $data_create = trim($worksheet->getCellByColumnAndRow(54, $row)->getValue());
+                    $pbf_izin_no_tdp_tgl = trim($worksheet->getCellByColumnAndRow(55, $row)->getValue());
+                    $pbf_izin_no_tdp_no = trim($worksheet->getCellByColumnAndRow(56, $row)->getValue());
+                    $pbf_izin_no_siup_tgl = trim($worksheet->getCellByColumnAndRow(57, $row)->getValue());
+                    $pbf_izin_no_siup = trim($worksheet->getCellByColumnAndRow(58, $row)->getValue());
+                    $pbf_izin_no_sito_tgl = trim($worksheet->getCellByColumnAndRow(59, $row)->getValue());
+                    $pbf_izin_no_sito = trim($worksheet->getCellByColumnAndRow(60, $row)->getValue());
+                    $pbf_izin_no_sipa_tgl = trim($worksheet->getCellByColumnAndRow(61, $row)->getValue());
+                    $pbf_izin_no_sipa = trim($worksheet->getCellByColumnAndRow(62, $row)->getValue());
+                    $pbf_izin_no_sia_tgl = trim($worksheet->getCellByColumnAndRow(63, $row)->getValue());
+                    $pbf_izin_no_sia = trim($worksheet->getCellByColumnAndRow(64, $row)->getValue());
+                    $pbf_izin_no_nib_tgl = trim($worksheet->getCellByColumnAndRow(65, $row)->getValue());
+                    $pbf_izin_no_nib = trim($worksheet->getCellByColumnAndRow(66, $row)->getValue());
+                    $pbf_izin_no_cdob_tgl = trim($worksheet->getCellByColumnAndRow(67, $row)->getValue());
+                    $pbf_izin_no_cdob = trim($worksheet->getCellByColumnAndRow(68, $row)->getValue());
+                    $pbf_asis_apoteker_tgl_sipa = trim($worksheet->getCellByColumnAndRow(69, $row)->getValue());
+                    $pbf_asis_apoteker_tgl_lahir = trim($worksheet->getCellByColumnAndRow(70, $row)->getValue());
+                    $pbf_asis_apoteker_telpon = trim($worksheet->getCellByColumnAndRow(71, $row)->getValue());
+                    $pbf_asis_apoteker_no_sipa = trim($worksheet->getCellByColumnAndRow(72, $row)->getValue());
+                    $pbf_asis_apoteker_no_ktp = trim($worksheet->getCellByColumnAndRow(73, $row)->getValue());
+                    $pbf_asis_apoteker_email = trim($worksheet->getCellByColumnAndRow(74, $row)->getValue());
+                    $pbf_asis_apoteker_nama = trim($worksheet->getCellByColumnAndRow(75, $row)->getValue());
+                    $pbf_asis_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(76, $row)->getValue());
+                    $pbf_apoteker_tgl_sipa = trim($worksheet->getCellByColumnAndRow(77, $row)->getValue());
+                    $pbf_apoteker_tgl_lahir = trim($worksheet->getCellByColumnAndRow(78, $row)->getValue());
+                    $pbf_apoteker_telpon = trim($worksheet->getCellByColumnAndRow(79, $row)->getValue());
+                    $pbf_apoteker_no_sipa = trim($worksheet->getCellByColumnAndRow(80, $row)->getValue());
+                    $pbf_apoteker_no_ktp = trim($worksheet->getCellByColumnAndRow(81, $row)->getValue());
+                    $pbf_apoteker_nama = trim($worksheet->getCellByColumnAndRow(82, $row)->getValue());
+                    $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
+                    $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
+
+                    if($nama_site == "" || $spot_id == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "") {
+                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
+                        redirect('bridging/mmm_palopo','refresh');
+                    }
+
+                    $data = [
+                        "kategori"    => $kategori,
+                        "nama_site"   => $nama_site,
+                        "regional"    => $regional,
+                        "customer_id" => $customer_id,
+                        "mapping_uli" => $mapping_uli,
+                        "mapping_nd6" => $mapping_nd6,
+                        "mapping_warung_pintar" => $mapping_warung_pintar,
+                        "mapping_pbf" => $mapping_pbf,
+                        "prefix" => $prefix,
+                        "nama_customer" => $nama_customer,
+                        "alamat" => $alamat,
+                        "tipe_bayar" => $tipe_bayar,
+                        "top" => $top,
+                        "status_konsinyasi" => $status_konsinyasi,
+                        "status_fuguh" => $status_fuguh,
+                        "kelurahan_id" => $kelurahan_id,
+                        "nama_kelurahan" => $nama_kelurahan,
+                        "kecamatan_id" => $kecamatan_id,
+                        "nama_kecamatan" => $nama_kecamatan,
+                        "kota_id" => $kota_id,
+                        "nama_kota" => $nama_kota,
+                        "propinsi_id" => $propinsi_id,
+                        "nama_propinsi" => $nama_propinsi,
+                        "kode_pos" => $kode_pos,
+                        "telp" => $telp,
+                        "fax" => $fax,
+                        "email" => $email,
+                        "head_office_id" => $head_office_id,
+                        "nama_head_office" => $nama_head_office,
+                        "company_id" => $company_id,
+                        "nama_company" => $nama_company,
+                        "branch_id" => $branch_id,
+                        "nama_branch_office" => $nama_branch_office,
+                        "site_id" => $site_id,
+                        "segment_id" => $segment_id,
+                        "nama_segment" => $nama_segment,
+                        "type_id" => $type_id,
+                        "nama_type" => $nama_type,
+                        "class_id" => $kodesalur,
+                        "class" => $namasalur,
+                        "spot_id" => $spot_id,
+                        "no_ktp" => $no_ktp,
+                        "kartu_keluarga" => $kartu_keluarga,
+                        "pln" => $pln,
+                        "nama_penghubung" => $nama_penghubung,
+                        "alamat_penghubung" => $alamat_penghubung,
+                        "telp_penghubung" => $telp_penghubung,
+                        "hubungan" => $hubungan,
+                        "latitude" => $latitude,
+                        "longitude" => $longitude,
+                        "member" => $member,
+                        "black_list" => $black_list,
+                        "aktif" => $aktif,
+                        "show_alamat_pkp" => $show_alamat_pkp,
+                        "data_create" => $data_create,
+                        "pbf_izin_no_tdp_tgl" => $pbf_izin_no_tdp_tgl,
+                        "pbf_izin_no_tdp" => $pbf_izin_no_tdp_no,
+                        "pbf_izin_no_siup_tgl" => $pbf_izin_no_siup_tgl,
+                        "pbf_izin_no_siup" => $pbf_izin_no_siup,
+                        "pbf_izin_no_sito_tgl" => $pbf_izin_no_sito_tgl,
+                        "pbf_izin_no_sito" => $pbf_izin_no_sito,
+                        "pbf_izin_no_sipa_tgl" => $pbf_izin_no_sipa_tgl,
+                        "pbf_izin_no_sipa" => $pbf_izin_no_sipa,
+                        "pbf_izin_no_cdob_tgl" => $pbf_izin_no_cdob_tgl,
+                        "pbf_izin_no_cdob" => $pbf_izin_no_cdob,
+                        "pbf_asis_apoteker_tgl_sipa" => $pbf_asis_apoteker_tgl_sipa,
+                        "pbf_asis_apoteker_tgl_lahir" => $pbf_asis_apoteker_tgl_lahir,
+                        "pbf_asis_apoteker_telpon" => $pbf_asis_apoteker_telpon,
+                        "pbf_asis_apoteker_no_sipa" => $pbf_asis_apoteker_no_sipa,
+                        "pbf_asis_apoteker_no_ktp" => $pbf_asis_apoteker_no_ktp,
+                        "pbf_asis_apoteker_email" => $pbf_asis_apoteker_email,
+                        "pbf_asis_apoteker_nama" => $pbf_asis_apoteker_nama,
+                        "pbf_asis_apoteker_alamat" => $pbf_asis_apoteker_alamat,
+                        "pbf_apoteker_tgl_sipa" => $pbf_apoteker_tgl_sipa,
+                        "pbf_apoteker_tgl_lahir" => $pbf_apoteker_tgl_lahir,
+                        "pbf_apoteker_telpon" => $pbf_apoteker_telpon,
+                        "pbf_apoteker_no_sipa" => $pbf_apoteker_no_sipa,
+                        "pbf_apoteker_no_ktp" => $pbf_apoteker_no_ktp,
+                        "pbf_apoteker_nama" => $pbf_apoteker_nama,
+                        "pbf_apoteker_alamat" => $pbf_apoteker_alamat,
+                        "pbf_apoteker_email" => $pbf_apoteker_email,
+                        "is_valid_type_id" => $is_valid_type_id,
+                        "is_valid_class_id" => $is_valid_class_id                 
+                    ];
+
+                    $insert = $this->model_bridging->insert_mmm_palopo_import_customer($data);
+                }
+            }
+        }else
+        {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+            // redirect('bridging/mmm_palopo','refresh');
+        };
+
+        $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
+        redirect('bridging/result_mmm_palopo_customer','refresh');
+    }
+
+    public function download_template_mmm_palopo_customer()
+    {
+        $query = "
+            select 	kategori,
+                    nama_site,
+                    regional,
+                    customer_id,
+                    mapping_uli,
+                    mapping_nd6,
+                    mapping_warung_pintar,
+                    mapping_pbf,
+                    prefix,
+                    nama_customer,
+                    alamat,
+                    tipe_bayar,
+                    top,
+                    status_konsinyasi,
+                    status_fuguh,
+                    kelurahan_id,
+                    nama_kelurahan,
+                    kecamatan_id,
+                    nama_kecamatan,
+                    kota_id,
+                    nama_kota,
+                    propinsi_id,
+                    nama_propinsi,
+                    kode_pos,
+                    telp,
+                    fax,
+                    email,
+                    head_office_id,
+                    nama_head_office,
+                    company_id,
+                    nama_company,
+                    branch_id,
+                    nama_branch_office,
+                    site_id,
+                    segment_id,
+                    nama_segment, 
+                    type_id,
+                    nama_type,
+                    class_id,
+                    class,
+                    spot_id,
+                    no_ktp,
+                    kartu_keluarga,
+                    pln,
+                    nama_penghubung,
+                    alamat_penghubung,
+                    telp_penghubung,
+                    hubungan,
+                    latitude,
+                    longitude,
+                    member,
+                    black_list,
+                    aktif,
+                    show_alamat_pkp,
+                    data_create,
+                    pbf_izin_no_tdp_tgl,
+                    pbf_izin_no_tdp,
+                    pbf_izin_no_siup_tgl,
+                    pbf_izin_no_siup,
+                    pbf_izin_no_sito_tgl,
+                    pbf_izin_no_sito,
+                    pbf_izin_no_sipa_tgl,
+                    pbf_izin_no_sipa,
+                    pbf_izin_no_sia_tgl,
+                    pbf_izin_no_sia,
+                    pbf_izin_no_nib_tgl,
+                    pbf_izin_no_nib,
+                    pbf_izin_no_cdob_tgl,
+                    pbf_izin_no_cdob,
+                    pbf_asis_apoteker_tgl_sipa,
+                    pbf_asis_apoteker_tgl_lahir,
+                    pbf_asis_apoteker_telpon,
+                    pbf_asis_apoteker_no_sipa,
+                    pbf_asis_apoteker_no_ktp,
+                    pbf_asis_apoteker_email,
+                    pbf_asis_apoteker_nama,
+                    pbf_asis_apoteker_alamat,
+                    pbf_apoteker_tgl_sipa,
+                    pbf_apoteker_tgl_lahir,
+                    pbf_apoteker_telpon,
+                    pbf_apoteker_no_sipa,
+                    pbf_apoteker_no_ktp,
+                    pbf_apoteker_nama,
+                    pbf_apoteker_alamat,
+                    pbf_apoteker_email
+        from site.bridging_mmm_palopo_import_customer a
+        ";
+
+        $hasil = $this->db->query($query);   
+    
+        $this->excel_generator->set_query($hasil);
+
+        $this->excel_generator->set_header(array
+        (
+            'kategori',
+            'nama_site',
+            'regional',
+            'customer_id',
+            'mapping_uli',
+            'mapping_nd6',
+            'mapping_warung_pintar',
+            'mapping_pbf',
+            'prefix',
+            'nama_customer',
+            'alamat',
+            'tipe_bayar',
+            'top',
+            'status_konsinyasi',
+            'status_fuguh',
+            'kelurahan_id',
+            'nama_kelurahan',
+            'kecamatan_id',
+            'nama_kecamatan',
+            'kota_id',
+            'nama_kota',
+            'propinsi_id',
+            'nama_propinsi',
+            'kode_pos',
+            'telp',
+            'fax',
+            'email',
+            'head_office_id',
+            'nama_head_office',
+            'company_id',
+            'nama_company',
+            'branch_id',
+            'nama_branch_office',
+            'site_id',
+            'segment_id',
+            'nama_segment', 
+            'type_id',
+            'nama_type',
+            'class_id',
+            'class',
+            'spot_id',
+            'no_ktp',
+            'kartu_keluarga',
+            'pln',
+            'nama_penghubung',
+            'alamat_penghubung',
+            'telp_penghubung',
+            'hubungan',
+            'latitude',
+            'longitude',
+            'member',
+            'black_list',
+            'aktif',
+            'show_alamat_pkp',
+            'data_create',
+            'pbf_izin_no_tdp_tgl',
+            'pbf_izin_no_tdp',
+            'pbf_izin_no_siup_tgl',
+            'pbf_izin_no_siup',
+            'pbf_izin_no_sito_tgl',
+            'pbf_izin_no_sito',
+            'pbf_izin_no_sipa_tgl',
+            'pbf_izin_no_sipa',
+            'pbf_izin_no_sia_tgl',
+            'pbf_izin_no_sia',
+            'pbf_izin_no_nib_tgl',
+            'pbf_izin_no_nib',
+            'pbf_izin_no_cdob_tgl',
+            'pbf_izin_no_cdob',
+            'pbf_asis_apoteker_tgl_sipa',
+            'pbf_asis_apoteker_tgl_lahir',
+            'pbf_asis_apoteker_telpon',
+            'pbf_asis_apoteker_no_sipa',
+            'pbf_asis_apoteker_no_ktp',
+            'pbf_asis_apoteker_email',
+            'pbf_asis_apoteker_nama',
+            'pbf_asis_apoteker_alamat',
+            'pbf_apoteker_tgl_sipa',
+            'pbf_apoteker_tgl_lahir',
+            'pbf_apoteker_telpon',
+            'pbf_apoteker_no_sipa',
+            'pbf_apoteker_no_ktp',
+            'pbf_apoteker_nama',
+            'pbf_apoteker_alamat',
+            'pbf_apoteker_email'
+        ));
+        $this->excel_generator->set_column(array
+        ( 
+            'kategori',
+            'nama_site',
+            'regional',
+            'customer_id',
+            'mapping_uli',
+            'mapping_nd6',
+            'mapping_warung_pintar',
+            'mapping_pbf',
+            'prefix',
+            'nama_customer',
+            'alamat',
+            'tipe_bayar',
+            'top',
+            'status_konsinyasi',
+            'status_fuguh',
+            'kelurahan_id',
+            'nama_kelurahan',
+            'kecamatan_id',
+            'nama_kecamatan',
+            'kota_id',
+            'nama_kota',
+            'propinsi_id',
+            'nama_propinsi',
+            'kode_pos',
+            'telp',
+            'fax',
+            'email',
+            'head_office_id',
+            'nama_head_office',
+            'company_id',
+            'nama_company',
+            'branch_id',
+            'nama_branch_office',
+            'site_id',
+            'segment_id',
+            'nama_segment', 
+            'type_id',
+            'nama_type',
+            'class_id',
+            'class',
+            'spot_id',
+            'no_ktp',
+            'kartu_keluarga',
+            'pln',
+            'nama_penghubung',
+            'alamat_penghubung',
+            'telp_penghubung',
+            'hubungan',
+            'latitude',
+            'longitude',
+            'member',
+            'black_list',
+            'aktif',
+            'show_alamat_pkp',
+            'data_create',
+            'pbf_izin_no_tdp_tgl',
+            'pbf_izin_no_tdp',
+            'pbf_izin_no_siup_tgl',
+            'pbf_izin_no_siup',
+            'pbf_izin_no_sito_tgl',
+            'pbf_izin_no_sito',
+            'pbf_izin_no_sipa_tgl',
+            'pbf_izin_no_sipa',
+            'pbf_izin_no_sia_tgl',
+            'pbf_izin_no_sia',
+            'pbf_izin_no_nib_tgl',
+            'pbf_izin_no_nib',
+            'pbf_izin_no_cdob_tgl',
+            'pbf_izin_no_cdob',
+            'pbf_asis_apoteker_tgl_sipa',
+            'pbf_asis_apoteker_tgl_lahir',
+            'pbf_asis_apoteker_telpon',
+            'pbf_asis_apoteker_no_sipa',
+            'pbf_asis_apoteker_no_ktp',
+            'pbf_asis_apoteker_email',
+            'pbf_asis_apoteker_nama',
+            'pbf_asis_apoteker_alamat',
+            'pbf_apoteker_tgl_sipa',
+            'pbf_apoteker_tgl_lahir',
+            'pbf_apoteker_telpon',
+            'pbf_apoteker_no_sipa',
+            'pbf_apoteker_no_ktp',
+            'pbf_apoteker_nama',
+            'pbf_apoteker_alamat',
+            'pbf_apoteker_email'  
+        ));
+        $this->excel_generator->set_width(array(10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10)); 
+        $this->excel_generator->exportTo2007('Download Template mmm_palopo Customer'); 
+    }
+
+    public function result_mmm_palopo_customer()
+    {
+        $data = [
+            "title" => "Result Bridging mmm_palopo Customer",
+            'url'   => 'bridging/mmm_palopo_submit_customer',
+            'get_data' => $this->model_bridging->get_mmm_palopo_import_customer(),
+            'get_summary' => $this->model_bridging->get_mmm_palopo_import_customer_summary(),
+        ];
+        // $this->view($data, false, "result_mmm_palopo_customer");
+        $this->render('bridging/result_mmm_palopo_customer', $data);
+    }
+
+    public function submit_mmm_palopo()
+    {
+        $id_bridging_log = $this->input->post('id_bridging_log');
+        // echo  $id_bridging_log; die;
+
+        $get_data_log = $this->model_bridging->get_bridging_log($id_bridging_log);
+        if($get_data_log->num_rows() > 0)
+        {
+            $site_code = $get_data_log->row()->site_code;
+            $kode_comp = substr($site_code, 0, 3);
+            $nocab = substr($site_code, 3, 2);
+
+            $bulan = $get_data_log->row()->bulan;
+
+            $tahun_upload = substr($bulan, 0, 4);
+            $bulan_upload = substr($bulan, 5, 2);
+        }
+
+        $get_userid = $this->model_bridging->get_userid_by_kode_comp($kode_comp);
+        if($get_userid->num_rows() > 0)
+        {
+            $userid = $get_userid->row()->id;
+        }else{
+            $this->session->set_flashdata("pesan", "gagal mendapatkan userid, ".$this->upload->display_errors());
+            redirect('bridging/mmm_palopo','refresh');
+        }
+
+        $get_last_upload = $this->model_bridging->get_mpm_upload_where_closing_by_userid($userid);
+        if($get_last_upload->num_rows() > 0)
+        {
+            $tahun_last_upload = $get_last_upload->row()->tahun;
+            $bulan_last_upload = $get_last_upload->row()->bulan;
+        }   
+
+        // die;
+
+        if ($tahun_upload < $tahun_last_upload || ($tahun_upload == $tahun_last_upload && $bulan_upload <= $bulan_last_upload)) {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, tahun dan bulan lebih kecil dari tahun dan bulan terakhir diupload");
+            redirect('bridging/mmm_palopo','refresh');
+        } 
+
+        $delete_fi = $this->model_bridging->delete_fi_mmm_palopo($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $delete_ri = $this->model_bridging->delete_ri_mmm_palopo($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        
+        $proses_fi = $this->model_bridging->insert_fi_mmm_palopo($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $proses_fi = $this->model_bridging->insert_fi_mmm_palopo_bonus($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $proses_ri = $this->model_bridging->insert_ri_mmm_palopo($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+
+        $delete_tblang = $this->model_bridging->delete_tblang_mmm_palopo($tahun_upload, $nocab);
+        $delete_tabsales = $this->model_bridging->delete_tabsales_mmm_palopo($tahun_upload, $nocab);
+        // $delete_tbkota = $this->model_bridging->delete_tbkota_mmm_palopo($tahun_upload, $nocab);
+
+        $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
+        $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
+        // $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
+
+
+        // update bridging_log
+        $get_data_result = $this->model_bridging->get_result($site_code, $tahun_upload, $bulan_upload);
+        if($get_data_result->num_rows() > 0)
+        {
+            $total_unit = $get_data_result->row()->total_unit;
+            $total_value = $get_data_result->row()->total_value;
+        }else{
+            $total_unit = 0;
+            $total_value = 0;            
+        }
+
+        $insert_upload = [
+            "userid"        => $userid,
+            "lastupload"    => $this->model_outlet_transaksi->timezone(),
+            "tanggal"       => date('d', strtotime($this->model_outlet_transaksi->timezone())),
+            "filename"      => "",
+            "omzet"         => $total_value,
+            "status"        => 1,
+            "tahun"         => $tahun_upload,
+            "bulan"         => $bulan_upload,
+            "status_closing" => 0
+        ];
+        $id_upload = $this->model_bridging->insert_upload($insert_upload);
+
+        $update_bridging = [
+            'sum_omzet' => $total_value,
+            'sum_unit' => $total_unit,
+            'id_upload' => $id_upload
+        ];
+        $this->model_bridging->update_bridging_log($update_bridging, $id_bridging_log);
+
+        $this->session->set_flashdata("pesan_result_success", "proses upload success");
+        redirect('bridging/mmm_palopo','refresh');
+        
+    }
+
+
+/// BULUKUMBA ///
+     public function mmm_bulukumba()
+    {
+        $site_code = 'BULE5';
+        $cek_hak = $this->model_bridging->get_bridging_hak_akses_by_site_code_userid($site_code, $this->userid)->row();
+        if(!$cek_hak) {
+            $this->session->set_flashdata("pesan", "user anda tidak diijinkan mengakses halaman ini");
+            redirect('bridging/dashboard','refresh');
+        }
+
+        // cek antrian upload data dan raw data
+        $proses = $this->model_bridging->get_temp_portal_akses()->row()->proses;
+        $status_antrian = $this->model_bridging->get_temp_portal_akses()->row()->status;
+        if ($status_antrian == '1') {
+            $this->session->set_flashdata("pesan", "Mohon menunggu sedang ada antrian proses $proses, Terima Kasih");
+            redirect('bridging');
+        }
+
+        $data = [
+            "title" => "Bridging mmm_bulukumba Sales",
+            "title_customer" => "Bridging Customer mmm_bulukumba (Outlet)",
+            'url'   => 'bridging/mmm_bulukumba_import',
+            'url_customer'   => 'bridging/mmm_bulukumba_import_customer',
+            'bridging'  => "mmm_bulukumba",
+            'get_bridging_log'  => $this->model_bridging->get_bridging_log_by_site_code($site_code)
+        ];
+        // $this->view($data, false, "mmm_bulukumba");
+        $this->render('bridging/mmm_bulukumba', $data);
+    }
+
+    public function mmm_bulukumba_import()
+    {
+        $month = $this->input->post('month');
+        $bulan = explode('-', $month)[1];
+        $tahun = explode('-', $month)[0];
+
+        $newDate_sebelumnya = date('Y-m', strtotime($month. ' -1 months')); // mencari periode -1 bulan sebelumnya
+        $tahun_sebelumnya = explode('-', $newDate_sebelumnya)[0];
+        $bulan_sebelumnya = explode('-', $newDate_sebelumnya)[1];
+
+        // cek data apakah bulan sebelumnya sudah closing bulanan atau belum
+        $get_mpm_user = $this->model_bridging->get_mpm_user('BUL');
+        $userid = $get_mpm_user->row()->id;
+
+        $get_mpm_upload_bulan_lalu = $this->model_bridging->get_mpm_upload($userid, $bulan_sebelumnya, $tahun_sebelumnya, '1');
+        if ($get_mpm_upload_bulan_lalu->num_rows() > 0) {
+            $status_closing_bulan_lalu = $get_mpm_upload_bulan_lalu->row()->status_closing;
+        } else {
+            $status_closing_bulan_lalu = null; // atau default value lain seperti 0 atau ''
+        }
+
+        if ($status_closing_bulan_lalu == null) {
+            $this->session->set_flashdata("pesan", "upload file gagal, data bulan sebelumnya belum di closing! silahkan upload data closing terlebih dahulu");
+            redirect('bridging/mmm_bulukumba','refresh');
+        }
+
+        // cek data apakah sudah closing bulanan atau belum
+        $get_mpm_uplaod = $this->model_bridging->get_mpm_upload($userid, $bulan, $tahun, '');
+
+        if ($get_mpm_uplaod->num_rows() > 0) {
+            $status_closing = $get_mpm_uplaod->row()->status_closing;
+        } else {
+            $status_closing = null; // atau default value lain seperti 0 atau ''
+        }
+        
+        if ($status_closing == '1') {
+            $this->session->set_flashdata("pesan", "upload file gagal, data sudah di closing! silahkan hubungi IT");
+            redirect('bridging/mmm_bulukumba','refresh');
+        }
+
+        // create table
+        $create = $this->model_bridging->create_table_mmm_bulukumba_import();
+        if(!$create) {
+            $this->session->set_flashdata("pesan", "gagal membuat table bridging_mmm_bulukumba_import");
+            redirect('bridging/mmm_bulukumba','refresh');
+        }
+
+        // inisialisasi upload
+        $init_upload = $this->attachment_config('mmm_bulukumba', '');        
+        if ($this->upload->do_upload('file')) 
+        {
+            $upload_data = $this->upload->data();
+            $filename_excel = $upload_data['file_name'];
+
+            $this->load->library('excel');
+            $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/mmm_bulukumba/$filename_excel");
+
+            $jumlahSheet = $object->getSheetCount();
+            if ($jumlahSheet > 1) {
+                echo "jumlah_sheet : ".$jumlahSheet;
+                echo "<script>alert('upload file gagal karena file mempunyai lebih dari 1 sheet'); </script>";
+                redirect('bridging/mmm_bulukumba','refresh');
+            }
+
+            $highestColumm = $object->setActiveSheetIndex(0)->getHighestColumn();
+            // var_dump($highestColumm);die;
+            if ($highestColumm != 'BT') {
+                echo "<script>alert('upload file gagal karena column tidak sesuai'); </script>";
+                redirect('bridging/mmm_bulukumba','refresh');
+            }
+
+            $input_log_data = [
+                "site_code" => "BULE5",
+                "bulan" => $month,
+                "filename"  => $filename_excel,
+                "signature" => md5("BULE5".$month.$this->model_outlet_transaksi->timezone()),
+                "created_at" => $this->model_outlet_transaksi->timezone(),
+                "created_by" => $this->session->userdata('id'),
+            ];
+
+            $id_log = $this->model_bridging->input_bridging_log($input_log_data);
+
+            foreach ($object->getWorksheetIterator() as $worksheet) 
+            {
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+
+                if ($highestRow > 5000) {
+                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 1000 ROW.");
+                    redirect('bridging/mmm_bulukumba','refresh');
+                }
+
+                if ($highestRow <= 1) {
+                    $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+                    redirect('bridging/mmm_bulukumba','refresh');
+                }
+
+                for ($row = 2; $row <= $highestRow; $row++) 
+                {   
+                    $distributor    = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+                    $cabang         = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
+                    $tipetrans      = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                    $divisi         = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());
+                    $principal      = trim($worksheet->getCellByColumnAndRow(4, $row)->getValue());
+                    $productgroup1  = trim($worksheet->getCellByColumnAndRow(5, $row)->getValue());
+                    $productgroup2  = trim($worksheet->getCellByColumnAndRow(6, $row)->getValue());
+                    $productgroup3  = trim($worksheet->getCellByColumnAndRow(7, $row)->getValue());
+                    $brand          = trim($worksheet->getCellByColumnAndRow(8, $row)->getValue());
+                    $kodeproduk     = trim($worksheet->getCellByColumnAndRow(9, $row)->getValue());
+                    $kodevarian     = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
+                    
+                    // cek kodeproduk mpm
+                    $kodeprodukprincipal = (strlen($temp = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue())) == 5) ? '0' . $temp : $temp;
+                    // echo $kodeprodukprincipal;
+                    // echo '</br>';
+
+                    $get_kodeprod = $this->model_bridging->get_master_product_by_kodeprod($kodeprodukprincipal);
+                    if($get_kodeprod->num_rows() > 0) {
+                        $is_valid_kodeprod = 1;
+                    }else{
+                        $is_valid_kodeprod = 0;
+                    }
+
+                    $namaproduk    = trim($worksheet->getCellByColumnAndRow(12, $row)->getValue());
+                    $packaging    = trim($worksheet->getCellByColumnAndRow(13, $row)->getValue());
+                    $productclass = trim($worksheet->getCellByColumnAndRow(14, $row)->getValue());
+                    $kodecustomer= trim($worksheet->getCellByColumnAndRow(15, $row)->getValue());
+
+                    // cek kodecustomer 
+                    $cek_customer = $this->model_bridging->get_mmm_bulukumba_customer($kodecustomer);
+                    if($cek_customer->num_rows() > 0) {
+                        $is_valid_customer = 1;
+                    }else{
+                        $is_valid_customer = 0;
+                    }
+
+                    $namacustomer = trim($worksheet->getCellByColumnAndRow(16, $row)->getValue());
+                    $alamatcustomer = trim($worksheet->getCellByColumnAndRow(17, $row)->getValue());
+                    $area = trim($worksheet->getCellByColumnAndRow(18, $row)->getValue());
+                    $subarea = trim($worksheet->getCellByColumnAndRow(19, $row)->getValue());
+                    $channel = trim($worksheet->getCellByColumnAndRow(20, $row)->getValue());
+                    $subchannel = trim($worksheet->getCellByColumnAndRow(21, $row)->getValue());
+                    $customergroup = trim($worksheet->getCellByColumnAndRow(22, $row)->getValue());
+                    $keyaccount= trim($worksheet->getCellByColumnAndRow(23, $row)->getValue());
+                    $kodesalesman = trim($worksheet->getCellByColumnAndRow(24, $row)->getValue());
+                    $namasalesman = trim($worksheet->getCellByColumnAndRow(25, $row)->getValue());
+                    $kodesalesco = trim($worksheet->getCellByColumnAndRow(26, $row)->getValue());
+                    $namasalesco = trim($worksheet->getCellByColumnAndRow(27, $row)->getValue());
+                    $kodespv = trim($worksheet->getCellByColumnAndRow(28, $row)->getValue());
+                    $namaspv = trim($worksheet->getCellByColumnAndRow(29, $row)->getValue());
+                    $tahunbulan = trim($worksheet->getCellByColumnAndRow(30, $row)->getValue());
+                    $bulan = trim($worksheet->getCellByColumnAndRow(31, $row)->getValue());
+                    
+                    // cek tanggal
+                    $cell = $worksheet->getCellByColumnAndRow(32, $row);
+                    $cellValue = $cell->getValue();
+
+                    // echo $cellValue; echo '<br>';
+                    $is_valid_tanggal = 1; // Nilai default valid
+
+                    if (is_numeric($cellValue)) {
+                        // echo "numeric: " . $cellValue . "<br>";die;
+                        $unixTimestamp = ($cellValue - 25569) * 86400; // 25569 is days between 1900-01-01 and 1970-01-01
+                        $tanggal = date('Y-m-d', $unixTimestamp); // Format as needed
+                        // Ekstrak tahun-bulan dari $tanggal untuk perbandingan
+                        $tanggal_ym = date('Y-m', $unixTimestamp);
+                        // Bandingkan dengan $month
+                        if ($tanggal_ym !== $month) {
+                            $is_valid_tanggal = 0; // Tandai sebagai tidak valid jika bulan berbeda
+                        }
+                    } else {
+                        // echo "string: " . $cellValue . "<br>";die;
+                        $tanggal = $cellValue;
+
+                        $formats = ['d/m/Y', 'd-m-Y', 'Y-m-d'];
+                        $dateObj = false;
+
+                        foreach ($formats as $format) {
+                            $dateObj = DateTime::createFromFormat($format, $tanggal);
+                            if ($dateObj !== false) {
+                                break;
+                            }
+                        }
+
+                        if ($dateObj !== false) {
+
+                            $tanggal = $dateObj->format('Y-m-d');
+                            $tanggal_ym = $dateObj->format('Y-m');
+
+                            if ($tanggal_ym !== $month) {
+                                $is_valid_tanggal = 0;
+                            }
+
+                        } else {
+                            $is_valid_tanggal = 0;
+                        }
+                    }
+                    
+                    $weekno = trim($worksheet->getCellByColumnAndRow(33, $row)->getValue());
+                    $nomornota = trim($worksheet->getCellByColumnAndRow(34, $row)->getValue());
+                    $salesmethod = trim($worksheet->getCellByColumnAndRow(35, $row)->getValue());
+                    $sellingtype = trim($worksheet->getCellByColumnAndRow(36, $row)->getValue());
+                    $qtysold        = trim($worksheet->getCellByColumnAndRow(37, $row)->getValue());
+                    $kartonutuh     = trim($worksheet->getCellByColumnAndRow(38, $row)->getValue());
+                    $qtysoldpcs     = trim($worksheet->getCellByColumnAndRow(39, $row)->getValue());
+                    $freegoodpcs    = trim($worksheet->getCellByColumnAndRow(40, $row)->getValue());
+
+                    $tonnage        = trim($worksheet->getCellByColumnAndRow(41, $row)->getValue());
+                    $volume_ltr     = trim($worksheet->getCellByColumnAndRow(42, $row)->getValue());
+                    $grossamount    = trim($worksheet->getCellByColumnAndRow(43, $row)->getValue());
+
+                    $linediscount1  = trim($worksheet->getCellByColumnAndRow(44, $row)->getValue());
+                    $linediscount2  = trim($worksheet->getCellByColumnAndRow(45, $row)->getValue());
+                    $linediscount3  = trim($worksheet->getCellByColumnAndRow(46, $row)->getValue());
+                    $linediscount4  = trim($worksheet->getCellByColumnAndRow(47, $row)->getValue());
+                    $linediscount5  = trim($worksheet->getCellByColumnAndRow(48, $row)->getValue());
+                    $totallinediscount = trim($worksheet->getCellByColumnAndRow(49, $row)->getValue());
+
+                    $discountnota1  = trim($worksheet->getCellByColumnAndRow(50, $row)->getValue());
+                    $discountnota2  = trim($worksheet->getCellByColumnAndRow(51, $row)->getValue());
+                    $discountnota3  = trim($worksheet->getCellByColumnAndRow(52, $row)->getValue());
+                    $totaldiscountnota = trim($worksheet->getCellByColumnAndRow(53, $row)->getValue());
+
+                    $dpp            = trim($worksheet->getCellByColumnAndRow(54, $row)->getValue());
+                    $ppn            = trim($worksheet->getCellByColumnAndRow(55, $row)->getValue());
+                    $ppnbm          = trim($worksheet->getCellByColumnAndRow(56, $row)->getValue());
+                    $tax3           = trim($worksheet->getCellByColumnAndRow(57, $row)->getValue());
+                    $netamount      = trim($worksheet->getCellByColumnAndRow(58, $row)->getValue());
+
+                    $warehouse      = trim($worksheet->getCellByColumnAndRow(59, $row)->getValue());
+                    $customerpo     = trim($worksheet->getCellByColumnAndRow(60, $row)->getValue());
+                    $customerjoindate = trim($worksheet->getCellByColumnAndRow(61, $row)->getValue());
+                    $nofakturpajak  = trim($worksheet->getCellByColumnAndRow(62, $row)->getValue());
+                    $tglfakturpajak = trim($worksheet->getCellByColumnAndRow(63, $row)->getValue());
+                    $nomorfakturproforma = trim($worksheet->getCellByColumnAndRow(64, $row)->getValue());
+                    $tglfakturproforma = trim($worksheet->getCellByColumnAndRow(65, $row)->getValue());
+
+                    $cogs               = trim($worksheet->getCellByColumnAndRow(66, $row)->getValue());
+                    $case_weight_kg     = trim($worksheet->getCellByColumnAndRow(67, $row)->getValue());
+                    $tslqtysoldnfg      = trim($worksheet->getCellByColumnAndRow(68, $row)->getValue());
+                    $tslconvpcstoctn    = trim($worksheet->getCellByColumnAndRow(69, $row)->getValue());
+                    $tsltonnagesoldfg   = trim($worksheet->getCellByColumnAndRow(70, $row)->getValue());
+                    $end                = trim($worksheet->getCellByColumnAndRow(71, $row)->getValue());
+
+                    $data = [
+                        'distributor'        => $distributor,
+                        'cabang'             => $cabang,
+                        'tipetrans'          => $tipetrans,
+                        'divisi'             => $divisi,
+                        'principal'          => $principal,
+                        'productgroup1'      => $productgroup1,
+                        'productgroup2'      => $productgroup2,
+                        'productgroup3'      => $productgroup3,
+                        'brand'              => $brand,
+                        'kodeproduk'         => $kodeproduk,
+                        'kodevarian'         => $kodevarian,
+                        'kodeprodukprincipal'=> $kodeprodukprincipal,
+                        'namaproduk'         => $namaproduk,
+                        'packaging'          => $packaging,
+                        'productclass'       => $productclass,
+                        'kodecustomer'       => $kodecustomer,
+                        'namacustomer'       => $namacustomer,
+                        'alamatcustomer'     => $alamatcustomer,
+                        'area'               => $area,
+                        'subarea'            => $subarea,
+                        'channel'            => $channel,
+                        'subchannel'         => $subchannel,
+                        'customergroup'      => $customergroup,
+                        'keyaccount'         => $keyaccount,
+                        'kodesalesman'       => $kodesalesman,
+                        'namasalesman'       => $namasalesman,
+                        'kodesalesco'        => $kodesalesco,
+                        'namasalesco'        => $namasalesco,
+                        'kodespv'            => $kodespv,
+                        'namaspv'            => $namaspv,
+                        'tahunbulan'         => $tahunbulan,
+                        'bulan'              => $bulan,
+                        'tanggal'            => $tanggal,
+                        'weekno'             => $weekno,
+                        'nomornota'          => $nomornota,
+                        'salesmethod'        => $salesmethod,
+                        'sellingtype'        => $sellingtype,
+                        'qtysold'            => $qtysold,
+                        'kartonutuh'         => $kartonutuh,
+                        'qtysoldpcs'         => $qtysoldpcs,
+                        'freegoodpcs'        => $freegoodpcs,
+                        'tonnage'            => $tonnage,
+                        'volume_ltr'         => $volume_ltr,
+                        'grossamount'        => $grossamount,
+                        'linediscount1'      => $linediscount1,
+                        'linediscount2'      => $linediscount2,
+                        'linediscount3'      => $linediscount3,
+                        'linediscount4'      => $linediscount4,
+                        'linediscount5'      => $linediscount5,
+                        'totallinediscount'  => $totallinediscount,
+                        'discountnota1'      => $discountnota1,
+                        'discountnota2'      => $discountnota2,
+                        'discountnota3'      => $discountnota3,
+                        'totaldiscountnota'  => $totaldiscountnota,
+                        'dpp'                => $dpp,
+                        'ppn'                => $ppn,
+                        'ppnbm'              => $ppnbm,
+                        'tax3'               => $tax3,
+                        'netamount'          => $netamount,
+                        'warehouse'          => $warehouse,
+                        'customerpo'         => $customerpo,
+                        'customerjoindate'   => $customerjoindate,
+                        'nofakturpajak'      => $nofakturpajak,
+                        'tanggalfakturpajak' => $tglfakturpajak,
+                        'nomorfakturproforma'=> $nomorfakturproforma,
+                        'tanggalfakturproforma'=> $tglfakturproforma,
+                        'cogs'               => $cogs,
+                        'case_weight_kg'     => $case_weight_kg,
+                        'tslqtysoldnfg'      => $tslqtysoldnfg,
+                        'tslconvpcstoctn'    => $tslconvpcstoctn,
+                        'tsltonnagesoldfg'   => $tsltonnagesoldfg,
+                        'end'                => $end,
+                        'is_valid_kodeprod'  => $is_valid_kodeprod,
+                        'is_valid_tanggal'   => $is_valid_tanggal,
+                        'is_valid_customer'  => $is_valid_customer,
+                        'id_bridging_log'    => $id_log
+                    ];
+
+                    $insert = $this->model_bridging->insert_mmm_bulukumba_import($data);
+                }
+            }
+            // echo "<pre>"; print_r($data); echo "</pre>"; die;
+            // echo "tanggal : ".$tanggal." - is_valid_tanggal : ".$is_valid_tanggal; die;
+        }else
+        {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+            redirect('bridging/mmm_bulukumba','refresh');
+        };
+
+        $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
+        redirect('bridging/preview_mmm_bulukumba','refresh');
+    }
+
+    public function preview_mmm_bulukumba()
+    {
+        $get_data = $this->model_bridging->get_mmm_bulukumba_import();
+        $id_bridging_log = $get_data->row()->id_bridging_log; 
+        // echo "id_bridging_log : ".$id_bridging_log; die;
+
+        $is_invalid = $this->model_bridging->get_mmm_bulukumba_import_where_is_valid_false();
+        if($is_invalid->num_rows() > 0)
+        {
+            // echo "is_invalid : ".$is_invalid->num_rows();die;
+            $params_invalid = 1;
+        }else{
+            $params_invalid = 0;
+        }
+
+        $data = [
+            "title"         => "Preview Bridging mmm_bulukumba",
+            'url'           => 'bridging/submit_mmm_bulukumba',
+            'get_data'      => $get_data,
+            'id_bridging_log'   => $id_bridging_log,
+            'get_summary'   => $this->model_bridging->get_mmm_bulukumba_import_summary(),
+            'params_invalid' => $params_invalid
+        ];
+        // $this->view($data, false, "preview_mmm_bulukumba");
+        $this->render('bridging/preview_mmm_bulukumba', $data);
+    }
+
+    public function download_template_mmm_bulukumba()
+    {
+        $query = "
+            select 	'' as distributor,
+                    '' as cabang,
+                    '' as tipetrans,
+                    '' as divisi,
+                    '' as principal,
+                    '' as productgroup1,
+                    '' as productgroup2,
+                    '' as productgroup3,
+                    '' as brand,
+                    '' as kodeproduk,
+                    '' as kodevarian,
+                    '' as kodeprodukprincipal,
+                    '' as namaproduk,
+                    '' as packaging,
+                    '' as productclass,
+                    '' as kodecustomer,
+                    '' as namacustomer,
+                    '' as alamatcustomer,
+                    '' as area,
+                    '' as subarea,
+                    '' as channel,
+                    '' as subchannel,
+                    '' as customergroup,
+                    '' as keyaccount,
+                    '' as kodesalesman,
+                    '' as namasalesman,
+                    '' as kodesalesco,
+                    '' as namasalesco,
+                    '' as kodespv,
+                    '' as namaspv,
+                    '' as tahunbulan,
+                    '' as bulan,
+                    '' as tanggal,
+                    '' as weekno,
+                    '' as nomornota,
+                    '' as salesmethod,
+                    '' as sellingtype,
+                    '' as qtysold,
+                    '' as kartonutuh,
+                    '' as qtysoldpcs,
+                    '' as freegoodpcs,
+                    '' as tonnage,
+                    '' as volume_ltr,
+                    '' as grossamount,
+                    '' as linediscount1,
+                    '' as linediscount2,
+                    '' as linediscount3,
+                    '' as linediscount4,
+                    '' as linediscount5,
+                    '' as totallinediscount,
+                    '' as discountnota1,
+                    '' as discountnota2,
+                    '' as discountnota3,
+                    '' as totaldiscountnota,
+                    '' as dpp,
+                    '' as ppn,
+                    '' as ppnbm,
+                    '' as tax3,
+                    '' as netamount,
+                    '' as warehouse,
+                    '' as customerpo,
+                    '' as customerjoindate,
+                    '' as nofakturpajak,
+                    '' as tanggalfakturpajak,
+                    '' as nomorfakturproforma,
+                    '' as tanggalfakturproforma,
+                    '' as cogs,
+                    '' as case_weight_kg,
+                    '' as tslqtysoldnfg,
+                    '' as tslconvpcstoctn,
+                    '' as tsltonnagesoldfg,
+                    '' as `end`
+        ";
+
+        $hasil = $this->db->query($query);   
+
+        $headers = [
+            'distributor','cabang','tipetrans','divisi','principal','productgroup1','productgroup2','productgroup3','brand','kodeproduk','kodevarian','kodeprodukprincipal',
+            'namaproduk','packaging','productclass','kodecustomer','namacustomer','alamatcustomer','area','subarea','channel','subchannel','customergroup','keyaccount',
+            'kodesalesman','namasalesman','kodesalesco','namasalesco','kodespv','namaspv','tahunbulan','bulan','tanggal','weekno','nomornota','salesmethod','sellingtype',
+            'qtysold','kartonutuh','qtysoldpcs','freegoodpcs','tonnage','volume_ltr','grossamount','linediscount1','linediscount2','linediscount3','linediscount4','linediscount5',
+            'totallinediscount','discountnota1','discountnota2','discountnota3','totaldiscountnota','dpp','ppn','ppnbm','tax3','netamount','warehouse','customerpo',
+            'customerjoindate','nofakturpajak','tanggalfakturpajak','nomorfakturproforma','tanggalfakturproforma','cogs','case_weight_kg','tslqtysoldnfg','tslconvpcstoctn',
+            'tsltonnagesoldfg','end'
+        ];
+
+        $this->excel_generator->set_query($hasil);
+        $this->excel_generator->set_header($headers);
+        $this->excel_generator->set_column($headers);
+        $this->excel_generator->set_width(array_fill(0, count($headers), 10)); 
+        $this->excel_generator->exportTo2007('Download Template mmm_bulukumba'); 
+    }
+
+    public function mmm_bulukumba_import_customer()
+    {        
+        // create table
+        $create = $this->model_bridging->create_table_mmm_bulukumba_import_customer();
+        if(!$create) {
+            $this->session->set_flashdata("pesan", "gagal membuat table bridging_mmm_bulukumba_import_customer");
+            redirect('bridging/mmm_bulukumba','refresh');
+        }
+
+        // add unique constraint
+        $unique_customer_id = $this->model_bridging->add_unique_mmm_bulukumba_import_customer('customer_id');
+        $unique_mapping_uli = $this->model_bridging->add_unique_mmm_bulukumba_import_customer('mapping_uli');
+
+        // echo'disini'; die;
+        // inisialisasi upload
+        $init_upload = $this->attachment_config('mmm_bulukumba', ''); 
+        if ($this->upload->do_upload('file_customer')) 
+        {
+            // echo 'disini'; die;
+            $upload_data = $this->upload->data();
+            $filename_excel = $upload_data['file_name'];
+
+            $this->load->library('excel');
+            $object = PHPExcel_IOFactory::load("assets/uploads/bridging/$this->tahun_folder/mmm_bulukumba/$filename_excel");
+
+            $jumlahSheet = $object->getSheetCount();
+            if ($jumlahSheet > 1) {
+                echo "jumlah_sheet : ".$jumlahSheet;
+                echo "<script>alert('upload file gagal karena file mempunyai lebih dari 1 sheet'); </script>";
+                redirect('bridging/mmm_bulukumba','refresh');
+            }
+
+            foreach ($object->getWorksheetIterator() as $worksheet) 
+            {
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+
+                if ($highestRow > 5000) {
+                    $this->session->set_flashdata("pesan", "Import Gagal. Terlalu banyak ROW. Maximal 5000 ROW.");
+                    redirect('bridging/mmm_bulukumba','refresh');
+                }
+
+                if ($highestRow <= 1) {
+                    $this->session->set_flashdata("pesan", "Data yang anda upload kosong. Silahkan ulangi kembali.");
+                    redirect('bridging/mmm_bulukumba','refresh');
+                }
+
+                for ($row = 2; $row <= $highestRow; $row++) 
+                {  
+                    $kategori    = trim($worksheet->getCellByColumnAndRow(0, $row)->getValue());
+                    $nama_site   = trim($worksheet->getCellByColumnAndRow(1, $row)->getValue());
+                    $regional    = trim($worksheet->getCellByColumnAndRow(2, $row)->getValue());
+                    $customer_id = trim($worksheet->getCellByColumnAndRow(3, $row)->getValue());                    
+                    $mapping_uli = trim($worksheet->getCellByColumnAndRow(4, $row)->getValue());
+                    $mapping_nd6 = trim($worksheet->getCellByColumnAndRow(5, $row)->getValue());
+                    $mapping_warung_pintar = trim($worksheet->getCellByColumnAndRow(6, $row)->getValue());
+                    $mapping_pbf = trim($worksheet->getCellByColumnAndRow(7, $row)->getValue());
+                    $prefix = trim($worksheet->getCellByColumnAndRow(8, $row)->getValue());
+                    $nama_customer = trim($worksheet->getCellByColumnAndRow(9, $row)->getValue());
+                    $alamat = trim($worksheet->getCellByColumnAndRow(10, $row)->getValue());
+                    $tipe_bayar = trim($worksheet->getCellByColumnAndRow(11, $row)->getValue());
+                    $top = trim($worksheet->getCellByColumnAndRow(12, $row)->getValue());
+                    $status_konsinyasi = trim($worksheet->getCellByColumnAndRow(13, $row)->getValue());
+                    $status_fuguh = trim($worksheet->getCellByColumnAndRow(14, $row)->getValue());
+                    $kelurahan_id = trim($worksheet->getCellByColumnAndRow(15, $row)->getValue());
+                    $nama_kelurahan = trim($worksheet->getCellByColumnAndRow(16, $row)->getValue());
+                    $kecamatan_id = trim($worksheet->getCellByColumnAndRow(17, $row)->getValue());
+                    $nama_kecamatan = trim($worksheet->getCellByColumnAndRow(18, $row)->getValue());
+                    $kota_id = trim($worksheet->getCellByColumnAndRow(19, $row)->getValue());
+                    $nama_kota = trim($worksheet->getCellByColumnAndRow(20, $row)->getValue());     
+                    $propinsi_id = trim($worksheet->getCellByColumnAndRow(21, $row)->getValue());
+                    $nama_propinsi = trim($worksheet->getCellByColumnAndRow(22, $row)->getValue());
+                    $kode_pos = trim($worksheet->getCellByColumnAndRow(23, $row)->getValue());
+                    $telp = trim($worksheet->getCellByColumnAndRow(24, $row)->getValue());     
+                    $fax = trim($worksheet->getCellByColumnAndRow(25, $row)->getValue());
+                    $email = trim($worksheet->getCellByColumnAndRow(26, $row)->getValue());
+                    $head_office_id = trim($worksheet->getCellByColumnAndRow(27, $row)->getValue());
+                    $nama_head_office = trim($worksheet->getCellByColumnAndRow(28, $row)->getValue());      
+                    $company_id = trim($worksheet->getCellByColumnAndRow(29, $row)->getValue());
+                    $nama_company = trim($worksheet->getCellByColumnAndRow(30, $row)->getValue());
+                    $branch_id = trim($worksheet->getCellByColumnAndRow(31, $row)->getValue());
+                    $nama_branch_office = trim($worksheet->getCellByColumnAndRow(32, $row)->getValue());
+                    $site_id = trim($worksheet->getCellByColumnAndRow(33, $row)->getValue());
+                    $segment_id = trim($worksheet->getCellByColumnAndRow(34, $row)->getValue());    
+                    $nama_segment = trim($worksheet->getCellByColumnAndRow(35, $row)->getValue());
+                    $type_id = trim($worksheet->getCellByColumnAndRow(36, $row)->getValue());
+
+                    // cek type_id
+                    $cek_type = $this->model_bridging->get_type($type_id);
+                    if(!$cek_type->num_rows() > 0) { // jika tidak ada
+                        $is_valid_type_id = 0;
+                    }else{
+                        $is_valid_type_id = 1;
+                    }
+
+                    $nama_type = trim($worksheet->getCellByColumnAndRow(37, $row)->getValue());
+                    $kodesalur = trim($worksheet->getCellByColumnAndRow(38, $row)->getValue());
+
+                    // cek kodesalur
+                    $cek_class = $this->model_bridging->get_class($kodesalur);
+                    // echo 'cek_class ' .$cek_class;die; 
+                    if(!$cek_class->num_rows() > 0) { // jika tidak ada
+                        $is_valid_class_id = 0;
+                    }else{
+                        $is_valid_class_id = 1;
+                    }
+
+                    $namasalur = trim($worksheet->getCellByColumnAndRow(39, $row)->getValue());
+                    $spot_id = trim($worksheet->getCellByColumnAndRow(40, $row)->getValue());
+                    $no_ktp = trim($worksheet->getCellByColumnAndRow(41, $row)->getValue());
+                    $kartu_keluarga = trim($worksheet->getCellByColumnAndRow(42, $row)->getValue());
+                    $pln = trim($worksheet->getCellByColumnAndRow(43, $row)->getValue());
+                    $nama_penghubung = trim($worksheet->getCellByColumnAndRow(44, $row)->getValue());
+                    $alamat_penghubung = trim($worksheet->getCellByColumnAndRow(45, $row)->getValue());
+                    $telp_penghubung = trim($worksheet->getCellByColumnAndRow(46, $row)->getValue());
+                    $hubungan = trim($worksheet->getCellByColumnAndRow(47, $row)->getValue());
+                    $latitude = trim($worksheet->getCellByColumnAndRow(48, $row)->getValue());
+                    $longitude = trim($worksheet->getCellByColumnAndRow(49, $row)->getValue());
+                    $member = trim($worksheet->getCellByColumnAndRow(50, $row)->getValue());
+                    $black_list = trim($worksheet->getCellByColumnAndRow(51, $row)->getValue());
+                    $aktif = trim($worksheet->getCellByColumnAndRow(52, $row)->getValue());
+                    $show_alamat_pkp = trim($worksheet->getCellByColumnAndRow(53, $row)->getValue());
+                    $data_create = trim($worksheet->getCellByColumnAndRow(54, $row)->getValue());
+                    $pbf_izin_no_tdp_tgl = trim($worksheet->getCellByColumnAndRow(55, $row)->getValue());
+                    $pbf_izin_no_tdp_no = trim($worksheet->getCellByColumnAndRow(56, $row)->getValue());
+                    $pbf_izin_no_siup_tgl = trim($worksheet->getCellByColumnAndRow(57, $row)->getValue());
+                    $pbf_izin_no_siup = trim($worksheet->getCellByColumnAndRow(58, $row)->getValue());
+                    $pbf_izin_no_sito_tgl = trim($worksheet->getCellByColumnAndRow(59, $row)->getValue());
+                    $pbf_izin_no_sito = trim($worksheet->getCellByColumnAndRow(60, $row)->getValue());
+                    $pbf_izin_no_sipa_tgl = trim($worksheet->getCellByColumnAndRow(61, $row)->getValue());
+                    $pbf_izin_no_sipa = trim($worksheet->getCellByColumnAndRow(62, $row)->getValue());
+                    $pbf_izin_no_sia_tgl = trim($worksheet->getCellByColumnAndRow(63, $row)->getValue());
+                    $pbf_izin_no_sia = trim($worksheet->getCellByColumnAndRow(64, $row)->getValue());
+                    $pbf_izin_no_nib_tgl = trim($worksheet->getCellByColumnAndRow(65, $row)->getValue());
+                    $pbf_izin_no_nib = trim($worksheet->getCellByColumnAndRow(66, $row)->getValue());
+                    $pbf_izin_no_cdob_tgl = trim($worksheet->getCellByColumnAndRow(67, $row)->getValue());
+                    $pbf_izin_no_cdob = trim($worksheet->getCellByColumnAndRow(68, $row)->getValue());
+                    $pbf_asis_apoteker_tgl_sipa = trim($worksheet->getCellByColumnAndRow(69, $row)->getValue());
+                    $pbf_asis_apoteker_tgl_lahir = trim($worksheet->getCellByColumnAndRow(70, $row)->getValue());
+                    $pbf_asis_apoteker_telpon = trim($worksheet->getCellByColumnAndRow(71, $row)->getValue());
+                    $pbf_asis_apoteker_no_sipa = trim($worksheet->getCellByColumnAndRow(72, $row)->getValue());
+                    $pbf_asis_apoteker_no_ktp = trim($worksheet->getCellByColumnAndRow(73, $row)->getValue());
+                    $pbf_asis_apoteker_email = trim($worksheet->getCellByColumnAndRow(74, $row)->getValue());
+                    $pbf_asis_apoteker_nama = trim($worksheet->getCellByColumnAndRow(75, $row)->getValue());
+                    $pbf_asis_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(76, $row)->getValue());
+                    $pbf_apoteker_tgl_sipa = trim($worksheet->getCellByColumnAndRow(77, $row)->getValue());
+                    $pbf_apoteker_tgl_lahir = trim($worksheet->getCellByColumnAndRow(78, $row)->getValue());
+                    $pbf_apoteker_telpon = trim($worksheet->getCellByColumnAndRow(79, $row)->getValue());
+                    $pbf_apoteker_no_sipa = trim($worksheet->getCellByColumnAndRow(80, $row)->getValue());
+                    $pbf_apoteker_no_ktp = trim($worksheet->getCellByColumnAndRow(81, $row)->getValue());
+                    $pbf_apoteker_nama = trim($worksheet->getCellByColumnAndRow(82, $row)->getValue());
+                    $pbf_apoteker_alamat = trim($worksheet->getCellByColumnAndRow(83, $row)->getValue());
+                    $pbf_apoteker_email = trim($worksheet->getCellByColumnAndRow(84, $row)->getValue());
+
+                    if($nama_site == "" || $spot_id == "" || $customer_id == "" || $mapping_uli == ""  || $type_id == "" || $class_id = "") {
+                        $this->session->set_flashdata("pesan_customer", "Data anda mempunyai kategori or nama_site or regional or customer_id or mapping_uli kosong.. Silahkan ulangi kembali.");
+                        redirect('bridging/mmm_bulukumba','refresh');
+                    }
+
+                    $data = [
+                        "kategori"    => $kategori,
+                        "nama_site"   => $nama_site,
+                        "regional"    => $regional,
+                        "customer_id" => $customer_id,
+                        "mapping_uli" => $mapping_uli,
+                        "mapping_nd6" => $mapping_nd6,
+                        "mapping_warung_pintar" => $mapping_warung_pintar,
+                        "mapping_pbf" => $mapping_pbf,
+                        "prefix" => $prefix,
+                        "nama_customer" => $nama_customer,
+                        "alamat" => $alamat,
+                        "tipe_bayar" => $tipe_bayar,
+                        "top" => $top,
+                        "status_konsinyasi" => $status_konsinyasi,
+                        "status_fuguh" => $status_fuguh,
+                        "kelurahan_id" => $kelurahan_id,
+                        "nama_kelurahan" => $nama_kelurahan,
+                        "kecamatan_id" => $kecamatan_id,
+                        "nama_kecamatan" => $nama_kecamatan,
+                        "kota_id" => $kota_id,
+                        "nama_kota" => $nama_kota,
+                        "propinsi_id" => $propinsi_id,
+                        "nama_propinsi" => $nama_propinsi,
+                        "kode_pos" => $kode_pos,
+                        "telp" => $telp,
+                        "fax" => $fax,
+                        "email" => $email,
+                        "head_office_id" => $head_office_id,
+                        "nama_head_office" => $nama_head_office,
+                        "company_id" => $company_id,
+                        "nama_company" => $nama_company,
+                        "branch_id" => $branch_id,
+                        "nama_branch_office" => $nama_branch_office,
+                        "site_id" => $site_id,
+                        "segment_id" => $segment_id,
+                        "nama_segment" => $nama_segment,
+                        "type_id" => $type_id,
+                        "nama_type" => $nama_type,
+                        "class_id" => $kodesalur,
+                        "class" => $namasalur,
+                        "spot_id" => $spot_id,
+                        "no_ktp" => $no_ktp,
+                        "kartu_keluarga" => $kartu_keluarga,
+                        "pln" => $pln,
+                        "nama_penghubung" => $nama_penghubung,
+                        "alamat_penghubung" => $alamat_penghubung,
+                        "telp_penghubung" => $telp_penghubung,
+                        "hubungan" => $hubungan,
+                        "latitude" => $latitude,
+                        "longitude" => $longitude,
+                        "member" => $member,
+                        "black_list" => $black_list,
+                        "aktif" => $aktif,
+                        "show_alamat_pkp" => $show_alamat_pkp,
+                        "data_create" => $data_create,
+                        "pbf_izin_no_tdp_tgl" => $pbf_izin_no_tdp_tgl,
+                        "pbf_izin_no_tdp" => $pbf_izin_no_tdp_no,
+                        "pbf_izin_no_siup_tgl" => $pbf_izin_no_siup_tgl,
+                        "pbf_izin_no_siup" => $pbf_izin_no_siup,
+                        "pbf_izin_no_sito_tgl" => $pbf_izin_no_sito_tgl,
+                        "pbf_izin_no_sito" => $pbf_izin_no_sito,
+                        "pbf_izin_no_sipa_tgl" => $pbf_izin_no_sipa_tgl,
+                        "pbf_izin_no_sipa" => $pbf_izin_no_sipa,
+                        "pbf_izin_no_cdob_tgl" => $pbf_izin_no_cdob_tgl,
+                        "pbf_izin_no_cdob" => $pbf_izin_no_cdob,
+                        "pbf_asis_apoteker_tgl_sipa" => $pbf_asis_apoteker_tgl_sipa,
+                        "pbf_asis_apoteker_tgl_lahir" => $pbf_asis_apoteker_tgl_lahir,
+                        "pbf_asis_apoteker_telpon" => $pbf_asis_apoteker_telpon,
+                        "pbf_asis_apoteker_no_sipa" => $pbf_asis_apoteker_no_sipa,
+                        "pbf_asis_apoteker_no_ktp" => $pbf_asis_apoteker_no_ktp,
+                        "pbf_asis_apoteker_email" => $pbf_asis_apoteker_email,
+                        "pbf_asis_apoteker_nama" => $pbf_asis_apoteker_nama,
+                        "pbf_asis_apoteker_alamat" => $pbf_asis_apoteker_alamat,
+                        "pbf_apoteker_tgl_sipa" => $pbf_apoteker_tgl_sipa,
+                        "pbf_apoteker_tgl_lahir" => $pbf_apoteker_tgl_lahir,
+                        "pbf_apoteker_telpon" => $pbf_apoteker_telpon,
+                        "pbf_apoteker_no_sipa" => $pbf_apoteker_no_sipa,
+                        "pbf_apoteker_no_ktp" => $pbf_apoteker_no_ktp,
+                        "pbf_apoteker_nama" => $pbf_apoteker_nama,
+                        "pbf_apoteker_alamat" => $pbf_apoteker_alamat,
+                        "pbf_apoteker_email" => $pbf_apoteker_email,
+                        "is_valid_type_id" => $is_valid_type_id,
+                        "is_valid_class_id" => $is_valid_class_id                 
+                    ];
+
+                    $insert = $this->model_bridging->insert_mmm_bulukumba_import_customer($data);
+                }
+            }
+        }else
+        {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, ".$this->upload->display_errors());
+            // redirect('bridging/mmm_bulukumba','refresh');
+        };
+
+        $this->session->set_flashdata("pesan_success", "upload file excel berhasil, ".$this->upload->display_errors());
+        redirect('bridging/result_mmm_bulukumba_customer','refresh');
+    }
+
+    public function download_template_mmm_bulukumba_customer()
+    {
+        $query = "
+            select 	kategori,
+                    nama_site,
+                    regional,
+                    customer_id,
+                    mapping_uli,
+                    mapping_nd6,
+                    mapping_warung_pintar,
+                    mapping_pbf,
+                    prefix,
+                    nama_customer,
+                    alamat,
+                    tipe_bayar,
+                    top,
+                    status_konsinyasi,
+                    status_fuguh,
+                    kelurahan_id,
+                    nama_kelurahan,
+                    kecamatan_id,
+                    nama_kecamatan,
+                    kota_id,
+                    nama_kota,
+                    propinsi_id,
+                    nama_propinsi,
+                    kode_pos,
+                    telp,
+                    fax,
+                    email,
+                    head_office_id,
+                    nama_head_office,
+                    company_id,
+                    nama_company,
+                    branch_id,
+                    nama_branch_office,
+                    site_id,
+                    segment_id,
+                    nama_segment, 
+                    type_id,
+                    nama_type,
+                    class_id,
+                    class,
+                    spot_id,
+                    no_ktp,
+                    kartu_keluarga,
+                    pln,
+                    nama_penghubung,
+                    alamat_penghubung,
+                    telp_penghubung,
+                    hubungan,
+                    latitude,
+                    longitude,
+                    member,
+                    black_list,
+                    aktif,
+                    show_alamat_pkp,
+                    data_create,
+                    pbf_izin_no_tdp_tgl,
+                    pbf_izin_no_tdp,
+                    pbf_izin_no_siup_tgl,
+                    pbf_izin_no_siup,
+                    pbf_izin_no_sito_tgl,
+                    pbf_izin_no_sito,
+                    pbf_izin_no_sipa_tgl,
+                    pbf_izin_no_sipa,
+                    pbf_izin_no_sia_tgl,
+                    pbf_izin_no_sia,
+                    pbf_izin_no_nib_tgl,
+                    pbf_izin_no_nib,
+                    pbf_izin_no_cdob_tgl,
+                    pbf_izin_no_cdob,
+                    pbf_asis_apoteker_tgl_sipa,
+                    pbf_asis_apoteker_tgl_lahir,
+                    pbf_asis_apoteker_telpon,
+                    pbf_asis_apoteker_no_sipa,
+                    pbf_asis_apoteker_no_ktp,
+                    pbf_asis_apoteker_email,
+                    pbf_asis_apoteker_nama,
+                    pbf_asis_apoteker_alamat,
+                    pbf_apoteker_tgl_sipa,
+                    pbf_apoteker_tgl_lahir,
+                    pbf_apoteker_telpon,
+                    pbf_apoteker_no_sipa,
+                    pbf_apoteker_no_ktp,
+                    pbf_apoteker_nama,
+                    pbf_apoteker_alamat,
+                    pbf_apoteker_email
+        from site.bridging_mmm_bulukumba_import_customer a
+        ";
+
+        $hasil = $this->db->query($query);   
+    
+        $this->excel_generator->set_query($hasil);
+
+        $this->excel_generator->set_header(array
+        (
+            'kategori',
+            'nama_site',
+            'regional',
+            'customer_id',
+            'mapping_uli',
+            'mapping_nd6',
+            'mapping_warung_pintar',
+            'mapping_pbf',
+            'prefix',
+            'nama_customer',
+            'alamat',
+            'tipe_bayar',
+            'top',
+            'status_konsinyasi',
+            'status_fuguh',
+            'kelurahan_id',
+            'nama_kelurahan',
+            'kecamatan_id',
+            'nama_kecamatan',
+            'kota_id',
+            'nama_kota',
+            'propinsi_id',
+            'nama_propinsi',
+            'kode_pos',
+            'telp',
+            'fax',
+            'email',
+            'head_office_id',
+            'nama_head_office',
+            'company_id',
+            'nama_company',
+            'branch_id',
+            'nama_branch_office',
+            'site_id',
+            'segment_id',
+            'nama_segment', 
+            'type_id',
+            'nama_type',
+            'class_id',
+            'class',
+            'spot_id',
+            'no_ktp',
+            'kartu_keluarga',
+            'pln',
+            'nama_penghubung',
+            'alamat_penghubung',
+            'telp_penghubung',
+            'hubungan',
+            'latitude',
+            'longitude',
+            'member',
+            'black_list',
+            'aktif',
+            'show_alamat_pkp',
+            'data_create',
+            'pbf_izin_no_tdp_tgl',
+            'pbf_izin_no_tdp',
+            'pbf_izin_no_siup_tgl',
+            'pbf_izin_no_siup',
+            'pbf_izin_no_sito_tgl',
+            'pbf_izin_no_sito',
+            'pbf_izin_no_sipa_tgl',
+            'pbf_izin_no_sipa',
+            'pbf_izin_no_sia_tgl',
+            'pbf_izin_no_sia',
+            'pbf_izin_no_nib_tgl',
+            'pbf_izin_no_nib',
+            'pbf_izin_no_cdob_tgl',
+            'pbf_izin_no_cdob',
+            'pbf_asis_apoteker_tgl_sipa',
+            'pbf_asis_apoteker_tgl_lahir',
+            'pbf_asis_apoteker_telpon',
+            'pbf_asis_apoteker_no_sipa',
+            'pbf_asis_apoteker_no_ktp',
+            'pbf_asis_apoteker_email',
+            'pbf_asis_apoteker_nama',
+            'pbf_asis_apoteker_alamat',
+            'pbf_apoteker_tgl_sipa',
+            'pbf_apoteker_tgl_lahir',
+            'pbf_apoteker_telpon',
+            'pbf_apoteker_no_sipa',
+            'pbf_apoteker_no_ktp',
+            'pbf_apoteker_nama',
+            'pbf_apoteker_alamat',
+            'pbf_apoteker_email'
+        ));
+        $this->excel_generator->set_column(array
+        ( 
+            'kategori',
+            'nama_site',
+            'regional',
+            'customer_id',
+            'mapping_uli',
+            'mapping_nd6',
+            'mapping_warung_pintar',
+            'mapping_pbf',
+            'prefix',
+            'nama_customer',
+            'alamat',
+            'tipe_bayar',
+            'top',
+            'status_konsinyasi',
+            'status_fuguh',
+            'kelurahan_id',
+            'nama_kelurahan',
+            'kecamatan_id',
+            'nama_kecamatan',
+            'kota_id',
+            'nama_kota',
+            'propinsi_id',
+            'nama_propinsi',
+            'kode_pos',
+            'telp',
+            'fax',
+            'email',
+            'head_office_id',
+            'nama_head_office',
+            'company_id',
+            'nama_company',
+            'branch_id',
+            'nama_branch_office',
+            'site_id',
+            'segment_id',
+            'nama_segment', 
+            'type_id',
+            'nama_type',
+            'class_id',
+            'class',
+            'spot_id',
+            'no_ktp',
+            'kartu_keluarga',
+            'pln',
+            'nama_penghubung',
+            'alamat_penghubung',
+            'telp_penghubung',
+            'hubungan',
+            'latitude',
+            'longitude',
+            'member',
+            'black_list',
+            'aktif',
+            'show_alamat_pkp',
+            'data_create',
+            'pbf_izin_no_tdp_tgl',
+            'pbf_izin_no_tdp',
+            'pbf_izin_no_siup_tgl',
+            'pbf_izin_no_siup',
+            'pbf_izin_no_sito_tgl',
+            'pbf_izin_no_sito',
+            'pbf_izin_no_sipa_tgl',
+            'pbf_izin_no_sipa',
+            'pbf_izin_no_sia_tgl',
+            'pbf_izin_no_sia',
+            'pbf_izin_no_nib_tgl',
+            'pbf_izin_no_nib',
+            'pbf_izin_no_cdob_tgl',
+            'pbf_izin_no_cdob',
+            'pbf_asis_apoteker_tgl_sipa',
+            'pbf_asis_apoteker_tgl_lahir',
+            'pbf_asis_apoteker_telpon',
+            'pbf_asis_apoteker_no_sipa',
+            'pbf_asis_apoteker_no_ktp',
+            'pbf_asis_apoteker_email',
+            'pbf_asis_apoteker_nama',
+            'pbf_asis_apoteker_alamat',
+            'pbf_apoteker_tgl_sipa',
+            'pbf_apoteker_tgl_lahir',
+            'pbf_apoteker_telpon',
+            'pbf_apoteker_no_sipa',
+            'pbf_apoteker_no_ktp',
+            'pbf_apoteker_nama',
+            'pbf_apoteker_alamat',
+            'pbf_apoteker_email'  
+        ));
+        $this->excel_generator->set_width(array(10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10)); 
+        $this->excel_generator->exportTo2007('Download Template mmm_bulukumba Customer'); 
+    }
+
+    public function result_mmm_bulukumba_customer()
+    {
+        $data = [
+            "title" => "Result Bridging mmm_bulukumba Customer",
+            'url'   => 'bridging/mmm_bulukumba_submit_customer',
+            'get_data' => $this->model_bridging->get_mmm_bulukumba_import_customer(),
+            'get_summary' => $this->model_bridging->get_mmm_bulukumba_import_customer_summary(),
+        ];
+        // $this->view($data, false, "result_mmm_bulukumba_customer");
+        $this->render('bridging/result_mmm_bulukumba_customer', $data);
+    }
+
+    public function submit_mmm_bulukumba()
+    {
+        $id_bridging_log = $this->input->post('id_bridging_log');
+        // echo  $id_bridging_log; die;
+
+        $get_data_log = $this->model_bridging->get_bridging_log($id_bridging_log);
+        if($get_data_log->num_rows() > 0)
+        {
+            $site_code = $get_data_log->row()->site_code;
+            $kode_comp = substr($site_code, 0, 3);
+            $nocab = substr($site_code, 3, 2);
+
+            $bulan = $get_data_log->row()->bulan;
+
+            $tahun_upload = substr($bulan, 0, 4);
+            $bulan_upload = substr($bulan, 5, 2);
+        }
+
+        $get_userid = $this->model_bridging->get_userid_by_kode_comp($kode_comp);
+        if($get_userid->num_rows() > 0)
+        {
+            $userid = $get_userid->row()->id;
+        }else{
+            $this->session->set_flashdata("pesan", "gagal mendapatkan userid, ".$this->upload->display_errors());
+            redirect('bridging/mmm_bulukumba','refresh');
+        }
+
+        $get_last_upload = $this->model_bridging->get_mpm_upload_where_closing_by_userid($userid);
+        if($get_last_upload->num_rows() > 0)
+        {
+            $tahun_last_upload = $get_last_upload->row()->tahun;
+            $bulan_last_upload = $get_last_upload->row()->bulan;
+        }   
+
+        // die;
+
+        if ($tahun_upload < $tahun_last_upload || ($tahun_upload == $tahun_last_upload && $bulan_upload <= $bulan_last_upload)) {
+            $this->session->set_flashdata("pesan", "gagal upload file excel, tahun dan bulan lebih kecil dari tahun dan bulan terakhir diupload");
+            redirect('bridging/mmm_bulukumba','refresh');
+        } 
+
+        $delete_fi = $this->model_bridging->delete_fi_mmm_bulukumba($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $delete_ri = $this->model_bridging->delete_ri_mmm_bulukumba($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        
+        $proses_fi = $this->model_bridging->insert_fi_mmm_bulukumba($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $proses_fi = $this->model_bridging->insert_fi_mmm_bulukumba_bonus($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+        $proses_ri = $this->model_bridging->insert_ri_mmm_bulukumba($kode_comp, $nocab, $tahun_upload, $bulan_upload);
+
+        $delete_tblang = $this->model_bridging->delete_tblang_mmm_bulukumba($tahun_upload, $nocab);
+        $delete_tabsales = $this->model_bridging->delete_tabsales_mmm_bulukumba($tahun_upload, $nocab);
+        // $delete_tbkota = $this->model_bridging->delete_tbkota_mmm_bulukumba($tahun_upload, $nocab);
+
+        $insert_tblang = $this->model_bridging->insert_tblang($tahun_upload, $site_code);
+        $update_spot_tblang = $this->model_bridging->update_spot_tblang($tahun_upload, $site_code);
+        $insert_tabsales = $this->model_bridging->insert_tabsales($tahun_upload, $site_code);
+        // $insert_tbkota = $this->model_bridging->insert_tbkota($tahun_upload, $nocab);
+
+
+        // update bridging_log
+        $get_data_result = $this->model_bridging->get_result($site_code, $tahun_upload, $bulan_upload);
+        if($get_data_result->num_rows() > 0)
+        {
+            $total_unit = $get_data_result->row()->total_unit;
+            $total_value = $get_data_result->row()->total_value;
+        }else{
+            $total_unit = 0;
+            $total_value = 0;            
+        }
+
+        $insert_upload = [
+            "userid"        => $userid,
+            "lastupload"    => $this->model_outlet_transaksi->timezone(),
+            "tanggal"       => date('d', strtotime($this->model_outlet_transaksi->timezone())),
+            "filename"      => "",
+            "omzet"         => $total_value,
+            "status"        => 1,
+            "tahun"         => $tahun_upload,
+            "bulan"         => $bulan_upload,
+            "status_closing" => 0
+        ];
+        $id_upload = $this->model_bridging->insert_upload($insert_upload);
+
+        $update_bridging = [
+            'sum_omzet' => $total_value,
+            'sum_unit' => $total_unit,
+            'id_upload' => $id_upload
+        ];
+        $this->model_bridging->update_bridging_log($update_bridging, $id_bridging_log);
+
+        $this->session->set_flashdata("pesan_result_success", "proses upload success");
+        redirect('bridging/mmm_bulukumba','refresh');
+        
+    }
+
 
 }
 ?>

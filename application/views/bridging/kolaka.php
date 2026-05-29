@@ -591,7 +591,7 @@
             $('#tabel-ajuan-claim').DataTable({
                 "pageLength": 10,
                 "ordering": true,
-                "order": [6, 'desc'],
+                //"order": [6, 'desc'],
                 "aLengthMenu": [
                     [10, 20, 50, -1],
                     [10, 20, 50, "All"]

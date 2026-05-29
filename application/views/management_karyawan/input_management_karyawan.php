@@ -132,18 +132,25 @@
         </div>
 
         <div class="row">
-            <div class="col-md-2">
-                <button onclick="toggleKonten()" class="btn btn-submit-black" id="button_form">
+            <div class="col">
+                <button onclick="toggleKonten()" class="btn btn-submit-black w-100">
                     Form Input Data Karyawan
                 </button>
             </div>
-            <div class="col-md-2">
-                <button onclick="toggleImport()" class="btn btn-submit-black" id="button_import">
+            <div class="col">
+                <button onclick="toggleImport()" class="btn btn-submit-black w-100">
                     <i class="fas fa-file-import"></i> Import Data Karyawan
                 </button>
             </div>
-            <div class="col-md-3">
-                <button class="btn btn-submit-black" id="button_form">Request Karyawan (Comming Soon)</button>
+            <div class="col">
+                <a href="<?= base_url('management_karyawan/reimbursement') ?>" class="btn btn-submit-black w-100">
+                    Reimbursement(<?= $count_reimbusement > 0 ? $count_reimbusement : '0' ?>)
+                </a>
+            </div>
+            <div class="col">
+                <button class="btn btn-submit-black w-100">
+                    Request Karyawan (Coming Soon)
+                </button>
             </div>
         </div>
         
@@ -169,13 +176,13 @@
                                         <div class="col-md-8">
                                             <select name="nama_perusahaan" id = "nama_perusahaan" class="form-control" required>
                                                 <option value="">-- Pilih --</option>
-                                                <option value="MPMHO" >PT. MULIA PUTRA MANDIRI</option>
-                                                <option value="JKT88">JAVAS KARYA TRIPTA</option>
-                                                <option value="JBR95">JAYA BAKTI RAHARJA</option>
-                                                <option value="JTM91" >JAVAS TRIPTA MANDALA</option>
-                                                <option value="SMG14">JAVAS TRIPTA GEMALA</option>
-                                                <option value="JBLJ2">JAVAS BALI LESTARI</option>
-                                                <option value="DIY98">DUTA INTRA YASA</option>
+                                                <?php if ($get_ho->num_rows() > 0): ?>
+                                                    <?php foreach ($get_ho->result() as $h): ?>
+                                                        <option value="<?= $site_code ?>">
+                                                            <?= $h->branch_name ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                <?php endif; ?>
                                             </select>
                                         </div>
                                     </div>
@@ -185,6 +192,11 @@
                                         <div class="col-md-8">
                                             <select name="kode_dp" id="kode_dp" class="form-control" required>
                                                 <option value="">-- Pilih DP --</option>
+                                                <?php if ($sub_branch): ?>
+                                                    <option value="<?= $site_code ?>">
+                                                        <?= $sub_branch ?>
+                                                    </option>
+                                                <?php endif; ?>
                                             </select>
                                         </div>
                                     </div>
@@ -197,7 +209,7 @@
                                         <div class="col-md-8">
                                             <select name="username" id="username" class="form-control select2" required>
                                                 <option value=""></option>
-                                                <?php foreach ($get_username as $a) { ?>
+                                                <?php foreach ($get_username->result() as $a) { ?>
                                                     <option value="<?= $a->username ?>"><?= $a->name ?></option>
                                                 <?php } ?>
                                             </select>
@@ -252,6 +264,7 @@
                                                 <option value="B">B</option>
                                                 <option value="AB">AB</option>
                                                 <option value="O">O</option>
+                                                <option value="-">-</option>
                                             </select>
                                         </div>
                                     </div>
@@ -376,7 +389,7 @@
 
 
                                     <div class="row mt-2">
-                                        <div class="col-md-4"><label>Tgl Mulai Kerja (*)</label></div>
+                                        <div class="col-md-4"><label>Tgl Mulai Kerja</label></div>
                                         <div class="col-md-8">
                                             <input type="date" name="tanggal_mulai_kerja" class="form-control">
                                         </div>
@@ -716,9 +729,9 @@
 
                             <div class="row mt-4 mb-4">
                                 <div class="col-md-12 text-center">
-                                    <button type="submit" name="button_action" class="btn btn-secondary px-4" value="1">
+                                    <!-- <button type="submit" name="button_action" class="btn btn-secondary px-4" value="1">
                                         Simpan Draft
-                                    </button>
+                                    </button> -->
                                     <!-- <a href="#" class="btn btn-secondary px-4">
                                         Simpan Draft
                                     </a> -->
@@ -1200,7 +1213,7 @@
 </script>
 
 <!-- script subbranch -->
-<script>
+<!-- <script>
     $(document).ready(function () {
 
         $('#nama_perusahaan').change(function () {
@@ -1251,7 +1264,7 @@
         });
 
     });
-</script>
+</script> -->
 
 <script>
     function toggleImport() {

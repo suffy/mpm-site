@@ -186,68 +186,91 @@ class Afiliasi extends MY_Controller
 
   public function monthly_planning()
   {
-    $get_master_karyawan = $this->model_afiliasi->get_master_karyawan_by_nama($this->username);
-    if($get_master_karyawan->num_rows() > 0)
-    {
-      $id_karyawan = $get_master_karyawan->row()->id;
-      $id_jabatan = $get_master_karyawan->row()->id_jabatan;
-      $nama_jabatan = $get_master_karyawan->row()->nama_jabatan;
-      $nama_divisi = $get_master_karyawan->row()->nama_divisi;
-      $nama = $get_master_karyawan->row()->nama;
+      $get_master_karyawan = $this->model_afiliasi->get_master_karyawan_by_nama($this->username);
+      if($get_master_karyawan->num_rows() > 0)
+      {
+          $id_karyawan = $get_master_karyawan->row()->id;
+          $id_jabatan = $get_master_karyawan->row()->id_jabatan;
+          $nama_jabatan = $get_master_karyawan->row()->nama_jabatan;
+          $nama_divisi = $get_master_karyawan->row()->nama_divisi;
+          $nama = $get_master_karyawan->row()->nama;
+      } else {
+          $this->session->set_flashdata('error', 'anda tidak diijinkan mengakses menu ini. Silahkan hubungi IT');
+          redirect('management_office/dashboard');
+          die;
+      }
 
-      // echo "id_karyawan : ".$id_karyawan;
-      // echo "id_jabatan : ".$id_jabatan;
-      // echo "nama_jabatan : ".$nama_jabatan;
-      // echo "nama_divisi : ".$nama_divisi;
+      $selected_date = $this->input->get('date') ? $this->input->get('date') : date('Y-m-d');
+      $selected_month = date('m', strtotime($selected_date));
+      $selected_year = date('Y', strtotime($selected_date));
 
-    }else{
-      $this->session->set_flashdata('error', 'anda tidak diijinkan mengakses menu ini. Silahkan hubungi IT');
-      redirect('management_office/dashboard');
-      die;
-    }
+      // Parse tanggal untuk mendapatkan nama bulan dan tahun
+      $date_obj = new DateTime($selected_date);
+      $current_month_name = $date_obj->format('F Y');
 
-    $selected_date = $this->input->get('date') ? $this->input->get('date') : date('Y-m-d');
-    $selected_month = date('m', strtotime($selected_date));
+      $plan = $this->model_afiliasi->get_activity_plan_by_date($selected_date); // untuk mengetahui plan apa saja yang ada di tanggal tersebut
+      
+      // Ambil ALL plan untuk seluruh bulan menggunakan function yang sudah ada
+      $all_plans_query = $this->model_afiliasi->get_activity_plan_by_month($selected_year, $selected_month);
+      
+      // Convert result object ke array
+      $all_plans = [];
+      if ($all_plans_query->num_rows() > 0) {
+          $all_plans = $all_plans_query->result_array();
+      }
+      
+      // Ambil count plan per tanggal
+      $count_plan = $this->model_afiliasi->get_activity_plan_group_by_month($selected_month);
 
-    // Parse tanggal untuk mendapatkan nama bulan dan tahun
-    $date_obj = new DateTime($selected_date);
-    $current_month_name = $date_obj->format('F Y');
-    $plan = $this->model_afiliasi->get_activity_plan_by_date($selected_date);
-    $count_plan = $this->model_afiliasi->get_activity_plan_group_by_month($selected_month);
+      // Format ulang count_plan menjadi array asosiatif yang mudah diakses
+      $formatted_count_plan = [];
+      foreach ($count_plan as $cp) {
+          $formatted_count_plan[] = [
+              'date' => $cp['date'],
+              'count' => $cp['count']
+          ];
+      }
 
-    $message = $this->session->flashdata('message');
+      $message = $this->session->flashdata('message');
 
-    $reminder_bulanan = $this->model_afiliasi->get_master_activity_not_in_activity_plan_bulanan($id_jabatan, $id_karyawan, $selected_month);
-    $reminder_harian = $this->model_afiliasi->get_master_activity_not_in_activity_plan_harian($id_jabatan, $id_karyawan, $selected_date);
-    $reminder_not_harian_bulanan = $this->model_afiliasi->get_master_activity_not_in_activity_plan_not_harian_bulanan($id_jabatan, $id_karyawan, $selected_month);
+      $reminder_bulanan = $this->model_afiliasi->get_master_activity_not_in_activity_plan_bulanan($id_jabatan, $id_karyawan, $selected_month);
+      $reminder_harian = $this->model_afiliasi->get_master_activity_not_in_activity_plan_harian($id_jabatan, $id_karyawan, $selected_date);
+      $reminder_not_harian_bulanan = $this->model_afiliasi->get_master_activity_not_in_activity_plan_not_harian_bulanan($id_jabatan, $id_karyawan, $selected_month);
 
-    $data = [
-      'title' => 'Monthly Planning Revisi',
-      'nama_jabatan' => $nama_jabatan,
-      'nama_divisi' => $nama_divisi,
-      'nama' => $nama,
-      'url' => 'afiliasi/monthly_planning_save',
-      'url_import' => 'afiliasi/monthly_planning_import',
-      'get_activity'  => $this->model_afiliasi->get_activity_by_pelaksana_jabatan($id_jabatan),
-      'selected_date' => $selected_date,
-      'current_month_name' => $current_month_name,
-      'reminder_bulanan' => $reminder_bulanan,
-      'reminder_harian' => $reminder_harian,
-      'reminder_not_harian_bulanan' => $reminder_not_harian_bulanan,
-      'plan' => $plan,
-      'form_data' => [], // Untuk menyimpan data form jika ada error
-      'message' => $message, // Untuk pesan sukses/error
-      'count_plan' => $count_plan,
-    ];
+      $data = [
+          'title' => 'Monthly Planning Revisi',
+          'nama_jabatan' => $nama_jabatan,
+          'nama_divisi' => $nama_divisi,
+          'nama' => $nama,
+          'url' => 'afiliasi/monthly_planning_save',
+          'url_import' => 'afiliasi/monthly_planning_import',
+          'get_activity' => $this->model_afiliasi->get_activity_by_pelaksana_jabatan($id_jabatan),
+          'selected_date' => $selected_date,
+          'current_month_name' => $current_month_name,
+          'reminder_bulanan' => $reminder_bulanan,
+          'reminder_harian' => $reminder_harian,
+          'reminder_not_harian_bulanan' => $reminder_not_harian_bulanan,
+          'plan' => $plan, // Plan untuk tanggal yang dipilih (result array)
+          'all_plans' => $all_plans, // SEMUA plan untuk bulan ini (sudah dalam bentuk array)
+          'form_data' => [],
+          'message' => $message,
+          'count_plan' => $formatted_count_plan,
+      ];
 
-    $this->render_multiple(
-      array(
-          'afiliasi/style',
-          'afiliasi/monthly_planning'
-      ),
-      $data
-    );
+      $this->render_multiple(
+          array(
+              'afiliasi/style',
+              'afiliasi/monthly_planning',
+              'afiliasi/alert',
+              'afiliasi/calendar',
+              'afiliasi/modal_activity',
+              'afiliasi/script',
+          ),
+          $data
+      );
   }
+
+  
 
   public function get_activities_by_date()
   {
@@ -273,52 +296,106 @@ class Afiliasi extends MY_Controller
 
   public function monthly_planning_save()
   {
-    $date = $this->input->post('selected_date');
-    // $title = $this->input->post('title');
-    $keterangan = $this->input->post('keterangan');
-    $activity_id = $this->input->post('activity_id');
-
-    // echo "Date: " . $date;
-    // echo "title: " . $title;
-    // echo "keterangan " . $keterangan;
-    // echo "activity_id : " . $activity_id;
-
-    // get_master_karyawan_by_nama
-    $get_master_karyawan = $this->model_afiliasi->get_master_karyawan_by_nama($this->username);
-    if($get_master_karyawan->num_rows() > 0)
-    {
-      $id_karyawan = $get_master_karyawan->row()->id;
-    }else{
-        $this->session->set_flashdata('pesan', 'data anda tidak ditemukan');
-        redirect('afiliasi/monthly_planning');
-        die;
-    }
-
-    // ambil nama dari database
-    $activity = $this->model_afiliasi->get_activity_by_id($activity_id);
-
-    $nama_activity = $activity->nama_activity;
-
-    echo "id_karyawan: " . $id_karyawan;
-
-    $data = [
-      'id_karyawan' => $id_karyawan,
-      'id_web'      => $this->created_by,
-      'id_activity' => $activity_id,
-      'title'       => $nama_activity,
-      'date'        => $date,
-      'keterangan'  => $keterangan,
-      'created_by'  => $this->created_by,
-      'created_at'  => $this->created_at
-    ];
-
-    $insert = $this->model_afiliasi->insert_to_table('site.afiliasi_activity_plan', $data);
-
-    if($insert)
-    {
-      $this->session->set_flashdata('pesan_success', 'Data berhasil disimpan');
-      redirect('afiliasi/monthly_planning/?date=' . $date);
-    }
+      // Cek apakah ini AJAX request atau bukan
+      $is_ajax = $this->input->is_ajax_request();
+      
+      $date = $this->input->post('selected_date');
+      $keterangan = $this->input->post('keterangan');
+      $activity_id = $this->input->post('activity_id');
+      
+      // Validasi input
+      if(empty($date) || empty($activity_id)) {
+          $message = 'Tanggal dan aktivitas harus diisi';
+          if($is_ajax) {
+              echo json_encode(['success' => false, 'message' => $message]);
+              return;
+          } else {
+              $this->session->set_flashdata('pesan', $message);
+              redirect('afiliasi/monthly_planning/?date=' . $date);
+              return;
+          }
+      }
+      
+      // get_master_karyawan_by_nama
+      $get_master_karyawan = $this->model_afiliasi->get_master_karyawan_by_nama($this->username);
+      if($get_master_karyawan->num_rows() > 0) {
+          $id_karyawan = $get_master_karyawan->row()->id;
+      } else {
+          $message = 'Data karyawan anda tidak ditemukan';
+          if($is_ajax) {
+              echo json_encode(['success' => false, 'message' => $message]);
+              return;
+          } else {
+              $this->session->set_flashdata('pesan', $message);
+              redirect('afiliasi/monthly_planning/?date=' . $date);
+              return;
+          }
+      }
+      
+      // Ambil nama activity dari database
+      $activity = $this->model_afiliasi->get_activity_by_id($activity_id);
+      
+      if(!$activity) {
+          $message = 'Aktivitas tidak ditemukan';
+          if($is_ajax) {
+              echo json_encode(['success' => false, 'message' => $message]);
+              return;
+          } else {
+              $this->session->set_flashdata('pesan', $message);
+              redirect('afiliasi/monthly_planning/?date=' . $date);
+              return;
+          }
+      }
+      
+      $nama_activity = $activity->nama_activity;
+      
+      // Cek apakah aktivitas sudah ada di tanggal tersebut untuk karyawan ini
+      $cek_duplicate = $this->model_afiliasi->check_duplicate_activity($id_karyawan, $activity_id, $date);
+      if($cek_duplicate) {
+          $message = 'Aktivitas sudah direncanakan untuk tanggal ini';
+          if($is_ajax) {
+              echo json_encode(['success' => false, 'message' => $message]);
+              return;
+          } else {
+              $this->session->set_flashdata('pesan', $message);
+              redirect('afiliasi/monthly_planning/?date=' . $date);
+              return;
+          }
+      }
+      
+      $data = [
+          'id_karyawan' => $id_karyawan,
+          'id_activity' => $activity_id,
+          'title'       => $nama_activity,
+          'date'        => $date,
+          'keterangan'  => $keterangan,
+          'created_by'  => $this->created_by,
+          'created_at'  => $this->created_at
+      ];
+      
+      $insert = $this->model_afiliasi->insert_to_table('site.afiliasi_activity_plan', $data);
+      
+      if($insert) {
+          $message = 'Data berhasil disimpan';
+          if($is_ajax) {
+              echo json_encode(['success' => true, 'message' => $message]);
+              return;
+          } else {
+              $this->session->set_flashdata('pesan_success', $message);
+              redirect('afiliasi/monthly_planning/?date=' . $date);
+              return;
+          }
+      } else {
+          $message = 'Gagal menyimpan data';
+          if($is_ajax) {
+              echo json_encode(['success' => false, 'message' => $message]);
+              return;
+          } else {
+              $this->session->set_flashdata('pesan', $message);
+              redirect('afiliasi/monthly_planning/?date=' . $date);
+              return;
+          }
+      }
   }
 
   public function export_monthly_planning($date)
@@ -347,40 +424,85 @@ class Afiliasi extends MY_Controller
 
   public function delete_monthly_plan()
   {
-    $activity_id = $this->input->post('activity_id');
-    $selected_date = $this->input->post('selected_date');
-
-    // cek apakah created_by sama dengan $this->created_by
-    $check = $this->model_afiliasi->get_activity_plan_by_id($activity_id);
-    if($check->num_rows() > 0)
-    {
-      $created_by = $check->row()->created_by;
-      if($created_by != $this->created_by)
-      {
-        $this->session->set_flashdata('error', 'Delete data gagal. Anda tidak memiliki hak akses untuk menghapus data ini.');
-        redirect('afiliasi/monthly_planning/?date=' . $selected_date);
-      }else{
-        $data = [
-          'deleted_at' => $this->created_at,
-          'deleted_by' => $this->created_by,
-          'updated_at' => $this->created_at,
-          'updated_by' => $this->created_by
-        ];
-
-        $update = $this->model_afiliasi->update_to_table('site.afiliasi_activity_plan', $data, $activity_id);
-        if($update)
-        {
-          $this->session->set_flashdata('pesan_success', 'Data berhasil dihapus');
-          redirect('afiliasi/monthly_planning/?date=' . $selected_date);
-        }else{
-          $this->session->set_flashdata('error', 'Delete data gagal. Data tidak ditemukan.');
-          redirect('afiliasi/monthly_planning/?date=' . $selected_date);
-        }
+      // Cek apakah ini AJAX request
+      $is_ajax = $this->input->is_ajax_request();
+      
+      $activity_id = $this->input->post('activity_id');
+      $selected_date = $this->input->post('selected_date');
+      
+      // Validasi input
+      if(empty($activity_id) || empty($selected_date)) {
+          $message = 'Data tidak lengkap';
+          if($is_ajax) {
+              echo json_encode(['success' => false, 'message' => $message]);
+              return;
+          } else {
+              $this->session->set_flashdata('error', $message);
+              redirect('afiliasi/monthly_planning/?date=' . $selected_date);
+              return;
+          }
       }
-    }else{
-      $this->session->set_flashdata('error', 'Delete data gagal. Data tidak ditemukan.');
-      redirect('afiliasi/monthly_planning/?date=' . $selected_date);
-    }
+      
+      // Cek apakah activity plan ada
+      $check = $this->model_afiliasi->get_activity_plan_by_id($activity_id);
+      if($check->num_rows() > 0) {
+          $activity_data = $check->row();
+          $created_by = $activity_data->created_by;
+          
+          // Cek hak akses
+          if($created_by != $this->created_by) {
+              $message = 'Delete data gagal. Anda tidak memiliki hak akses untuk menghapus data ini.';
+              if($is_ajax) {
+                  echo json_encode(['success' => false, 'message' => $message]);
+                  return;
+              } else {
+                  $this->session->set_flashdata('error', $message);
+                  redirect('afiliasi/monthly_planning/?date=' . $selected_date);
+                  return;
+              }
+          } else {
+              $data = [
+                  'deleted_at' => $this->created_at,
+                  'deleted_by' => $this->created_by,
+                  'updated_at' => $this->created_at,
+                  'updated_by' => $this->created_by
+              ];
+              
+              $update = $this->model_afiliasi->update_to_table('site.afiliasi_activity_plan', $data, $activity_id);
+              
+              if($update) {
+                  $message = 'Data berhasil dihapus';
+                  if($is_ajax) {
+                      echo json_encode(['success' => true, 'message' => $message]);
+                      return;
+                  } else {
+                      $this->session->set_flashdata('pesan_success', $message);
+                      redirect('afiliasi/monthly_planning/?date=' . $selected_date);
+                      return;
+                  }
+              } else {
+                  $message = 'Delete data gagal. Data tidak ditemukan.';
+                  if($is_ajax) {
+                      echo json_encode(['success' => false, 'message' => $message]);
+                      return;
+                  } else {
+                      $this->session->set_flashdata('error', $message);
+                      redirect('afiliasi/monthly_planning/?date=' . $selected_date);
+                      return;
+                  }
+              }
+          }
+      } else {
+          $message = 'Delete data gagal. Data tidak ditemukan.';
+          if($is_ajax) {
+              echo json_encode(['success' => false, 'message' => $message]);
+              return;
+          } else {
+              $this->session->set_flashdata('error', $message);
+              redirect('afiliasi/monthly_planning/?date=' . $selected_date);
+              return;
+          }
+      }
   }
 
   public function export_template_import()
