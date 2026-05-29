@@ -79,11 +79,18 @@
                 </div>
                 <div class="col-6">
                   <?php
-                    $interval = date('Y') - 2024;
-                    for ($i = 1; $i <= $interval; $i++) {
-                      $options[$i + 2024] = $i + 2024;
-                    }
-                    echo form_dropdown('year', $options, date('Y'), 'class="form-control"');
+                    // $interval = date('Y') - 2024;
+                    // for ($i = 1; $i <= $interval; $i++) {
+                    //   $options[$i + 2024] = $i + 2024;
+                    // }
+                    // echo form_dropdown('year', $options, date('Y'), 'class="form-control"');
+
+                    $options = [];
+                    // Jika get_upload NOT NULL, maka $max_tahun dari controller adalah 2026
+                    // Kita buat start dan end tahunnya sama agar hanya muncul 1 pilihan
+                    $year_display = $max_tahun; 
+                    $options[$year_display] = $year_display;
+                    echo form_dropdown('year', $options, $year_display, 'class="form-control"');
                   ?>
                 </div>
               </div>
