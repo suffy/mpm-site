@@ -239,6 +239,26 @@ class model_management_upload extends CI_Model
             $msg[] = 'tbrayo~1.TXT' . ' not found<BR />';
         }
 
+        $file = './assets/uploads/unzip/' . $nocab . '/TABTSPOT.TXT';
+        if (is_file($file)) {
+            $sql_del = "delete from db_upload.tabtspot";
+            $this->db->query($sql_del);
+            $sql = $load . "TABTSPOT.TXT' INTO TABLE db_upload.tabtspot FIELDS TERMINATED BY ',' ENCLOSED BY '~' LINES TERMINATED BY '\\r\\n' SET NOCAB='$nocab', KODE_COMP='$kode_comp'";
+            $this->db->query($sql);
+        } else {
+            $msg[] = 'TABTSPOT.TXT' . ' not found<BR />';
+        }
+
+        $file = './assets/uploads/unzip/' . $nocab . '/m_area_subarea.TXT';
+        if (is_file($file)) {
+            $sql_del = "delete from db_upload.m_area_subarea";
+            $this->db->query($sql_del);
+            $sql = $load . "m_area_subarea.TXT' INTO TABLE db_upload.m_area_subarea FIELDS TERMINATED BY ',' ENCLOSED BY '~' LINES TERMINATED BY '\\r\\n' SET nocab ='$nocab'";
+            $this->db->query($sql);
+        } else {
+            $msg[] = 'm_area_subarea.TXT' . ' not found<BR />';
+        }
+
         // update tgl gto
         if ($kode_comp == 'GTO') {
             # code...
@@ -281,6 +301,7 @@ class model_management_upload extends CI_Model
     {
         //$prosesData = $this->load->database('prosesData',TRUE);
         $userid = $data->row()->userid;
+        $kode_comp = $data->row()->username;
         $nocab = substr($data->row()->filename, 2, 2);
         $tahun = $data->row()->tahun;
         $tahun_stock = substr($tahun, 2, 2);
@@ -298,25 +319,25 @@ class model_management_upload extends CI_Model
         // ==================== INSERT DATA ====================
         $sql = "
             delete from data$tahun.fi
-            where bulan = $bulan and nocab = '$nocab'
+            where bulan = $bulan and nocab = '$nocab' and thndok = $tahun
         ";
         $proses_fi_del = $this->db->query($sql);
         $sql = "
             insert into data$tahun.fi
             select * from db_upload.fi
-            where bulan = $bulan and nocab = '$nocab'
+            where bulan = $bulan and nocab = '$nocab' and thndok = $tahun
         ";
         $proses_fi = $this->db->query($sql);
         $sql = "
             delete from data$tahun.ri
-            where bulan = $bulan and nocab = '$nocab'
+            where bulan = $bulan and nocab = '$nocab' and thndok = $tahun
         ";
 
         $proses_ri_del = $this->db->query($sql);
         $sql = "
             insert into data$tahun.ri
             select * from db_upload.ri
-            where bulan = $bulan and nocab = '$nocab'
+            where bulan = $bulan and nocab = '$nocab' and thndok = $tahun
         ";
         $proses_ri = $this->db->query($sql);
         $sql = "
@@ -417,6 +438,52 @@ class model_management_upload extends CI_Model
         ";
         $proses_tbkota = $this->db->query($sql);
 
+         $sql = "
+            delete from data$tahun.tabtspot
+            where nocab = '$nocab'
+        ";
+        $proses_tabtspot_del = $this->db->query($sql);
+        $sql = "
+            insert into data$tahun.tabtspot
+            select * from db_upload.tabtspot
+            where nocab = '$nocab'
+        ";
+        $proses_tabtspot = $this->db->query($sql);
+
+        $sql = "
+            delete from data$tahun.m_area_subarea
+            where kode_comp = '$kode_comp' and nocab = '$nocab'
+        ";
+        $proses_m_area_subarea_del = $this->db->query($sql);
+        $sql = "
+            insert into data$tahun.m_area_subarea
+            select * from db_upload.m_area_subarea
+            where kode_comp = '$kode_comp' and nocab = '$nocab'
+        ";
+        $proses_m_area_subarea = $this->db->query($sql);
+
+        // $sql = "
+        //     UPDATE data$tahun.tblang a
+        //     JOIN data$tahun.tabtspot b ON a.status_payment = b.kode_spot
+        //     SET a.kode_spot = b.kode_spot,
+        //     a.status_payment = null
+        //     WHERE a.nocab = '$nocab';
+        // ";
+
+        $sql = "
+            UPDATE data$tahun.tblang a
+            SET a.kode_spot = a.status_payment
+            WHERE a.nocab = '$nocab';
+        ";
+        $proses_update_tblang = $this->db->query($sql);
+
+        $sql_null = "
+            UPDATE data$tahun.tblang a
+            SET a.status_payment = null
+            WHERE a.nocab = '$nocab';
+        ";
+        $proses_update_null = $this->db->query($sql_null);
+
 
         // ======================================================
         
@@ -427,5 +494,21 @@ class model_management_upload extends CI_Model
         ";
         $proses_portal = $this->db->query($sql);
         // ======================================================
+    }
+
+    public function get_mpm_upload_by_id($userid, $tahun, $bulan)
+    {
+        $query = "
+            SELECT a.*, b.username 
+            FROM mpm.upload a
+            LEFT JOIN mpm.user b on a.userid = b.id
+            WHERE a.userid = $userid and a.tahun = $tahun and bulan = $bulan and a.status_closing = 1 and status = 1
+            ORDER BY a.id DESC
+        ";
+
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";die;
+        return $this->db->query($query);
     }
 }

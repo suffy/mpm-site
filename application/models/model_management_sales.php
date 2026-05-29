@@ -476,8 +476,7 @@ class Model_management_sales extends CI_Model
         ";
         // echo "<pre>";
         // print_r($query);
-        // echo "</pre>";
-        // die;
+        // echo "</pre>";die;
         return $this->db->query($query);
     }
 
