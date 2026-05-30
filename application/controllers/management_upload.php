@@ -3,10 +3,9 @@
 if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Management_upload extends MY_Controller
 {
-    public function __construct()
+    function __construct()
     {
         parent::__construct();
-        $this->data['page_title'] = 'Management Upload';
         $logged_in= $this->session->userdata('logged_in');
         if(!isset($logged_in) || $logged_in != TRUE)
         {
@@ -17,23 +16,82 @@ class Management_upload extends MY_Controller
         $this->load->helper(array('url', 'csv'));
         $this->load->model(array('model_management_upload', 'model_sales_omzet'));
         $this->dataUpload = $this->model_management_upload->get_dataUpload($this->session->userdata('id'));
-    }
 
+        
+    }
+    // function management_upload()
+    // {
+    //     $logged_in= $this->session->userdata('logged_in');
+    //     if(!isset($logged_in) || $logged_in != TRUE)
+    //     {
+    //         redirect('login/','refresh');
+    //     }
+    //     set_time_limit(0);
+    //     $this->load->library(array('table', 'template', 'Excel_generator', 'form_validation', 'email', 'zip'));
+    //     $this->load->helper(array('url', 'csv'));
+    //     $this->load->model(array('model_management_upload', 'model_sales_omzet'));
+    //     $this->dataUpload = $this->model_management_upload->get_dataUpload($this->session->userdata('id'));
+    // }
+
+    // function navbar($data)
+    // {
+    //     if ($this->session->userdata('level') === '4') { // jika dp
+    //         $this->load->view('management_office/top_header_dp', $data);
+    //     }elseif ($this->session->userdata('level') === '3') { // jika principal
+    //         $this->load->view('management_office/top_header_principal', $data);
+    //     }elseif ($this->session->userdata('level') === "3a") { // jika principal tanpa sales
+    //         $this->load->view('management_office/top_header_principal_nosales', $data);
+    //     }elseif ($this->session->userdata('level') === "3b") { // jika principal hanya raw data, claim, rpd
+    //         $this->load->view('management_office/top_header_principal_rawdata', $data);
+    //     }elseif ($this->session->userdata('level') === "3c") { // jika principal raw_data dan retur dan rpd = RSPH = ghozali yoseph sudarsono
+    //         $this->load->view('management_office/top_header_principal_rawdata_retur', $data);
+    //     }elseif ($this->session->userdata('level') === "3d") { // jika principal rpd
+    //         $this->load->view('management_office/top_header_principal_rpd', $data);
+    //     }elseif ($this->session->userdata('level') === '5') { // jika dp mpi
+    //         $this->load->view('management_office/top_header_dp_mpi', $data);
+    //     }else{
+    //         $this->load->view('management_office/top_header', $data);
+    //     }
+    // }
     function index()
     {
+        // if ($this->session->userdata('username') != 'millax'){
+        // // ($this->session->userdata('username') == 'bdg' && $this->session->userdata('username') == 'jk1' && $this->session->userdata('username') == 'srg') { // jika dp
+        //     //tampilkan alert kalau sedang maintenance
+            // echo "<script>alert('Maaf Urgent !!! sedang ada maintenance');document.location='javascript:history.back()'</script>";
+                                
+        //     redirect('management_office/dashboard');
+        //     die;
+        // }
         $this->dashboard();
     }
 
     public function dashboard()
     {
         $this->session->unset_userdata('upload');
+        $tahun = '2025';
+        $bulan = '12';
+
+        // Ambil data upload
+        $query_upload = $this->model_management_upload->get_mpm_upload_by_id($this->session->userdata('id'), $tahun, $bulan);
+
+        $max_tahun = ($query_upload->num_rows() > 0) ? 2026 : 2025;
+        // echo $max_tahun;die;
 
         $data = [
             'title' => 'Data Upload',
             'url'   => 'management_upload/proses_validasi_upload',
             'data_upload' => $this->dataUpload,
             'data_uploadhistory' => $this->model_management_upload->get_dataUpload_all_status($this->session->userdata('id')),
+            'max_tahun' => $max_tahun
         ];
+
+        // $this->navbar($data);
+        // $this->load->view('kalimantan/header_full_width', $data);
+        // $this->load->view('management_claim/css');
+        // $this->load->view('management_upload/dashboard', $data);
+        // $this->load->view('kalimantan/footer');
+
         $this->render('management_upload/dashboard', $data);
     }
 
@@ -100,45 +158,84 @@ class Management_upload extends MY_Controller
             $batas_bulan_upload = date('m', strtotime($tanggal_berjalan. '-7 day'));
             $batas_tahun_upload = date('Y', strtotime($tanggal_berjalan. '-7 day'));
 
-            if ($bulan == $batas_bulan_upload && $tahun == $batas_tahun_upload) {
-                $data_historyUpload = $this->model_management_upload->get_dataUpload_status_closing($data);
+            $periode_input = (int)($tahun . sprintf("%02d", $bulan));
+            $periode_batas = (int)($batas_tahun_upload . sprintf("%02d", $batas_bulan_upload));
+
+            // if ($bulan == $batas_bulan_upload && $tahun == $batas_tahun_upload) {
+            //     $data_historyUpload = $this->model_management_upload->get_dataUpload_status_closing($data);
                 
-                // cek history closing
-                if ($data_historyUpload->num_rows() > 0) {
-                    $filename_historyUpload = $data_historyUpload->row('filename');
-                    $this->session->set_flashdata("pesan_gagal", "Anda sudah melakukan upload data closing bulan $bulan tahun $tahun dengan file $filename_historyUpload, jika ingin revisi silakan hubung tim IT !");
-                    redirect('management_upload');
-                } 
+            //     // cek history closing
+            //     if ($data_historyUpload->num_rows() > 0) {
+            //         $filename_historyUpload = $data_historyUpload->row('filename');
+            //         $this->session->set_flashdata("pesan_gagal", "Anda sudah melakukan upload data closing bulan $bulan tahun $tahun dengan file $filename_historyUpload, jika ingin revisi silakan hubung tim IT !");
+            //         redirect('management_upload');
+            //     } 
 
-                // cek tanggal
-                if(!empty($data_historyUpload->row('tanggal'))){
-                    if ($tanggal < $$this->dataUpload->row()->tanggal) {
-                        $this->session->set_flashdata("pesan_gagal", "Upload gagal. Silahkan upload file terbaru !!");
-                        redirect('management_upload');
-                    }
-                }
-            } else if ($bulan < $batas_bulan_upload && $tahun <= $batas_tahun_upload) {
+            //     // cek tanggal
+            //     if(!empty($data_historyUpload->row('tanggal'))){
+            //         if ($tanggal < $$this->dataUpload->row()->tanggal) {
+            //             $this->session->set_flashdata("pesan_gagal", "Upload gagal. Silahkan upload file terbaru !!");
+            //             redirect('management_upload');
+            //         }
+            //     }
+            // } else if ($bulan < $batas_bulan_upload && $tahun <= $batas_tahun_upload) {
+            //     $data_historyUpload = $this->model_management_upload->get_dataUpload_status_closing($data);
+
+            //     // cek history closing
+            //     if ($data_historyUpload->num_rows() > 0) {
+            //         $filename_historyUpload = $data_historyUpload->row('filename');
+            //         $this->session->set_flashdata("pesan_gagal", "Anda sudah melakukan upload data closing bulan $bulan tahun $tahun dengan file $filename_historyUpload, jika ingin revisi silakan hubung tim IT !");
+            //         redirect('management_upload');
+            //     }
+            // } elseif ($bulan > $batas_bulan_upload && $tahun >= $batas_tahun_upload) {
+            //     $batas['bulan'] = $batas_bulan_upload;
+            //     $batas['tahun'] = $batas_tahun_upload;
+            //     $data_historyUpload = $this->model_management_upload->get_dataUpload_status_closing_before($data,$batas);
+                
+            //     // cek history closing
+            //     if ($data_historyUpload->num_rows() < 0) {
+            //         $filename_historyUpload = $data_historyUpload->row('filename');
+            //         $this->session->set_flashdata("pesan_gagal", "Anda sudah melakukan upload data closing bulan $batas_bulan_upload tahun $batas_tahun_upload !");
+            //         redirect('management_upload');
+            //     } 
+            // } else {
+            //     $this->session->set_flashdata("pesan_gagal", "Data anda tidak sesuai, Silakan hubungi tim IT !");
+            //     redirect('management_upload');
+            // }
+
+            if ($periode_input == $periode_batas) {
+                // echo "masuk periode input = periode batas<br>";die;
+                // KASUS: User upload untuk bulan yang baru saja lewat (Closing periode Desember 2025)
                 $data_historyUpload = $this->model_management_upload->get_dataUpload_status_closing($data);
-
-                // cek history closing
                 if ($data_historyUpload->num_rows() > 0) {
-                    $filename_historyUpload = $data_historyUpload->row('filename');
-                    $this->session->set_flashdata("pesan_gagal", "Anda sudah melakukan upload data closing bulan $bulan tahun $tahun dengan file $filename_historyUpload, jika ingin revisi silakan hubung tim IT !");
+                    $filename = $data_historyUpload->row('filename');
+                    $this->session->set_flashdata("pesan_gagal", "Anda sudah upload closing bulan $bulan-$tahun ($filename). Hubungi IT untuk revisi.");
                     redirect('management_upload');
                 }
-            } elseif ($bulan > $batas_bulan_upload && $tahun >= $batas_tahun_upload) {
+                
+            } else if ($periode_input < $periode_batas) {
+                // KASUS: User upload untuk bulan-bulan yang sudah lama lewat (Backdate)
+                $data_historyUpload = $this->model_management_upload->get_dataUpload_status_closing($data);
+                if ($data_historyUpload->num_rows() > 0) {
+                    $this->session->set_flashdata("pesan_gagal", "Periode $bulan-$tahun sudah closing.");
+                    redirect('management_upload');
+                }
+            } else if ($periode_input > $periode_batas) {
+                // KASUS: User upload untuk bulan berjalan atau masa depan (Januari 2026 ke atas)
+                // Cek apakah bulan sebelumnya sudah di-upload?
                 $batas['bulan'] = $batas_bulan_upload;
                 $batas['tahun'] = $batas_tahun_upload;
-                $data_historyUpload = $this->model_management_upload->get_dataUpload_status_closing_before($data,$batas);
+                $data_history_before = $this->model_management_upload->get_dataUpload_status_closing_before($data, $batas);
                 
-                // cek history closing
-                if ($data_historyUpload->num_rows() < 0) {
-                    $filename_historyUpload = $data_historyUpload->row('filename');
-                    $this->session->set_flashdata("pesan_gagal", "Anda sudah melakukan upload data closing bulan $batas_bulan_upload tahun $batas_tahun_upload !");
+                // Jika bulan sebelumnya (Desember 2025) BELUM di-upload, maka tidak boleh loncat ke Januari
+                if ($data_history_before->num_rows() < 0) {
+                    $this->session->set_flashdata("pesan_gagal", "Gagal! Anda harus upload data closing bulan $batas_bulan_upload-$batas_tahun_upload terlebih dahulu.");
                     redirect('management_upload');
-                } 
+                }
+
             } else {
-                $this->session->set_flashdata("pesan_gagal", "Data anda tidak sesuai, Silakan hubungi tim IT !");
+                // Kondisi pengaman jika ada data tidak valid
+                $this->session->set_flashdata("pesan_gagal", "Data tidak sesuai, silakan hubungi tim IT!");
                 redirect('management_upload');
             }
 
@@ -189,11 +286,13 @@ class Management_upload extends MY_Controller
             'data_upload' => $this->session->userdata('upload'),
         ];
 
-        $this->navbar($data);
-        $this->load->view('kalimantan/header_full_width', $data);
-        $this->load->view('management_claim/css');
-        $this->load->view('management_upload/preview_upload', $data);
-        $this->load->view('kalimantan/footer');
+        // $this->navbar($data);
+        // $this->load->view('kalimantan/header_full_width', $data);
+        // $this->load->view('management_claim/css');
+        // $this->load->view('management_upload/preview_upload', $data);
+        // $this->load->view('kalimantan/footer');
+
+        $this->render('management_upload/preview_upload', $data);
     }
 
     public function simpan_upload()
