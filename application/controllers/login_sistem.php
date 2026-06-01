@@ -72,7 +72,7 @@ class Login_sistem extends MY_Controller
         // ==================================================
         // VALIDASI KHUSUS: LEVEL 10 WAJIB ADA DI TABEL KARYAWAN
         // ==================================================
-        if ($level == 10 && $kode_company == '000' && $username != 'thomas' && $username != 'yayang' && $username != 'nanita' && $username != 'hendra' && $username != 'fahrodin') {
+        if ($level == 10 && $kode_company == '000' && $username != 'thomas' && $username != 'yayang' && $username != 'nanita' && $username != 'hendra' && $username != 'fahrodin' && $username != 'fardison' && $username != 'eny' && $username != 'bagus') {
             // echo "masuk";die;
             $get_personalia = $this->login->get_personalia($username)->result();
             $pic_ids = [];
@@ -80,7 +80,7 @@ class Login_sistem extends MY_Controller
                 $pic_ids[] = (int)$row->username_web;
             }
             if (!$pic_ids) {
-                $this->session->set_flashdata("pesan", "Anda belum terdaftar di Personalia. Silahkan input data Personalia agar dapat login.");
+                $this->session->set_flashdata("pesan", "Anda belum melengkapi data Personalia. Silahkan input data Personalia agar dapat login.");
                 redirect('login_sistem/formLogin');
                 return;
             }

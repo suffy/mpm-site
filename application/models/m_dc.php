@@ -473,12 +473,10 @@ class M_dc extends CI_Model
             )b on a.kode_alamat = b.kode_alamat
         ";
 
-        echo "<pre>";
-        print_r($sql);
-        echo "</pre>";
+        // echo "<pre>";
+        // print_r($sql);
+        // echo "</pre>";
         $proses = $this->db->query($sql);
-
-        die;
         return $proses;
     }
 
@@ -522,9 +520,9 @@ class M_dc extends CI_Model
             )
         ";
 
-        echo "<pre><br><br><br><br>";
-        print_r($sql);
-        echo "</pre>";
+        // echo "<pre><br><br><br><br>";
+        // print_r($sql);
+        // echo "</pre>";
 
         return $this->db->query($sql);
     }
@@ -541,9 +539,9 @@ class M_dc extends CI_Model
             )
         ";
 
-        echo "<pre><br>";
-        print_r($sql);
-        echo "</pre>";
+        // echo "<pre><br><br><br><br>";
+        // print_r($sql);
+        // echo "</pre>";
 
         return $this->db->query($sql);
     }
@@ -599,9 +597,9 @@ class M_dc extends CI_Model
             order by a.kode desc
         ";
 
-        echo "<br><br><br><br><pre>";
-        print_r($sql);
-        echo "</pre>";
+        // echo "<br><br><br><br><pre>";
+        // print_r($sql);
+        // echo "</pre>";
         // die;
 
         return $this->db->query($sql);
@@ -671,44 +669,69 @@ class M_dc extends CI_Model
         return $this->db->query($query);
     }
 
+    // public function generate()
+    // {
+    //     $cek_jumlah = $this->db->get("site.t_dc_do")->num_rows();
+    //     if (!$cek_jumlah) {
+    //         $reserve_nomor_params = "MPM_LBM/" . date('Y') . date('m') . "-001";
+    //     } else {
+    //         // echo "ada";
+    //         $sql = "
+    //             select right(a.kode,3) as urut
+    //             from site.t_dc_do a
+    //             GROUP BY a.kode
+    //             ORDER BY right(a.kode,3) desc
+    //             limit 1
+    //         ";
+
+    //         // MPM_LBM/202209-099
+
+    //         // URUT = 099
+    //         // URUT = 99
+    //         // RESERVE_NOMOR = 99 + 1 = 100
+    //         // RESERVE_NOMOR_PARAMS = MPM_LBM/202209-002
+    //         // RESERVE_NOMOR_PARAMS = MPM_LBM/202209-100
+
+
+    //         $proses = $this->db->query($sql)->row();
+    //         $reserve_nomor = $proses->urut + 1;
+    //         if (strlen($reserve_nomor) === 1) {
+    //             $reserve_nomor_params = "MPM_LBM/" . date('Y') . date('m') . "-00" . $reserve_nomor;
+    //         } else if (strlen($reserve_nomor) === 2) {
+    //             $reserve_nomor_params = "MPM_LBM/" . date('Y') . date('m') . "-0" . $reserve_nomor;
+    //         } else {
+    //             $reserve_nomor_params = "MPM_LBM/" . date('Y') . date('m') . "-" . $reserve_nomor;
+    //         }
+    //         // echo "reserve_nomor_params : ".$reserve_nomor_params;
+    //     }
+
+    //     // echo "reserve_nomor_params : ".$reserve_nomor_params;
+    //     // die;
+
+    //     return $reserve_nomor_params;
+    // }
+
     public function generate()
     {
         $cek_jumlah = $this->db->get("site.t_dc_do")->num_rows();
         if (!$cek_jumlah) {
-            $reserve_nomor_params = "MPM_LBM/" . date('Y') . date('m') . "-001";
+            $reserve_nomor_params = "MPM_LBM/" . date('Y') . date('m') . "-0001";
         } else {
-            // echo "ada";
             $sql = "
-                select right(a.kode,3) as urut
-                from site.t_dc_do a
-                GROUP BY a.kode
-                ORDER BY right(a.kode,3) desc
-                limit 1
+                SELECT SUBSTRING_INDEX(a.kode, '-', -1) AS urut
+                FROM site.t_dc_do a
+                ORDER BY CAST(SUBSTRING_INDEX(a.kode, '-', -1) AS UNSIGNED) DESC
+                LIMIT 1
             ";
 
-            // MPM_LBM/202209-099
-
-            // URUT = 099
-            // URUT = 99
-            // RESERVE_NOMOR = 99 + 1 = 100
-            // RESERVE_NOMOR_PARAMS = MPM_LBM/202209-002
-            // RESERVE_NOMOR_PARAMS = MPM_LBM/202209-100
-
-
             $proses = $this->db->query($sql)->row();
-            $reserve_nomor = $proses->urut + 1;
-            if (strlen($reserve_nomor) === 1) {
-                $reserve_nomor_params = "MPM_LBM/" . date('Y') . date('m') . "-00" . $reserve_nomor;
-            } else if (strlen($reserve_nomor) === 2) {
-                $reserve_nomor_params = "MPM_LBM/" . date('Y') . date('m') . "-0" . $reserve_nomor;
-            } else {
-                $reserve_nomor_params = "MPM_LBM/" . date('Y') . date('m') . "-" . $reserve_nomor;
-            }
-            // echo "reserve_nomor_params : ".$reserve_nomor_params;
-        }
+            $reserve_nomor = (int)$proses->urut + 1;
 
-        // echo "reserve_nomor_params : ".$reserve_nomor_params;
-        // die;
+            // Atur panjang digit (misalnya 4 digit: 0001, 0010, 0100, dst.)
+            $reserve_nomor_str = str_pad($reserve_nomor, 4, "0", STR_PAD_LEFT);
+
+            $reserve_nomor_params = "MPM_LBM/" . date('Y') . date('m') . "-" . $reserve_nomor_str;
+        }
 
         return $reserve_nomor_params;
     }
@@ -783,5 +806,6 @@ class M_dc extends CI_Model
         $proses = $this->db->query($query)->row();
         return $proses->vendor;
     }
+
 
 }

@@ -810,7 +810,7 @@ class Model_inventory extends CI_Model
                 if(a.company like 'PT. MPI%', a.company, if(a.company like 'PT. PENTA VALENT TBK%', a.company, e.nama_comp)) as nama_comp,a.company, 
                 if(a.company like '%PT. MPI%','MT', if(a.company like 'PT. PENTA VALENT TBK%', 'MT', 'GT')) as channel,
                 a.nopo, a.po_ref,a.tipe,a.tglpo,month(a.tglpo) as bulan, year(a.tglpo) as tahun, a.tglpesan,a.alamat, c.supp, f.namasupp as principal, b.kodeprod, 
-                c.namaprod, c.nama_group,c.nama_sub_group, b.banyak, b.hna, b.total, $id, '$created_date'
+                c.namaprod, c.nama_group,c.nama_sub_group, b.banyak, b.banyak_karton, b.hna, b.total, $id, '$created_date'
         from 
         (
             select 	a.id, a.nopo,a.po_ref,a.tipe, date(a.tglpo) as tglpo, a.alamat, a.userid, a.company, date(a.tglpesan) as tglpesan, a.kode_alamat
@@ -818,7 +818,7 @@ class Model_inventory extends CI_Model
             where $parameter 
         )a INNER JOIN
         (
-            select b.id_ref, b.kodeprod, b.banyak ,b.harga as hna,(b.banyak*b.harga) as total
+            select b.id_ref, b.kodeprod, b.banyak, b.banyak_karton, b.harga as hna,(b.banyak*b.harga) as total
             from mpm.po_detail b
             where b.kodeprod in ($kodeprod) and b.deleted = 0
         )b on a.id = b.id_ref inner JOIN 

@@ -355,7 +355,7 @@ class model_management_karyawan extends CI_Model {
     public function get_username_by_id_karyawan($id_karyawan) 
     {
         $query = "
-            SELECT username_web
+            SELECT username_web, flag_status
             FROM site.karyawan 
             WHERE id = $id_karyawan
         ";

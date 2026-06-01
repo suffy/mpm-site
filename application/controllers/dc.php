@@ -26,8 +26,9 @@ class Dc extends MY_Controller
             'url'       => 'dc/proses_dashboard',
             'url_keluar' => 'dc/proses_dashboard_keluar',
             'get_label' => $this->M_menu->get_label(),
-            // 'get_data_row_mutasi_by_produk'  => $this->m_dc->get_data_row_mutasi_by_produk()->result(),
-            // 'get_data_row_mutasi_by_produk_total'  => $this->m_dc->get_data_row_mutasi_by_produk_total()->row(),
+            'get_data_row_mutasi_by_produk'  => $this->m_dc->get_data_row_mutasi_by_produk()->result(),
+            'get_data_row_mutasi_by_produk_total'  => $this->m_dc->get_data_row_mutasi_by_produk_total()->row(),
+            
             'get_data_row_keluar'  => $this->m_dc->get_data_row_keluar()->result(),
             'get_vendor_dc'  => $this->m_dc->get_vendor_dc()->result(),
         ];
@@ -44,9 +45,7 @@ class Dc extends MY_Controller
     {
         $nodo = $this->input->post('nodo');
         $userid = $this->session->userdata('id');
-        echo "nodo : ".$nodo;
-        echo "userid : ".$userid;
-        // die;
+        // echo "nodo : ".$nodo;
 
         $created_at = $this->model_outlet_transaksi->timezone();
 

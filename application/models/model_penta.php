@@ -233,13 +233,14 @@ class Model_penta extends CI_Model
     public function get_penta_sales_ext($token, $tahun, $bulan)
     {
         $url_penta = getenv('PENTA_API').'list/sales_ext/'.$tahun.'/'.$bulan;
-        // echo "<br>";
-        // echo "url_penta : ".$url_penta;
-        // echo "<br>";
-        // echo "token : "; echo $token;
+        echo "<br>";
+        echo "url_penta : ".$url_penta;
+        echo "<br>";
+        echo "token : "; echo $token;
         $curl = curl_init();
 
         $authorization = "Authorization: Bearer $token";
+        echo "authorization : ".$authorization;
 
         curl_setopt($curl, CURLOPT_URL, $url_penta);
         curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $authorization ));

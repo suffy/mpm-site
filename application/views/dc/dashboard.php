@@ -38,7 +38,27 @@
                     <center>
                     <div class="col-md mt-5">
 
-                       
+                        <div class="col-xl-4 col-md-6 text-center">
+                            <div class="card ticket-card">
+                                <div class="card-body">
+                                    <p class="m-b-30 bg-c-red lbl-card"><i class="fas fa-folder-open"></i> Total Stock DC</p>
+                                    <div class="text-center">
+                                        <h2 class="m-b-0 d-inline-block text-c-red">
+                                            <?php 
+                                                if ($get_data_row_mutasi_by_produk_total->total == null) {
+                                                    echo "0";
+                                                }else{
+                                                    echo $get_data_row_mutasi_by_produk_total->total; 
+                                                }
+                                            ?>
+                                        </h2>
+                                        <p class="m-b-0 d-inline-block"><strong>UNIT</strong></p>
+                                        <p class="m-b-0 m-t-15">
+                                            
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                     </div>
                     </center>

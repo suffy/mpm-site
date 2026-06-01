@@ -96,10 +96,13 @@ class Model_upload_file extends CI_Model
             from mpm.tbl_tabcomp a
             where kode_comp ='$user' and a.active = 1
         ";
+
         $hasil = $this->db->query($sql)->result();
+        // print_r($this->db->last_query());die;
         foreach($hasil as $a){
             $nocab = $a->nocab;
         }
+        // echo "nocab : ".$nocab;die;
         // var_dump($nocab);die;
         if($nocab == $nocab_zip ){
             if ($flag_check != 1 && $flag_check != 3 ) {
@@ -312,10 +315,14 @@ class Model_upload_file extends CI_Model
         }
         set_time_limit(0);
 
-        $ddl1 = array('fi', 'fh', 'ri', 'rh', 'st', 't_sales_rrk', 'm_sales_salsman_ob');
-        $ddl2 = array('tblang', 'tbkota', 'm_customer_creditlimit_prinsipal','m_setup_ppn');
-        $ddl3 = array('tabsupp', 'tabsales', 'tabsalur', 'tabtype', 'tbrayon', 'tabfaktr', 'tabgrupp');
-        $load = "LOAD DATA INFILE 'D:/xampp/htdocs/cisk/assets/uploads/unzip/" . $nocab . "/";
+        // $ddl1 = array('fi', 'fh', 'ri', 'rh', 'st', 't_sales_rrk', 'm_sales_salsman_ob');
+        // $ddl2 = array('tblang', 'tbkota', 'm_customer_creditlimit_prinsipal','m_setup_ppn');
+        // $ddl3 = array('tabsupp', 'tabsales', 'tabsalur', 'tabtype', 'tbrayon', 'tabfaktr', 'tabgrupp');
+        // $load = "LOAD DATA INFILE 'C:/xampp/htdocs/cisk/assets/uploads/unzip/" . $nocab . "/";
+        $ddl1 = array('fi', 'ri', 'st', 'ekspedisi');
+        $ddl2 = array('tblang', 'tbkota');
+        $ddl3 = array('tabsupp', 'tabsales', 'tabsalur', 'tabtype', 'tbrayon', 'tabgrupp');
+        $load = "LOAD DATA INFILE 'C:/xampp/htdocs/cisk/assets/uploads/unzip/" . $nocab . "/";
         foreach ($ddl1 as $ddl) {
             $fields = $this->db->field_data("db_upload." . $ddl);
             $name = '(';
@@ -337,21 +344,12 @@ class Model_upload_file extends CI_Model
             $cek = file_exists($file);
             // echo "file : ".$file;
             if (file_exists($file)) {
-                if ($ddl == 'st') {
+                if ($ddl == 'st' || $ddl == 'ekspedisi') {
                     $sql_del = "delete from db_upload.$ddl where nocab='$nocab'";
                     $this->db->query($sql_del);
                     $sql = $load . strtoupper($ddl) . $nocab . $year . $month . ".TXT' INTO TABLE db_upload.$ddl FIELDS TERMINATED BY ',' ENCLOSED BY '~' LINES TERMINATED BY '\\r\\n' " . $name . " SET NOCAB='$nocab', BULAN='$year$month' " . $set;
                     $this->db->query($sql);
                     $msg[] = $ddl . $nocab . $year . $month . '.TXT' . ' found and uploaded <br />';
-
-                    // $sql_del_st_detail="delete from db_upload.st_detail where nocab='$nocab' and tanggal='$tanggal'";
-                    // $this->db->query($sql_del_st_detail);
-                    // $sql = $load.strtoupper($ddl).$nocab.$year.$month.".TXT' INTO TABLE db_upload.st_detail FIELDS TERMINATED BY ',' ENCLOSED BY '~' LINES TERMINATED BY '\\r\\n' ".$name." SET NOCAB='$nocab', BULAN='$year$month' ,TANGGAL='$tanggal' ".$set;
-                    // $this->db->query($sql);
-
-                    // echo $sql_del."<br>";
-                    // echo $sql."<br>";
-
                 } elseif ($ddl == 't_sales_rrk') {
                     $sql_del = "delete from db_upload.$ddl where kode_comp = '$kode_comp' and nocab='$nocab'";
                     $this->db->query($sql_del);
@@ -1112,6 +1110,35 @@ class Model_upload_file extends CI_Model
                 where nocab = '$nocab'
             ";
             $proses_m_setup_ppn = $this->db->query($sql);
+
+            $sql = "
+            delete from data$tahun.ekspedisi
+            where bulan = $tahun_stock$bulan and nocab = '$nocab'
+            ";
+            $proses_tbkota_del = $this->db->query($sql);
+            $sql = "
+                insert into data$tahun.ekspedisi
+                select * from db_upload.ekspedisi
+                where bulan = $tahun_stock$bulan and nocab = '$nocab'
+            ";
+            $proses_tbkota = $this->db->query($sql);
+
+            // UPDATE FI DAN RI SUPRALITA
+            $sql = "
+                update data$tahun.fi
+                set kodeprod = '010121',
+	                keterangan = 'ED042025'
+                where kodeprod = 'KJM001N' and bulan = $bulan and nocab in ('0l','1s')
+            ";
+            $proses_update_fi = $this->db->query($sql);
+
+            $sql = "
+                update data$tahun.ri
+                set kodeprod = '010121',
+	                keterangan = 'ED042025'
+                where kodeprod = 'KJM001N' and bulan = $bulan and nocab in ('0l','1s')
+            ";
+            $proses_update_ri = $this->db->query($sql);
             // =========================================================
 
             // ================ UPDATE db_upload =======================

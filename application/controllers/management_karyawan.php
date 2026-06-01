@@ -334,8 +334,10 @@ class management_karyawan extends MY_Controller
         $get_username_by_id_karyawan = $this->model_management_karyawan->get_username_by_id_karyawan($id_karyawan);
         if ($get_username_by_id_karyawan->num_rows() > 0) {
             $username_karyawan = $get_username_by_id_karyawan->row()->username_web;
+            $flag_status = $get_username_by_id_karyawan->row()->flag_status;
         } else {
             $username_karyawan = null;
+            $flag_status = null;
         }
 
         $get_atasan = $this->model_management_karyawan->get_atasan($username_karyawan);
@@ -421,18 +423,22 @@ class management_karyawan extends MY_Controller
         $this->handleKeluarga($id_karyawan);
         $this->handleAsuransi($id_karyawan);
 
-        if ($action == 2 && !$this->isDataLengkap($data_karyawan)) {
+        if ($flag_status == 1 && !$this->isDataLengkap($data_karyawan)) {
             $data['flag_status'] = 1;
             $data['nama_status'] = 'Draft';
             $sessin_flash = $this->session->set_flashdata('pesan_success', 'Data karyawan tidak lengkap, data disimpan dan status diubah menjadi Draft. Silakan lengkapi data sebelum diajukan ke HRD.');
-        }elseif ($action == 2 && $this->isDataLengkap($data_karyawan)) {
+        }elseif ($flag_status == 1 && $this->isDataLengkap($data_karyawan)) {
             $data['flag_status'] = 2;
             $data['nama_status'] = 'Pending HRD';
             $sessin_flash = $this->session->set_flashdata('pesan_success', 'Data karyawan lengkap dan berhasil diajukan ke HRD!');
-        }elseif ($action == 1) {
-            $data['flag_status'] = 1;
-            $data['nama_status'] = 'Draft';
-            $sessin_flash = $this->session->set_flashdata('pesan_success', 'Data karyawan berhasil disimpan sebagai Draft!');
+        }elseif ($flag_status == 3 && $this->isDataLengkap($data_karyawan)) {
+            $data['flag_status'] = 3;
+            $data['nama_status'] = 'Completed';
+            $sessin_flash = $this->session->set_flashdata('pesan_success', 'Data karyawan berhasil diupdate!');
+        }elseif ($flag_status == 2){
+            $data['flag_status'] = 2;
+            $data['nama_status'] = 'Pending HRD';
+            $sessin_flash = $this->session->set_flashdata('pesan_success', 'Data karyawan berhasil diupdate!');
         }
 
         $this->model_management_karyawan->update_karyawan_by_id($id_karyawan, $data);

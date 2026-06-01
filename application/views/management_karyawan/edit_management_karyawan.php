@@ -622,7 +622,7 @@
                                     <!-- <a href="<?= base_url('management_karyawan/input_management_karyawan'); ?>" class="btn btn-secondary px-4">
                                         <i class="fas fa-times"></i> Batal
                                     </a> -->
-                                    <button type="submit" class="btn btn-primary px-4 ml-2">
+                                    <button type="submit" class="btn btn-primary px-4 ml-2" name="button_action" value="2">
                                         <i class="fas fa-save"></i> Simpan Perubahan
                                     </button>
                                     <a href="<?= base_url('management_karyawan/edit_management_karyawan/' . $karyawan->signature . '?status_action=approve'); ?>" class="btn btn-success px-4 ml-2">

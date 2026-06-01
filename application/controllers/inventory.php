@@ -290,11 +290,8 @@ class Inventory extends MY_Controller
     public function export_laporan_po(){
         $id = $this->session->userdata('id');
         $query="
-        SELECT a.branch_name, a.nama_comp, a.company, a.channel, a.nopo, a.po_ref, a.tipe, a.tglpo, a.bulan, a.tahun, a.tglpesan, a.alamat, a.supp, a.principal, a.kodeprod, a.namaprod, a.nama_group, a.nama_sub_group, a.banyak, a.banyak/b.isisatuan as qty_karton, a.harga, a.total, a.id, a.created_date
-        FROM
-        (
-            select * from site.temp_laporan_po a where a.id = $id and a.created_date = (select max(created_date) from site.temp_laporan_po where a.id = $id)
-        )a left join mpm.tabprod b on a.kodeprod = b.kodeprod
+            select a.branch_name, a.nama_comp, a.company, a.channel, a.nopo, a.po_ref, a.tipe, a.tglpo, a.bulan, a.tahun, a.tglpesan, a.alamat, a.supp, a.principal, a.kodeprod, a.namaprod, a.nama_group, a.nama_sub_group, a.banyak, a.banyak_karton, a.harga, a.total, a.id, a.created_date
+            from site.temp_laporan_po a where a.id = $id and a.created_date = (select max(created_date) from site.temp_laporan_po where a.id = $id)
         ";
 
         $hasil = $this->db->query($query);        

@@ -18,10 +18,20 @@ class Upload_file extends MY_Controller
         $this->load->model('model_sales_omzet');
         $this->load->model('M_menu');
         $this->load->database();
+
+        // if ($this->session->userdata('username') != 'suffy' && $this->session->userdata('username') != 'milla' && $this->session->userdata('username') != 'ilham') { // jika dp
+        //     redirect('management_office');
+        //     die;
+        // }
     }
 
     function index()
     {
+        echo "<script>
+        alert('Menu Upload Lama ini Sudah di non-Aktifkan, Anda akan di redirect ke Menu Upload Baru');
+        window.location.href='http://site.muliaputramandiri.com/cisk/management_upload';
+        </script>";
+        die;
         $this->db->select('*');
         $this->db->from('site.temp_portal_akses');
         $this->db->where('proses', 'raw_data');
@@ -202,7 +212,7 @@ class Upload_file extends MY_Controller
 
         $this->load->library('upload', $config);
         $zip = new ZipArchive;
-        $file = "D:/xampp/htdocs/cisk/assets/uploads/zip/" . $filename;
+        $file = "C:/xampp/htdocs/cisk/assets/uploads/zip/" . $filename;
         //echo $file;
 
         $openZip = $zip->open($file);

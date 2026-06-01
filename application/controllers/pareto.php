@@ -24,9 +24,7 @@ class Pareto extends MY_Controller
 
   public function index()
   {
-    // echo "hello";
-    // die;
-
+    // echo "pareto";die;
     $tahun = $this->input->get('tahun');
     $site_code = $this->input->get('site_code');
     $supp = $this->input->get('supp');
@@ -37,6 +35,11 @@ class Pareto extends MY_Controller
 
     // echo "type : ".$type;
     // echo "class : ".$class;
+    // echo "periode : ".$periode;
+    // echo "tahun : ".$tahun;
+    // echo "site_code : ".$site_code;
+    // echo "supp : ".$supp;
+    // echo "<br>";die;
 
     if(empty($tahun))
     {
@@ -45,9 +48,6 @@ class Pareto extends MY_Controller
     }else{
       $flag_export = true;
     }
-
-    // echo "hellos";
-    // die;
 
     $data = [
       'title' => 'Pareto Account Management',
@@ -62,9 +62,6 @@ class Pareto extends MY_Controller
       'type' => $type,
       'class' => $class,
     ];        
-
-    // echo "xxx";
-    // die;
 
     $this->render('pareto/index', $data);
   }

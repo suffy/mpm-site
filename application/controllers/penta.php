@@ -208,20 +208,54 @@ class Penta extends MY_Controller
             $update_length_kodeprod =  $this->model_penta->update_length_kodeprod($id_log);
         }    
 
-        $array_type = ['penta_sales'];
-        foreach ($array_type as $key => $value) {
-            $token = $this->get_token($value);
-            echo "token : ".$token; 
-            echo "<br>";
-            $sales_ext = $this->model_penta->get_penta_sales_ext($token,$tahun,$bulan);
+        // $array_type = ['penta_sales'];
+        // foreach ($array_type as $key => $value) {
+        //     // $token = $this->get_token($value);
+        //     echo "token penta_sales : ".$token; 
+        //     // echo "<br>";
+        //     $sales_ext = $this->model_penta->get_penta_sales_ext($token,$tahun,$bulan);
             
+        // }
+
+        $token = $this->get_token('penta_sales');
+
+        // echo "token penta_sales : ".$token;
+        $sales_ext = $this->model_penta->get_penta_sales_ext($token,$tahun,$bulan);
+
+        echo "sales_ext : ".$sales_ext;
+
+        if($sales_ext)
+        {
+            // $sales_ext = $this->model_penta->get_penta_sales_ext($token,$tahun,$bulan);
+            $join_sales = $this->model_penta->join_sales($id_log, $sales_ext);
+            if($join_sales)
+            {
+                $this->session->set_flashdata("pesan_success", "Penarikan data berhasil. Silahkan tarik data anda");
+                redirect('penta/log_sales', 'refresh');
+                die;
+            }else{
+                $this->session->set_flashdata("pesan", "Gagal join sales & master customer. Silahkan ulangi kembali atau hubungi IT");
+                redirect('penta/log_sales', 'refresh');
+                die;
+            }
+        }else{
+            $this->session->set_flashdata("pesan", "Gagal tarik master customer penta. Silahkan ulangi kembali atau hubungi IT");
+            redirect('penta/log_sales', 'refresh');
+            die;
         }
 
-        // $sales_ext = $this->model_penta->get_penta_sales_ext($token,$tahun,$bulan);
-        $join_sales = $this->model_penta->join_sales($id_log, $sales_ext);
+        // die;
 
-        $this->session->set_flashdata("pesan_success", "Penarikan data berhasil. Silahkan tarik data anda");
-        redirect('penta/log_sales', 'refresh');
+        
+
+        // if($this->session->userdata('id')==297){
+
+        // }else{
+        //     $this->session->set_flashdata("pesan_success", "Penarikan data berhasil. Silahkan tarik data anda");
+        //     redirect('penta/log_sales', 'refresh');
+        // }
+
+        
 
 
         // $token = $this->get_token('batam');
