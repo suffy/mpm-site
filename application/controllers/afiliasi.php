@@ -238,7 +238,7 @@ class Afiliasi extends MY_Controller
       $reminder_not_harian_bulanan = $this->model_afiliasi->get_master_activity_not_in_activity_plan_not_harian_bulanan($id_jabatan, $id_karyawan, $selected_month);
 
       $data = [
-          'title' => 'Monthly Planning Revisi',
+          'title' => 'Monthly Planning',
           'nama_jabatan' => $nama_jabatan,
           'nama_divisi' => $nama_divisi,
           'nama' => $nama,
