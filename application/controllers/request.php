@@ -28,8 +28,8 @@ class Request extends MY_Controller
         if ( function_exists( 'date_default_timezone_set' ) )
         date_default_timezone_set('Asia/Jakarta');        
         $created_date='"'.date('Y-m-d H:i:s').'"';
-
-        if ($created_by != 297 && $created_by != 452 && $created_by != 11 && $created_by != 547) {
+        
+        if ($created_by != 297 && $created_by != 452 && $created_by != 11 && $created_by != 547 && $created_by != 685 && $created_by != 12) {
             
             echo "<script>alert('anda tidak diijinkan mengakses ini'); </script>";
             redirect('http://site.muliaputramandiri.com','refresh');
@@ -187,7 +187,7 @@ class Request extends MY_Controller
         $to = $email_dp; //setelah rilis
         // $data['to'] = "suffy.mpm@gmail.com";
         $data['to'] = $to;
-        $cc = "sampurno@muliaputramandiri.com,dewi@muliaputramandiri.com, suffy@muliaputramandiri.com";
+        $cc = "sampurno@muliaputramandiri.com, zul@muliaputramandiri.com,dewi@muliaputramandiri.com, suffy@muliaputramandiri.com";
         // $cc = "sampurno@muliaputramandiri.com"; //setelah rilis
         $subject = "MPM Site|Request Perubahan Tipe Class Outlet";
 
@@ -247,6 +247,13 @@ class Request extends MY_Controller
             $this->approval_request_email($status_approve,$log_id,$signature);
             
         }
+    }
+
+    public function export() 
+    {
+        $hsl = $this->model_request->export();
+
+        query_to_csv($hsl,TRUE,'Export Segment.csv');
     }
     
 }

@@ -1,6 +1,7 @@
 <div class="col-xs-16">
     <!-- <a href="<?php echo base_url()."request/input_ticket"; ?>  " class="btn btn-warning" role="button"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> create ticket</a> -->
     <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Tambah Data Karyawan</button> -->
+    <a href="<?= base_url('request/export'); ?>" type="button" class="btn btn-primary">Export</a>
     <hr />
 </div>
 <div class="card table-card">

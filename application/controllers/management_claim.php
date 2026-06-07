@@ -3175,8 +3175,8 @@ class Management_claim extends MY_Controller
 
       if (!$is_exist->num_rows() > 0){
           $nomor_ajuan = $this->model_management_claim->generate($site_code, $this->created_at);
-          echo "nomor_ajuan : ".$nomor_ajuan;
-          die;            
+          // echo "nomor_ajuan : ".$nomor_ajuan;
+          // die;            
 
           $data = [
               "nomor_ajuan"   => $nomor_ajuan,
@@ -3360,7 +3360,7 @@ class Management_claim extends MY_Controller
         $this->email->cc($cc);
         $this->email->subject($subject);
         $this->email->message($message);
-        // $send = $this->email->send();    
+        $send = $this->email->send();    
         if ($send) 
         {
             $this->session->set_flashdata("pesan_success", "Send Email Berhasil");

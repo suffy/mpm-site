@@ -19,41 +19,41 @@ class Model_request extends CI_Model
     public function history(){
     
         $sql = "
-            
-        select 	a.id,a.signature,a.tgl_request,a.nocab,a.customerid,a.signature,
-                sum(a.pending) as total_pending, sum(a.approve) as total_approve, sum(a.reject) as total_reject,
-                sum(a.pending) + sum(a.approve) + sum(a.reject) as total_customerid, b.branch_name,b.nama_comp,b.kode_comp
-        from
-        (
-            select 	a.signature,a.id, date(a.created_date) as tgl_request,a.nocab,
-                    b.customerid,b.status_approval,
-                    IF(b.status_approval is null,1,0) as pending,
-                    IF(b.status_approval = 1,1,0) as approve,
-                    IF(b.status_approval = 0,1,0) as reject
-            from 	dbrest.t_log_request a INNER JOIN 
+            select 	a.id,a.signature,a.tgl_request,a.nocab,a.customerid,a.signature,
+                    sum(a.pending) as total_pending, sum(a.approve) as total_approve, sum(a.reject) as total_reject,
+                    sum(a.pending) + sum(a.approve) + sum(a.reject) as total_customerid, b.branch_name,b.nama_comp,b.kode_comp
+            from
             (
-                SELECT	a.log_id, a.customerid,a.status_approval
-                from 	dbrest.t_request_customer a
-            )b on a.id = b.log_id
-        )a left join 
-        (
-            SELECT a.branch_name,a.nama_comp,a.nocab,a.kode_comp
-            FROM
+                select 	a.signature,a.id, date(a.created_date) as tgl_request,a.nocab, b.kode_comp,
+                        CONCAT(b.kode_comp,a.nocab) as site_code,
+                        b.customerid,b.status_approval,
+                        IF(b.status_approval is null,1,0) as pending,
+                        IF(b.status_approval = 1,1,0) as approve,
+                        IF(b.status_approval = 0,1,0) as reject
+                from 	dbrest.t_log_request a INNER JOIN 
+                (
+                    SELECT	a.log_id, a.customerid,a.status_approval, SUBSTR(a.siteid,1,3) as kode_comp
+                    from 	dbrest.t_request_customer a
+                )b on a.id = b.log_id
+            )a left join 
             (
-                SELECT  CONCAT(a.kode_comp,a.nocab) as kode, a.branch_name, a.nama_comp,a.nocab,a.kode_comp
-                from    mpm.tbl_tabcomp a
-                WHERE   a.`status` = 1
-                GROUP BY kode
-            )a INNER JOIN 
-            (
-                SELECT CONCAT(a.kode_comp,a.nocab) as kode, a.nocab
-                FROM db_dp.t_dp a
-                WHERE a.tahun = YEAR(NOW())
-                GROUP BY a.nocab
-            )b on a.kode = b.kode
-        )b on a.nocab = b.nocab
-        GROUP BY a.id
-        order by id desc
+                SELECT a.branch_name,a.nama_comp,a.nocab,a.kode_comp, a.kode
+                FROM
+                (
+                    SELECT  CONCAT(a.kode_comp,a.nocab) as kode, a.branch_name, a.nama_comp,a.nocab,a.kode_comp
+                    from    mpm.tbl_tabcomp a
+                    WHERE   a.`status` = 1 and CONCAT(a.kode_comp,a.nocab) not in ('LL303', 'SKW82', 'LL202')
+                    GROUP BY kode
+                )a INNER JOIN 
+                (
+                    SELECT CONCAT(a.kode_comp,a.nocab) as kode, a.nocab
+                    FROM db_dp.t_dp a
+                    WHERE a.tahun = YEAR(NOW())
+                    GROUP BY kode
+                )b on a.kode = b.kode
+            )b on a.nocab = b.nocab
+            GROUP BY a.id
+            order by id desc
         ";
         $proses = $this->db->query($sql)->result();
         // echo "<pre><br><br><br><br>";
@@ -69,34 +69,35 @@ class Model_request extends CI_Model
     public function detail_request($id){
     
         $sql = "
-        select 	a.id,b.siteid,b.customerid,substr(b.nama_customer,1,20) as nama_customer,
-        a.nocab,c.branch_name,c.nama_comp,
-        b.typeid_current,b.typeid_request,b.classid_current,b.classid_request,b.no_request,b.status_approval,b.segmentid_current,b.segmentid_request
-        from dbrest.t_log_request a INNER JOIN (
-            select a.siteid,a.customerid,a.nama_customer,a.typeid_current,a.typeid_request,a.classid_current,a.classid_request,a.no_request,a.log_id,a.status_approval, a.				
-            segmentid_current, a.segmentid_request
-            from dbrest.t_request_customer a
-        )b on a.id = b.log_id LEFT JOIN
-        (
-            SELECT a.branch_name,a.nama_comp,a.nocab
-            FROM
+            select 	a.id,b.siteid,b.customerid,substr(b.nama_customer,1,20) as nama_customer,
+                    a.nocab,c.branch_name,c.nama_comp,
+                    b.typeid_current,b.typeid_request,b.classid_current,b.classid_request,b.no_request,b.status_approval,b.segmentid_current,b.segmentid_request, b.kode_comp, concat(b.kode_comp, a.nocab) as site_code
+            from dbrest.t_log_request a INNER JOIN (
+                select a.siteid,a.customerid,a.nama_customer,a.typeid_current,a.typeid_request,a.classid_current,a.classid_request,a.no_request,a.log_id,a.status_approval, a.segmentid_current, a.segmentid_request, SUBSTR(a.siteid,1,3) as kode_comp
+                from dbrest.t_request_customer a
+            )b on a.id = b.log_id LEFT JOIN
             (
-                SELECT  CONCAT(a.kode_comp,a.nocab) as kode, a.branch_name, a.nama_comp,a.nocab
-                from    mpm.tbl_tabcomp a
-                WHERE   a.`status` = 1
-                GROUP BY kode
-            )a INNER JOIN 
-            (
-                SELECT CONCAT(a.kode_comp,a.nocab) as kode, a.nocab
-                FROM db_dp.t_dp a
-                WHERE a.tahun = YEAR(NOW())
-                GROUP BY a.nocab
-            )b on a.kode = b.kode
-        )c on a.nocab = c.nocab
-        where a.id = $id
+                SELECT a.branch_name,a.nama_comp,a.nocab, a.kode
+                FROM
+                (
+                    SELECT  CONCAT(a.kode_comp,a.nocab) as kode, a.branch_name, a.nama_comp,a.nocab
+                    from    mpm.tbl_tabcomp a
+                    WHERE   a.`status` = 1 and CONCAT(a.kode_comp,a.nocab) not in ('LL303', 'SKW82', 'LL202')
+                    GROUP BY kode
+                )a INNER JOIN 
+                (
+                    SELECT CONCAT(a.kode_comp,a.nocab) as kode, a.nocab
+                    FROM db_dp.t_dp a
+                    WHERE a.tahun = YEAR(NOW())
+                    GROUP BY kode
+                )b on a.kode = b.kode
+            )c on a.nocab = c.nocab
+            where a.id = $id
         ";
-        // echo "<br><br><br><br><br><br>";
+        // echo "<pre>";
         // print_r($sql);
+        // echo "</pre>";
+        // die;
         $proses = $this->db->query($sql)->result();
         if ($proses) {
             return $proses;
@@ -923,6 +924,23 @@ class Model_request extends CI_Model
 
 
 
+    }
+
+    public function export(){
+        $sql = "
+                    SELECT YEAR(a.created_date) as tahun, MONTH(a.created_date) as bulan, a.kode, a.branch_name, a.nama_comp, a.customerid, a.nama_customer, a.segmentid_current as 'segment before', a.kode_type_current as 'type before', a.classid_current as 'class before', a.segmentid_request as 'segment after', a.kode_type_request as 'type after', a.classid_request as 'class after', IF(a.status_approval = 1,'Approve',IF(a.status_approval = 0,'Reject','Pending')) as 'status', a.created_date as 'tanggal'
+                    FROM dbrest.t_request_customer_detail a
+                ";
+        $hasil = $this->db->query($sql);
+        if ($hasil->num_rows() > 0) 
+        {
+            return $hasil;
+        } else {
+            return array();
+        }
+                
+            /* END PROSES TAMPIL KE WEBSITE */
+      
     }
 
 }

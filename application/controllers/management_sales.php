@@ -231,11 +231,12 @@ class Management_sales extends MY_Controller
 
             $update_source = $this->model_management_sales->update_log_sell_out_product($source, 0);
 
-            $this->navbar($data);
-            $this->load->view('kalimantan/header_full_width', $data);
-            $this->load->view('management_claim/css');
-            $this->load->view('management_sales/get_sales_by_site_code_kodeprod', $data);
-            $this->load->view('kalimantan/footer');
+            // $this->navbar($data);
+            // $this->load->view('kalimantan/header_full_width', $data);
+            // $this->load->view('management_claim/css');
+            // $this->load->view('management_sales/get_sales_by_site_code_kodeprod', $data);
+            // $this->load->view('kalimantan/footer');
+            $this->render('management_sales/get_sales_by_site_code_kodeprod', $data);
         }  
 
         elseif ($breakdown == 'v3') // subbranch, bulan, kodeprod, tipe, class
@@ -282,11 +283,13 @@ class Management_sales extends MY_Controller
 
             $update_source = $this->model_management_sales->update_log_sell_out_product($source, 0);
 
-            $this->navbar($data);
-            $this->load->view('kalimantan/header_full_width', $data);
-            $this->load->view('management_claim/css');
-            $this->load->view('management_sales/get_sales_by_site_code_kodeprod_tipe_class', $data);
-            $this->load->view('kalimantan/footer');
+            // $this->navbar($data);
+            // $this->load->view('kalimantan/header_full_width', $data);
+            // $this->load->view('management_claim/css');
+            // $this->load->view('management_sales/get_sales_by_site_code_kodeprod_tipe_class', $data);
+            // $this->load->view('kalimantan/footer');
+
+            $this->render('management_sales/get_sales_by_site_code_kodeprod_tipe_class', $data);
         }  
 
 
@@ -294,6 +297,12 @@ class Management_sales extends MY_Controller
 
     public function export($filename)
     {
+        // if ( !$this->db->table_exists("site.$filename")) 
+        // {
+        //     $this->session->set_flashdata('pesan','Tabel '.$filename.' tidak ditemukan');
+        //     redirect('management_sales/history_penarikan');
+        // }
+
         $query = "
             select site_code, branch_name, nama_comp, bulan, tahun, value, unit, created_at
             from site.$filename a
@@ -317,6 +326,11 @@ class Management_sales extends MY_Controller
 
     public function export_horizontal($filename)
     {
+        // if ( !$this->db->table_exists("site.$filename")) 
+        // {
+        //     $this->session->set_flashdata('pesan','Tabel '.$filename.' tidak ditemukan');
+        //     redirect('management_sales/history_penarikan');
+        // }
         $query = "
             select 	site_code, branch_name, nama_comp, tahun,
                     sum(if(a.bulan = 1, a.unit, 0)) as u1,
@@ -380,6 +394,12 @@ class Management_sales extends MY_Controller
 
     public function export_by_kodeprod($filename)
     {
+        // if ( !$this->db->table_exists("site.$filename")) 
+        // {
+        //     $this->session->set_flashdata('pesan','Tabel '.$filename.' tidak ditemukan');
+        //     redirect('management_sales/history_penarikan');
+        // }
+
         $query = "
             select  site_code, branch_name, nama_comp, bulan, tahun, a.kodeprod, a.namaprod, 
                     a.namasupp as principal, a.nama_group, a.nama_sub_group, value, unit, created_at
@@ -416,6 +436,12 @@ class Management_sales extends MY_Controller
 
     public function export_by_kodeprod_horizontal($filename)
     {
+        // if ( !$this->db->table_exists("site.$filename")) 
+        // {
+        //     $this->session->set_flashdata('pesan','Tabel '.$filename.' tidak ditemukan');
+        //     redirect('management_sales/history_penarikan');
+        // }
+        
         $query = "
             select 	a.site_code, a.branch_name, a.nama_comp, a.kodeprod, a.namaprod,
                     a.namasupp, a.nama_group, a.nama_sub_group, a.tahun,
@@ -533,6 +559,11 @@ class Management_sales extends MY_Controller
 
     public function export_by_kodeprod_tipe_class($filename)
     {
+        // if ( !$this->db->table_exists("site.$filename")) {
+        //     $this->session->set_flashdata('pesan', 'Tabel '.$filename.' sudah tidak ada.');
+        //     redirect('management_sales/history_penarikan');
+        // }
+
         $query = "
             select  site_code, branch_name, nama_comp, bulan, tahun, a.kodeprod, a.namaprod, 
                     a.namasupp as principal, a.nama_group, a.nama_sub_group, 
@@ -575,6 +606,11 @@ class Management_sales extends MY_Controller
 
     public function export_by_kodeprod_tipe_class_horizontal($filename)
     {
+        // if ( !$this->db->table_exists("site.$filename")) {
+        //     $this->session->set_flashdata('pesan', 'Tabel '.$filename.' sudah tidak ada.');
+        //     redirect('management_sales/history_penarikan');
+        // }
+
         $query = "
             select 	a.site_code, a.branch_name, a.nama_comp, a.kodeprod, a.namaprod,
                     a.namasupp, a.nama_group, a.nama_sub_group, 

@@ -32,6 +32,23 @@
 ?>
 
 <div class="card mt-4 mb-5">
+    <div class="row mt-1">
+        <div class="col-md-12">
+            <?php 
+            if($this->session->flashdata('pesan')){ ?>
+                <div class="alert alert-danger" role="alert">
+                    <?= $this->session->flashdata('pesan'); ?>
+                </div>
+            <?php
+            }elseif($this->session->flashdata('pesan_success')){ ?>
+                <div class="alert alert-success" role="alert">
+                    <?= $this->session->flashdata('pesan_success'); ?>
+                </div>
+            <?php
+            }
+            ?>
+        </div>
+    </div>
     <div class="card-body">
         <h5 class="card-title"><?= $title ?></h5>
 

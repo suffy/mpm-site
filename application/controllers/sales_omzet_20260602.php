@@ -241,7 +241,6 @@ class Sales_omzet extends MY_Controller
     }
 
     public function omzet_hasil(){
-        // echo 'disini';die;
         $from = $this->input->post('from');
         $to = $this->input->post('to');
         $output = $this->input->post('output');      
@@ -257,9 +256,6 @@ class Sales_omzet extends MY_Controller
         $tempo =  $this->input->post('tempo');
         $gdp =  $this->input->post('gdp');
         $gss =  $this->input->post('gss');
-        $dualima =  $this->input->post('dualima');
-        // echo 'principal : '.$principal;echo '<br>';
-        // echo 'dualima : '.$dualima;die;
 
         if ($principal === "XXX") {   
             $kodeprod = $this->model_sales_omzet->get_kodeprod($principal);
@@ -275,9 +271,8 @@ class Sales_omzet extends MY_Controller
             $tempo!=null ? $supp_tempo = $tempo : $supp_tempo = null;
             $gdp!=null ? $supp_gdp = $gdp : $supp_gdp = null;
             $gss!=null ? $supp_gss = $gss : $supp_gss = null;
-            $dualima!=null ? $supp_dualima = $dualima : $supp_dualima = null;
 
-            $split =  str_split($supp_deltomed.$supp_us.$supp_marguna.$supp_jaya.$supp_intrafood.$supp_strive.$supp_kojiesan.$supp_tempo.$supp_gdp.$supp_mdj.$supp_gss.$supp_dualima,"3");
+            $split =  str_split($supp_deltomed.$supp_us.$supp_marguna.$supp_jaya.$supp_intrafood.$supp_strive.$supp_kojiesan.$supp_tempo.$supp_gdp.$supp_mdj.$supp_gss,"3");
 
             $implode = implode(",",$split);
             $kodeprod = $this->model_sales_omzet->get_kodeprod($implode);

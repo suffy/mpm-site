@@ -72,7 +72,7 @@ class Login_sistem extends MY_Controller
         // ==================================================
         // VALIDASI KHUSUS: LEVEL 10 WAJIB ADA DI TABEL KARYAWAN
         // ==================================================
-        if ($level == 10 && $kode_company == '000' && $username != 'thomas' && $username != 'yayang' && $username != 'nanita' && $username != 'hendra' && $username != 'fahrodin' && $username != 'fardison' && $username != 'eny' && $username != 'bagus') {
+        if ($level == 10 && $kode_company == '000' && $username != 'thomas' && $username != 'yayang' && $username != 'nanita' && $username != 'hendra' && $username != 'fahrodin' && $username != 'fardison' && $username != 'eny' && $username != 'bagus' && $username != 'erlandy') {
             // echo "masuk";die;
             $get_personalia = $this->login->get_personalia($username)->result();
             $pic_ids = [];

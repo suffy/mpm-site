@@ -163,39 +163,45 @@ class Penta extends MY_Controller
         redirect('penta/log_sales', 'refresh');
     }
 
-    public function get_penta_sales_all()
+  public function get_penta_sales_all()
+  {
+    $this->db->trans_begin();
+
+    $get_bulan = $this->input->post('bulan');
+    $tahun = substr($get_bulan,0,4);
+    $bulan = (int) substr($get_bulan,5,2);
+    $signature = 'penta-sales-' . rand() . md5($this->created_at) . date('Ymd');
+
+    $data = [
+        "created_at" => $this->created_at,
+        "created_by" => $this->userid,
+        "tahun" => $tahun,
+        "bulan" => $bulan,
+        "signature" => $signature
+    ];
+    $this->db->insert('site.penta_log_sales', $data);
+    $id_log = $this->db->insert_id();
+
+    // $array_type = ['penta_sales','batam','gt'];
+    $array_type = ['penta_sales'];
+
+    $error_occurred = false;
+    $error_message = '';
+
+    foreach ($array_type as $key => $value) 
     {
-        $get_bulan = $this->input->post('bulan');
-        $tahun = substr($get_bulan,0,4);
-        $bulan = (int) substr($get_bulan,5,2);
-        $signature = 'penta-sales-' . rand() . md5($this->created_at) . date('Ymd');
+      $token = $this->get_token($value);
+      $tarik_sales = $this->model_penta->get_penta_sales($token, $tahun, $bulan, $signature, $id_log);    
 
-        $data = [
-            "created_at" => $this->created_at,
-            "created_by" => $this->userid,
-            "tahun" => $tahun,
-            "bulan" => $bulan,
-            "signature" => $signature
-        ];
+      // Cek jika gagal
+      if (!$tarik_sales) {
+          $error_occurred = true;
+          $error_message = "Gagal menarik data untuk " . $value;
+          break;
+      }
+    }
 
-        echo "<pre>";
-        print_r($data);
-        echo "</pre>";
-
-        $this->db->insert('site.penta_log_sales', $data);
-        $id_log = $this->db->insert_id();
-
-        // $array_type = ['penta_sales','batam','gt'];
-        $array_type = ['penta_sales'];
-
-        foreach ($array_type as $key => $value) {
-            $token = $this->get_token($value);
-            echo "token : ".$token; 
-            echo "<br>";
-            $tarik_sales = $this->model_penta->get_penta_sales($token, $tahun, $bulan, $signature, $id_log);
-            
-        }
-
+    if (!$error_occurred) {
         $get_sum = $this->model_penta->get_sum_sales_origin($id_log);
         if ($get_sum->num_rows() > 0) {
             $total_gross = $get_sum->row()->total_gross;
@@ -204,62 +210,48 @@ class Penta extends MY_Controller
                 'total_gross' => $total_gross,
                 'total_net' => $total_net
             ];
-            $update_log_sales =  $this->model_penta->update_log_sales($data, $id_log);                
-            $update_length_kodeprod =  $this->model_penta->update_length_kodeprod($id_log);
-        }    
-
-        // $array_type = ['penta_sales'];
-        // foreach ($array_type as $key => $value) {
-        //     // $token = $this->get_token($value);
-        //     echo "token penta_sales : ".$token; 
-        //     // echo "<br>";
-        //     $sales_ext = $this->model_penta->get_penta_sales_ext($token,$tahun,$bulan);
+            $update_log_sales = $this->model_penta->update_log_sales($data, $id_log);                
+            $update_length_kodeprod = $this->model_penta->update_length_kodeprod($id_log);
             
-        // }
-
-        $token = $this->get_token('penta_sales');
-
-        // echo "token penta_sales : ".$token;
-        $sales_ext = $this->model_penta->get_penta_sales_ext($token,$tahun,$bulan);
-
-        echo "sales_ext : ".$sales_ext;
-
-        if($sales_ext)
-        {
-            // $sales_ext = $this->model_penta->get_penta_sales_ext($token,$tahun,$bulan);
-            $join_sales = $this->model_penta->join_sales($id_log, $sales_ext);
-            if($join_sales)
-            {
-                $this->session->set_flashdata("pesan_success", "Penarikan data berhasil. Silahkan tarik data anda");
-                redirect('penta/log_sales', 'refresh');
-                die;
-            }else{
-                $this->session->set_flashdata("pesan", "Gagal join sales & master customer. Silahkan ulangi kembali atau hubungi IT");
-                redirect('penta/log_sales', 'refresh');
-                die;
+            if (!$update_log_sales || !$update_length_kodeprod) {
+                $error_occurred = true;
+                $error_message = "Gagal update data summary";
             }
-        }else{
-            $this->session->set_flashdata("pesan", "Gagal tarik master customer penta. Silahkan ulangi kembali atau hubungi IT");
-            redirect('penta/log_sales', 'refresh');
-            die;
         }
-
-        // die;
-
-        
-
-        // if($this->session->userdata('id')==297){
-
-        // }else{
-        //     $this->session->set_flashdata("pesan_success", "Penarikan data berhasil. Silahkan tarik data anda");
-        //     redirect('penta/log_sales', 'refresh');
-        // }
-
-        
-
-
-        // $token = $this->get_token('batam');
     }
+
+    if (!$error_occurred) {
+        $token_2 = $this->get_token('penta_sales');
+        $sales_ext = $this->model_penta->get_penta_sales_ext($token_2, $tahun, $bulan);
+        
+        if(is_numeric($sales_ext))
+        {
+            $join_sales = $this->model_penta->join_sales($id_log, $sales_ext);
+            if(!$join_sales)
+            {
+                $error_occurred = true;
+                $error_message = "Gagal join sales & master customer. Silahkan ulangi kembali atau hubungi IT";
+            }
+        } else {
+            $error_occurred = true;
+            $error_message = "Gagal tarik master customer penta. Silahkan ulangi kembali atau hubungi IT";
+        }
+    }
+
+    // Cek apakah ada error
+    if ($error_occurred) {
+        $this->db->trans_rollback();
+        $this->session->set_flashdata("pesan", $error_message);
+        redirect('penta/log_sales', 'refresh');
+        die;
+    } else {
+        $this->db->trans_commit();
+        $this->session->set_flashdata("pesan_success", "Penarikan data berhasil. Silahkan tarik data anda");
+        redirect('penta/log_sales', 'refresh');
+        die;
+    }
+    
+  }
 
     public function get_token($type = null)
     {        

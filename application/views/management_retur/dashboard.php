@@ -195,6 +195,7 @@
                     <option value="023"> UICCP (Kojiesan) </option>
                     <option value="025"> GDP - Good Pharma Dermatology </option>
                     <option value="027"> PT. DUALIMA INDUSTRIES </option>
+                    <option value="026"> PT. GUNUNG SUBUR SEJAHTERA </option>
                 </select>
                 <input type="submit" class="btn btn-warning d-inline mt-2" value="Export data on the table" id="export">
                 <input type="submit" class="btn btn-secondary d-inline mt-2" value="update_ref" name="update"

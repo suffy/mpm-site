@@ -913,10 +913,9 @@ class Model_sales_omzet extends CI_Model
                 )g on a.kode_sales = g.kode_sales
                 $group_by
                  ";
-        // echo "<pre>";
-        // echo "<br><br><br>";
-        // print_r($sql);
-        // echo "</pre>";
+        echo "<pre>";
+        print_r($sql);
+        echo "</pre>";
 
         // die;
 	        
@@ -974,13 +973,11 @@ class Model_sales_omzet extends CI_Model
                 // echo "<pre>";
                 // print_r($sql_grandtotal);
                 // echo "</pre>";
-                // die;
 
             
         }else{
             return array();
-        }  
-        // die;       
+        }         
         $sql = "select *
                 from db_temp.t_temp_soprod a
                 where a.id = $id and created_date = $tgl_created 

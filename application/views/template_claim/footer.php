@@ -43,11 +43,11 @@
 <![endif]-->
 
 <!-- <a href="<?php echo base_url(); ?>eccomerce/info" class="whatsapp d-flex align-items-center justify-content-center active"> -->
-<a href="<?php echo base_url(); ?>" class="whatsapp d-flex align-items-center justify-content-center active" data-toggle="modal" data-target="#whatsapp">
-    <img src="<?php echo base_url() ?>assets/png/whatsapp-logo-1.png"></a>
+<!-- <a href="<?php echo base_url(); ?>" class="whatsapp d-flex align-items-center justify-content-center active" data-toggle="modal" data-target="#whatsapp"> -->
+    <!-- <img src="<?php echo base_url() ?>assets/png/whatsapp-logo-1.png"></a> -->
 
 <!-- Modal -->
-<div class="modal fade" id="whatsapp" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="whatsapp" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -70,7 +70,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <script type="7ab3cb0e204785e18dc50839-text/javascript" src="<?php echo base_url() ?>assets_new/web/js/jquery.min.js"></script>
 <script type="7ab3cb0e204785e18dc50839-text/javascript" src="<?php echo base_url() ?>assets_new/web/js/jquery-ui.min.js"></script>

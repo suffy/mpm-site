@@ -15,14 +15,73 @@ class Management_retur extends MY_Controller
         $this->load->library(array('table', 'template', 'Excel_generator', 'form_validation', 'email', 'zip'));
         $this->load->helper(array('url', 'csv'));
         $this->load->model(array('model_outlet_transaksi','model_management_retur'));
+
         
         $id = $this->session->userdata('id');
-
+        // if ($id != 547 && $id != 297) {
+        //     $link = base_url('management_office');
+        //     echo "
+        //     <script>
+        //     alert('Maaf, Kami sedang melakukan maintenance.'); 
+        //     window.location = '$link';
+        //     </script>";
+        // }
     }
+    // function management_retur()
+    // {
+    //     $logged_in= $this->session->userdata('logged_in');
+    //     if(!isset($logged_in) || $logged_in != TRUE)
+    //     {
+    //         redirect('login_sistem/kalimantan','refresh');
+    //     }
+    //     set_time_limit(0);
+    //     $this->load->library(array('table', 'template', 'Excel_generator', 'form_validation', 'email', 'zip'));
+    //     $this->load->helper(array('url', 'csv'));
+    //     $this->load->model(array('model_outlet_transaksi','model_management_retur'));
+
+        
+    //     $id = $this->session->userdata('id');
+    //     // if ($id != 547 && $id != 297) {
+    //     //     $link = base_url('management_office');
+    //     //     echo "
+    //     //     <script>
+    //     //     alert('Maaf, Kami sedang melakukan maintenance.'); 
+    //     //     window.location = '$link';
+    //     //     </script>";
+    //     // }
+    // }
+
+    // function navbar($data){
+    //     if ($this->session->userdata('level') === '4') { // jika dp
+    //         $this->load->view('management_office/top_header_dp', $data);
+    //     }elseif ($this->session->userdata('level') === '3') { // jika principal
+    //         $this->load->view('management_office/top_header_principal', $data);
+    //     }elseif ($this->session->userdata('level') === "3a") { // jika principal tanpa sales 
+    //         $this->load->view('management_office/top_header_principal_nosales', $data);
+    //     }elseif ($this->session->userdata('level') === "3b") { // jika principal hanya raw data, claim, rpd 
+    //         $this->load->view('management_office/top_header_principal_rawdata', $data);
+    //     }elseif ($this->session->userdata('level') === "3c") { // jika principal raw_data dan retur dan rpd = RSPH = ghozali yoseph sudarsono
+    //         $this->load->view('management_office/top_header_principal_rawdata_retur', $data);
+    //     }elseif ($this->session->userdata('level') === "3d") { // jika principal rpd
+    //         $this->load->view('management_office/top_header_principal_rpd', $data);
+    //     }elseif ($this->session->userdata('level') === '5') { // jika dp mpi
+    //         $this->load->view('management_office/top_header_dp_mpi', $data);
+    //     }else{
+    //         $this->load->view('management_office/top_header', $data);
+    //     }
+    // }
     
     function index()
     {
         $this->dashboard();
+    }
+
+    private function template($view,$data)
+    {
+        $this->template->set_title('MPM SQUARE');
+        $this->template->add_js('modules/skeleton.js');
+        $this->template->add_css('modules/skeleton.css');
+        $this->template->load_view($view, $data);
     }
 
     public function dashboard(){
@@ -323,28 +382,69 @@ class Management_retur extends MY_Controller
         $to = $this->input->get('to');
 
         if (empty($from) || empty($to)) {
-            // $from = date('Y-m-d');
-            // $to = date('Y-m-d');
-            $get_ajuan_retur = [];
-        }else{
-            $get_ajuan_retur = $this->model_management_retur->get_ajuan_retur($from, $to);
+            $from = date('Y-m-d');
+            $to = date('Y-m-d');
         }
 
         $data = [
             'title'             => 'Ajuan Retur',
-            'get_ajuan_retur'   => $get_ajuan_retur,
+            'get_ajuan_retur'   => $this->model_management_retur->get_ajuan_retur($from, $to),
+            'url'               => "management_retur/join_ajuan/",
             'url_search'        => '',
             'from'              => $from,
             'to'                => $to
         ];
 
+        // $this->navbar($data);
+        // $this->load->view('kalimantan/header_full_width', $data);
+        // $this->load->view('management_retur/ajuan_retur', $data);
+        // $this->load->view('kalimantan/footer');
         $this->render('management_retur/ajuan_retur', $data);
     }
 
-    public function comparing_product_ajuan($signature, $versi)
-    {
-        $get_id_pengajuan_by_signature = $this->model_management_retur->get_id_pengajuan_by_signature_new($signature);
-        
+    // public function join_ajuan($versi = '0'){
+    //     $id = $this->input->post('options');
+    //     // var_dump($id);
+
+    //     $code = '';
+    //     foreach($id as $idx)
+    //     {
+    //         $code.=",".$idx;
+
+    //         // get signature dari salah satu id
+    //         if ($versi == 2) {
+    //             $signature = $this->model_management_retur->get_signature_by_id($idx, $versi)->row()->signature;
+    //         } else {
+    //             $signature = $this->model_management_retur->get_signature_by_id($idx, $versi)->row()->signature;
+    //         }
+
+
+    //     }
+
+    //     $id_join = preg_replace('/,/', '', $code,1) ;
+
+    //     $data = [
+    //         'title'                     => 'Comparing LPK VS Ajuan Retur DP',
+    //         'get_product_ajuan_retur'   => $this->model_management_retur->get_product_ajuan_retur($id_join, 1, $signature, $versi),
+    //         'url'                       => 'management_retur/update_qty_lpk',
+    //         'url_search'                => '',
+    //         'signature_ajuan_retur'     => $signature,
+    //         'branch_name'               => $this->model_management_retur->get_company_by_signature($signature, $versi)->row()->branch_name,
+    //         'nama_comp'                 => $this->model_management_retur->get_company_by_signature($signature, $versi)->row()->nama_comp,
+    //         'signature'                 => $signature
+    //     ];
+
+    //     $this->navbar($data);
+    //     $this->load->view('kalimantan/header_full_width', $data);
+    //     $this->load->view('management_retur/comparing_product_ajuan_retur', $data);
+    //     $this->load->view('kalimantan/footer');
+
+    // }
+
+    public function comparing_product_ajuan($signature){
+
+        $get_id_pengajuan_by_signature = $this->model_management_retur->get_id_pengajuan_by_signature($signature);
+
         if (!$get_id_pengajuan_by_signature->num_rows() > 0) {
             $this->session->set_flashdata("pesan", "Proses yang anda inginkan gagal dijalankan. Silahkan ulangi kembali !! data not found");
             redirect('management_retur/ajuan_retur');
@@ -353,8 +453,6 @@ class Management_retur extends MY_Controller
             $id_ajuan = $get_id_pengajuan_by_signature->row()->id;
             $versi = $get_id_pengajuan_by_signature->row()->versi;
             $no_pengajuan = $get_id_pengajuan_by_signature->row()->no_pengajuan;
-            $branch_name = $get_id_pengajuan_by_signature->row()->branch_name;
-            $nama_comp = $get_id_pengajuan_by_signature->row()->nama_comp;
         }       
 
         $data_pengajuan = [
@@ -366,33 +464,37 @@ class Management_retur extends MY_Controller
             'created_by'            => $this->session->userdata('id'),
         ];
 
-        $is_exist = $this->model_management_retur->get_pengajuan_by_signature_pengajuan($signature);
-        if ($is_exist->num_rows() >= 1) {
+        # cek pengajuan, jika ada data di update 
+        // echo "signature : ".$signature;
+        // die;
+        $cek_pengajuan = $this->db->select('*')->where('signature_pengajuan', $signature)->get('management_retur.pengajuan');
+        if ($cek_pengajuan->num_rows() >= 1) {
             // echo "ada";
             // die;
-            // $this->db->where('signature_pengajuan', $signature);
-            // $this->db->where('no_pengajuan', $no_pengajuan);
-            // $this->db->update('management_retur.pengajuan', $data_pengajuan);
+            $this->db->where('signature_pengajuan', $signature);
+            $this->db->where('no_pengajuan', $no_pengajuan);
+            $this->db->update('management_retur.pengajuan', $data_pengajuan);
         } else {
             // echo "tidak ada";
             // die;
-            $insert = $this->model_management_retur->insert_pengajuan($data_pengajuan);
+            $this->db->insert('management_retur.pengajuan', $data_pengajuan);
         }
-
-        // die;
 
         $data = [
             'title'                     => 'Comparing LPK VS Ajuan Retur DP',
-            // 'get_product_ajuan_retur'   => $this->model_management_retur->get_product_ajuan_retur($id_ajuan, $signature, $versi),
-            'get_product_ajuan_retur'   => $this->model_management_retur->get_product_ajuan_retur_new($id_ajuan, $signature),
+            'get_product_ajuan_retur'   => $this->model_management_retur->get_product_ajuan_retur($id_ajuan, $signature, $versi),
             'url'                       => "management_retur/update_qty_lpk/",
             'url_search'                => '',
             'signature_ajuan_retur'     => $signature,
-            'branch_name'               => $branch_name,
-            'nama_comp'                 => $nama_comp,
+            'branch_name'               => $get_id_pengajuan_by_signature->row()->branch_name,
+            'nama_comp'                 => $get_id_pengajuan_by_signature->row()->nama_comp,
             'signature'                 => $signature,
-            'no_pengajuan'              => $no_pengajuan,
         ];
+
+        // $this->navbar($data);
+        // $this->load->view('kalimantan/header_full_width', $data);
+        // $this->load->view('management_retur/comparing_product_ajuan_retur', $data);
+        // $this->load->view('kalimantan/footer');
 
         $this->render('management_retur/comparing_product_ajuan_retur', $data); 
     }
@@ -402,50 +504,19 @@ class Management_retur extends MY_Controller
         $id = $this->input->post('id');
         $qty_lpk = $this->input->post('qty_lpk');
 
-        echo "signature : ".$signature;
-        // print_r($id);
-        // print_r($qty_lpk);
-        // die;
-
-        $get_id_pengajuan_by_signature = $this->model_management_retur->get_id_pengajuan_by_signature_new($signature);
-        
-        if (!$get_id_pengajuan_by_signature->num_rows() > 0) {
-            $this->session->set_flashdata("pesan", "Proses yang anda inginkan gagal dijalankan. Silahkan ulangi kembali !! data not found");
-            redirect('management_retur/ajuan_retur');
-            die;
-        }else{
-            $id_ajuan = $get_id_pengajuan_by_signature->row()->id;
-            $versi = $get_id_pengajuan_by_signature->row()->versi;
-            $no_pengajuan = $get_id_pengajuan_by_signature->row()->no_pengajuan;
-            $branch_name = $get_id_pengajuan_by_signature->row()->branch_name;
-            $nama_comp = $get_id_pengajuan_by_signature->row()->nama_comp;
-        }   
-
-        echo "id ajuan : ".$id_ajuan;
-        echo "versi : ".$versi;
-        echo "no_pengajuan : ".$no_pengajuan;
-        echo "branch_name : ".$branch_name;
-        echo "nama_comp : ".$nama_comp;
-
-        // die;
-
-
-
-        // $get_id_pengajuan_by_signature = $this->model_management_retur->get_id_pengajuan_by_signature($signature);
-        // // var_dump($get_id_pengajuan_by_signature);die;
-        // $id_ajuan = $get_id_pengajuan_by_signature->row()->id;
-        // $versi = $get_id_pengajuan_by_signature->row()->versi;
-        // $no_pengajuan = $get_id_pengajuan_by_signature->row()->no_pengajuan;
+        $get_id_pengajuan_by_signature = $this->model_management_retur->get_id_pengajuan_by_signature($signature);
+        // var_dump($get_id_pengajuan_by_signature);die;
+        $id_ajuan = $get_id_pengajuan_by_signature->row()->id;
+        $versi = $get_id_pengajuan_by_signature->row()->versi;
+        $no_pengajuan = $get_id_pengajuan_by_signature->row()->no_pengajuan;
         // var_dump($id_ajuan);die;
 
-        die;
-
         # pilih database
-        // if ($versi == 'V2') {
-        //     $db = 'management_inventory.pengajuan_retur_detail';
-        // } else {
-        //     $db = 'db_temp.t_temp_produk_pengajuan_retur';
-        // }
+        if ($versi == 'V2') {
+            $db = 'management_inventory.pengajuan_retur_detail';
+        } else {
+            $db = 'db_temp.t_temp_produk_pengajuan_retur';
+        }
 
         # update qty_lpk
         $count = count($this->input->post('qty_lpk'));

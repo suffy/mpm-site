@@ -190,7 +190,7 @@
               }
               ?>
               <?php
-              if ($this->session->userdata('username') == 'suffy' || $this->session->userdata('username') == 'sadmin' || $this->session->userdata('username') == 'dewi' || $this->session->userdata('username') == 'adinda' || $this->session->userdata('username') == 'angga') { ?>
+              if ($this->session->userdata('username') == 'suffy' || $this->session->userdata('username') == 'sadmin' || $this->session->userdata('username') == 'dewi' || $this->session->userdata('username') == 'adinda' || $this->session->userdata('username') == 'angga' || $this->session->userdata('username') == 'ello' || $this->session->userdata('username') == 'fauzan') { ?>
                 <a href="<?= base_url() ?>mes" class="dropdown-item d-flex align-items-center" target="_blank">MES <i>(Eccommerce)</i></a>
               <?php
               }

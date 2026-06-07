@@ -104,77 +104,51 @@ class Model_management_retur extends CI_Model
         }
         // die;
 
-        // $query = "
-        // SELECT a.id, a.no_pengajuan, a.site_code, a.nama, a.supp, a.tanggal_pengajuan, a.`status`,
-        //         a.nama_status, a.file_principal, a.tanggal_approval, a.keterangan_lain, a.signature,
-        //         b.branch_name, b.nama_comp,
-        //         if(a.supp ='001-herbal', 'DELTOMED-HERBAL',if(a.supp='001-herbana','DELTOMED-HERBANA',c.namasupp)) as principal,
-        //         count(d.signature_draft_nota_retur) as count_nota_retur, a.no_terima, versi
-        // FROM
-        // (
-        // select 	a.id, a.no_pengajuan, a.site_code, a.nama, a.supp, a.tanggal_pengajuan, a.`status`,
-        //         a.nama_status, a.file_principal, a.tanggal_approval, a.keterangan_lain, a.signature, a.no_terima_barang as no_terima, 'V2' as versi
-        // from management_inventory.pengajuan_retur a
-        // where a.`status` in (8, 9, 11, 12) $params_periode
+        $query = "
+        SELECT a.id, a.no_pengajuan, a.site_code, a.nama, a.supp, a.tanggal_pengajuan, a.`status`,
+                a.nama_status, a.file_principal, a.tanggal_approval, a.keterangan_lain, a.signature,
+                b.branch_name, b.nama_comp,
+                if(a.supp ='001-herbal', 'DELTOMED-HERBAL',if(a.supp='001-herbana','DELTOMED-HERBANA',c.namasupp)) as principal,
+                count(d.signature_draft_nota_retur) as count_nota_retur, a.no_terima, versi
+        FROM
+        (
+        select 	a.id, a.no_pengajuan, a.site_code, a.nama, a.supp, a.tanggal_pengajuan, a.`status`,
+                a.nama_status, a.file_principal, a.tanggal_approval, a.keterangan_lain, a.signature, a.no_terima_barang as no_terima, 'V2' as versi
+        from management_inventory.pengajuan_retur a
+        where a.`status` in (8, 9, 11, 12) $params_periode
         
 
-        // /*UNION ALL
+        /*UNION ALL
 
-        // select 	a.id, a.no_pengajuan, a.site_code, a.nama, a.supp, a.tanggal_pengajuan, a.`status`,
-        //         a.nama_status, a.file_principal, a.tanggal_approval, a.keterangan_lain, a.signature, a.no_terima, 'V1' as versi
-        // from db_temp.t_temp_pengajuan_retur a
-        // where a.`status` in (8, 9, 10, 11)*/
-        // )a
-        // LEFT JOIN
-        // (
-        //     select concat(a.kode_comp, a.nocab) as site_code, a.branch_name, a.nama_comp
-        //     from mpm.tbl_tabcomp a
-        //     where a.status = 1
-        //     GROUP BY concat(a.kode_comp, a.nocab)
-        // )b on a.site_code = b.site_code
-        // LEFT JOIN
-        // (
-        //     select a.supp, a.namasupp
-        //     from mpm.tabsupp a
-        // )c on a.supp = c.supp
-        // LEFT JOIN
-        // (
-        //     SELECT a.signature_ajuan_retur, a.signature_draft_nota_retur
-        //     from management_retur.ajuan_vs_nota_retur a
-        //     where deleted_at is null
-        // )d on a.signature = d.signature_ajuan_retur
-        // GROUP BY a.id, a.versi
-        // ORDER BY a.tanggal_pengajuan desc
-        // ";
-
-        $query = "
-            select  a.id, a.no_pengajuan, a.site_code, a.nama, a.supp, a.tanggal_pengajuan, a.`status`,
-                    a.nama_status, a.file_principal, a.tanggal_approval, a.keterangan_lain, 
-                    a.signature, b.branch_name, b.nama_comp,
-                    if(a.supp ='001-herbal', 'DELTOMED-HERBAL',if(a.supp='001-herbana','DELTOMED-HERBANA',c.namasupp)) as principal,count(d.signature_draft_nota_retur) as count_nota_retur, 
-                    a.no_terima, versi
-            from
-            (
-                select 	a.id, a.no_pengajuan, a.site_code, a.nama, a.supp, a.tanggal_pengajuan, a.`status`,
-                        a.nama_status, a.file_principal, a.tanggal_approval, a.keterangan_lain, a.signature, a.no_terima_barang as no_terima, 'V2' as versi
-                from 	management_inventory.pengajuan_retur a
-                where 	a.`status` in (8, 9, 11, 12) $params_periode
-            )a
-            left join site.master_site b  on a.site_code = b.site_code
-            left join site.master_supplier c on a.supp = c.supp
-            left join
-            (
-                select a.signature_ajuan_retur, a.signature_draft_nota_retur
-                from management_retur.ajuan_vs_nota_retur a
-                where deleted_at is null
-            )d on a.signature = d.signature_ajuan_retur
-            group by a.id, a.versi
-            order by a.tanggal_pengajuan desc
+        select 	a.id, a.no_pengajuan, a.site_code, a.nama, a.supp, a.tanggal_pengajuan, a.`status`,
+                a.nama_status, a.file_principal, a.tanggal_approval, a.keterangan_lain, a.signature, a.no_terima, 'V1' as versi
+        from db_temp.t_temp_pengajuan_retur a
+        where a.`status` in (8, 9, 10, 11)*/
+        )a
+        LEFT JOIN
+        (
+            select concat(a.kode_comp, a.nocab) as site_code, a.branch_name, a.nama_comp
+            from mpm.tbl_tabcomp a
+            where a.status = 1
+            GROUP BY concat(a.kode_comp, a.nocab)
+        )b on a.site_code = b.site_code
+        LEFT JOIN
+        (
+            select a.supp, a.namasupp
+            from mpm.tabsupp a
+        )c on a.supp = c.supp
+        LEFT JOIN
+        (
+            SELECT a.signature_ajuan_retur, a.signature_draft_nota_retur
+            from management_retur.ajuan_vs_nota_retur a
+            where deleted_at is null
+        )d on a.signature = d.signature_ajuan_retur
+        GROUP BY a.id, a.versi
+        ORDER BY a.tanggal_pengajuan desc
         ";
-
-        echo "<pre>";
-        print_r($query);
-        echo "</pre>";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
 
         return $this->db->query($query);
     }
@@ -210,16 +184,12 @@ class Model_management_retur extends CI_Model
                 GROUP BY concat(a.kode_comp, a.nocab)
             )b on a.site_code = b.site_code
         ";
-        echo "<pre>";
-        print_r($query);
-        echo "</pre>";
 
         // print_r($query);
         return $this->db->query($query);
     }
 
-    public function get_product_ajuan_retur($id_ajuan, $signature, $versi)
-    {
+    public function get_product_ajuan_retur($id_ajuan, $signature, $versi){
 
         //status = 3 artinya sudah verified oleh linda
         $query = "
@@ -255,9 +225,9 @@ class Model_management_retur extends CI_Model
             GROUP BY a.kodeprod, a.batch_number
         ";
 
-        echo "<pre>";
-        print_r($query);
-        echo "</pre>";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
 
         return $this->db->query($query);
     }
@@ -371,6 +341,9 @@ class Model_management_retur extends CI_Model
             from mpm.tabprod a
         )c on a.kodeprod = c.kodeprod
         ";
+        // echo "<pre>";
+        // print_r($query);
+        // echo "</pre>";
         return $this->db->query($query);
     }
 
@@ -1404,7 +1377,8 @@ class Model_management_retur extends CI_Model
     }
 
     public function export_retur_dashboard($userid,$supp, $from, $to)
-    {
+    {   
+        // echo 'disini'; die;
         if ($userid) {
             $params = "and a.userid = $userid";
         }else{
@@ -1412,7 +1386,10 @@ class Model_management_retur extends CI_Model
         }
 
         $query="
-            select 	a.company, REPLACE(a.tgldo_beli, '-', '/') as tgldo_beli, REPLACE(a.tgldo, '-', '/') as tgldo, a.nopo, a.nodo, a.ref, a.nodo_beli, if(SUBSTRING(a.noseri,4,1) = '.', a.noseri,  concat('''',a.noseri)) as noseri, if(SUBSTRING(a.noseri_beli,4,1) = '.', a.noseri_beli,  concat('''',a.noseri_beli)) as noseri_beli, b.kodeprod, b.namaprod, abs(b.banyak) as qty, b.harga, b.harga_beli, b.diskon, b.diskon_beli, REPLACE(a.tglbuat, '-', '/') as tglbuat
+            select 	a.company, REPLACE(a.tgldo_beli, '-', '/') as tgldo_beli, REPLACE(a.tgldo, '-', '/') as tgldo, a.nopo, a.nodo, a.ref, 
+            a.nodo_beli, if(SUBSTRING(a.noseri,4,1) = '.', a.noseri,  concat('''',a.noseri)) as noseri, if(SUBSTRING(a.noseri_beli,4,1) = '.', 
+            a.noseri_beli,  concat('''',a.noseri_beli)) as noseri_beli, b.kodeprod, b.namaprod, abs(b.banyak) as qty, b.harga, b.harga_beli, 
+            b.diskon, b.diskon_beli, REPLACE(a.tglbuat, '-', '/') as tglbuat, a.no_pengajuan
             from mpm.trans a inner JOIN mpm.trans_detail b
                     on a.id = b.id_ref
             where  a.supp = '$supp' and a.deleted = 0 and b.deleted = 0 and (a.tglbuat between '$from' and '$to') $params
@@ -1424,15 +1401,15 @@ class Model_management_retur extends CI_Model
         $this->excel_generator->set_query($hasil);
         $this->excel_generator->set_header(array
         (
-            'company', 'tgldo_beli', 'tgldo', 'nopo', 'nodo', 'ref', 'nodo_beli', 'noseri', 'noseri_beli', 'kodeprod', 'namaprod', 'qty', 'harga', 'harga_beli', 'diskon', 'diskon_beli', 'tglbuat'
+            'company', 'tgldo_beli', 'tgldo', 'nopo', 'nodo', 'ref', 'nodo_beli', 'noseri', 'noseri_beli', 'kodeprod', 'namaprod', 'qty', 'harga', 'harga_beli', 'diskon', 'diskon_beli', 'tglbuat', 'no_pengajuan'
         ));
             
         $this->excel_generator->set_column(array
         (
-            'company', 'tgldo_beli', 'tgldo', 'nopo', 'nodo', 'ref', 'nodo_beli', 'noseri', 'noseri_beli', 'kodeprod', 'namaprod', 'qty', 'harga', 'harga_beli', 'diskon', 'diskon_beli', 'tglbuat'
+            'company', 'tgldo_beli', 'tgldo', 'nopo', 'nodo', 'ref', 'nodo_beli', 'noseri', 'noseri_beli', 'kodeprod', 'namaprod', 'qty', 'harga', 'harga_beli', 'diskon', 'diskon_beli', 'tglbuat', 'no_pengajuan'
         ));       
         
-        $this->excel_generator->set_width(array(10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10));
+        $this->excel_generator->set_width(array(10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10));
         $this->excel_generator->exportTo2007('export'); 
     }
 
@@ -1456,99 +1433,6 @@ class Model_management_retur extends CI_Model
             )
             WHERE a.no_coretax is NULL
         ";
-        return $this->db->query($query);
-    }
-
-    public function get_id_pengajuan_by_signature_new($signature){
-
-        $query = "
-            select 	a.id, a.no_pengajuan, a.site_code, a.nama, a.supp, a.tanggal_pengajuan, a.`status`,
-                    a.nama_status, a.file_principal, a.tanggal_approval, a.keterangan_lain, a.signature, 
-                    a.no_terima_barang as no_terima, 'V2' as versi, b.branch_name, b.nama_comp
-            from management_inventory.pengajuan_retur a left join site.master_site b 
-                on a.site_code = b.site_code
-            where a.signature = '$signature'
-                        
-        ";
-        echo "<pre>";
-        print_r($query);
-        echo "</pre>";
-
-        // print_r($query);
-        return $this->db->query($query);
-    }
-
-    public function insert_pengajuan($data)
-    {   
-        $this->db->insert('management_retur.pengajuan', $data);
-        return $this->db->insert_id();
-    }
-
-    public function get_pengajuan_by_signature_pengajuan($signature)
-    {
-        $query = "
-            select *
-            from management_retur.pengajuan a 
-            where a.signature_pengajuan = '$signature'
-        ";
-        return $this->db->query($query);
-    }
-
-    public function get_product_ajuan_retur_new($id_ajuan, $signature)
-    {
-
-        //status = 3 artinya sudah verified oleh linda
-        // $query = "
-        //     SELECT a.id, a.kodeprod, b.namaprod, a.batch_number, a.tahun, a.expired_date, a.jumlah,
-        //             a.alasan, a.satuan, a.nama_outlet, a.keterangan, a.kode_produksi, a.`status`,
-        //             a.nama_status, a.deskripsi, a.qty_approval_ho, a.qty_final, a.qty_lpk
-        //     FROM
-        //     (
-        //         select a.id, a.id_pengajuan, a.kodeprod, a.batch_number, IF(SUBSTR(batch_number,-2) < 20 || SUBSTR(batch_number,-2) > SUBSTR(YEAR(CURRENT_DATE),-2), 'NULL', CONCAT(20,SUBSTR(batch_number,-2))) as tahun,
-		// 			a.expired_date, sum(if(a.kodeprod like '12%', a.total_pcs, a.jumlah )) as jumlah,
-		// 			a.alasan, a.satuan, a.nama_outlet, a.keterangan, a.kode_produksi, a.`status`,
-		// 			a.nama_status, a.deskripsi, sum(a.qty_lpk) as qty_approval_ho, sum(a.qty_lpk) as qty_final, 
-        //             sum(a.qty_lpk) as qty_lpk, 'V1' as versi, a.deleted
-        //         from db_temp.t_temp_produk_pengajuan_retur a
-        //         where a.id_pengajuan in ($id_ajuan) and a.deleted is null and a.status = 3
-        //         GROUP BY a.kodeprod, a.batch_number
-        //         UNION ALL
-        //         select a.id, a.id_pengajuan, a.kodeprod, a.batch_number, IF(SUBSTR(batch_number,-2) < 20 || SUBSTR(batch_number,-2) > SUBSTR(YEAR(CURRENT_DATE),-2), 'NULL', CONCAT(20,SUBSTR(batch_number,-2))) as tahun,
-		// 			a.expired_date, sum(a.qty_approval) as jumlah,
-		// 			a.alasan, a.satuan, a.nama_outlet, a.keterangan, a.kode_produksi, a.`status`,
-		// 			a.nama_status, a.deskripsi, sum(a.qty_approval_ho) as qty_approval_ho, 
-        //             sum(a.qty_final) as qty_final, sum(a.qty_lpk) as qty_lpk, 'V2' as versi, a.deleted
-        //         from management_inventory.pengajuan_retur_detail a
-        //         where a.id_pengajuan in ($id_ajuan) and a.deleted is null and a.status = 3
-        //         GROUP BY a.kodeprod, a.batch_number
-        //     )a
-        //     left join site.master_product b on a.kodeprod = b.kodeprod
-        //     where a.versi = '$versi'
-        //     GROUP BY a.kodeprod, a.batch_number
-        // ";
-
-        $query = "
-            select 	a.id, a.kodeprod, b.namaprod, a.batch_number, a.tahun, a.expired_date, a.jumlah,
-                    a.alasan, a.satuan, a.nama_outlet, a.keterangan, a.kode_produksi, a.`status`,
-                    a.nama_status, a.deskripsi, a.qty_approval_ho, a.qty_final, a.qty_lpk
-            from
-            (
-                select 	a.id, a.id_pengajuan, a.kodeprod, a.batch_number, 
-                        IF(SUBSTR(batch_number,-2) < 20 || SUBSTR(batch_number,-2) > SUBSTR(year(current_date),-2), 'NULL', CONCAT(20,SUBSTR(batch_number,-2))) as tahun,
-                        a.expired_date, sum(a.qty_approval) as jumlah,
-                        a.alasan, a.satuan, a.nama_outlet, a.keterangan, a.kode_produksi, a.`status`,
-                        a.nama_status, a.deskripsi, sum(a.qty_approval_ho) as qty_approval_ho, sum(a.qty_final) as qty_final, sum(a.qty_lpk) as qty_lpk, 'V2' as versi, a.deleted
-                from 	management_inventory.pengajuan_retur_detail a
-                where 	a.id_pengajuan in ($id_ajuan) and a.deleted is null and a.status = 3
-                group by a.kodeprod, a.batch_number
-            )a left join site.master_product b on a.kodeprod = b.kodeprod
-            group by a.kodeprod, a.batch_number
-        ";
-
-        echo "<pre>";
-        print_r($query);
-        echo "</pre>";
-
         return $this->db->query($query);
     }
 }

@@ -184,6 +184,7 @@ class Model_relokasi extends CI_Model
     }
 
     public function email(){
+        // echo "masuk sini";die;
         date_default_timezone_set('Asia/Jakarta');
         $date = date_create(date('Y-m-d H:i:s'));
         date_add($date, date_interval_create_from_date_string('-7 hours'));
@@ -202,10 +203,8 @@ class Model_relokasi extends CI_Model
             // echo 'email : '.$email_username;
         }else{
             // echo 'jam : '.$jam;die;
-            // $email_username = 'EMAIL_USERNAME3';
-            // $email_pass     = 'EMAIL_PASSWORD3';
-            $email_username = 'EMAIL_USERNAME4';
-            $email_pass     = 'EMAIL_PASSWORD4';
+            $email_username = 'EMAIL_USERNAME3';
+            $email_pass     = 'EMAIL_PASSWORD3';
         }
 
         $this->load->library('email');
@@ -225,7 +224,7 @@ class Model_relokasi extends CI_Model
         return $config;
     }
 
-    public function send_email($data)
+    public function send_email($data, $type)
     {
         $this->load->library('email');
 
@@ -251,47 +250,65 @@ class Model_relokasi extends CI_Model
 
             $this->email->from($data['from'], $data['from_name']);
             $this->email->to($data['to']);
+            $this->email->cc($data['cc']);
             $this->email->subject($data['subject']);
             $this->email->message($data['message']);
 
             if ($this->email->send()) {
-                $this->log_email_success($smtp['user'], $data['to'], $data['subject']);
+                $this->log_email_success($smtp['user'], $data['to'], $data['cc'],$data['subject'], $type);
                 return TRUE;
             }
 
-            $this->log_email_failed(
-                $smtp['user'],
-                $data['to'],
-                $data['subject'],
-                $this->email->print_debugger(['headers'])
-            );
+            $this->log_email_failed($smtp['user'], $data['to'],$data['cc'],$data['subject'],$this->email->print_debugger(['headers']), $type );
         }
 
         return FALSE;
     }
 
 
-    private function log_email_success($smtp_user, $to, $subject)
+    private function log_email_success($smtp_user, $to, $cc, $subject, $type)
     {
-        $this->db->insert('mpm.po_email_log', [
-            'smtp_user'  => $smtp_user,
-            'recipient'  => $to,
-            'subject'    => $subject,
-            'status'     => 'SUCCESS',
-            'created_at' => date('Y-m-d H:i:s')
-        ]);
+        if ($type == 'biop'){
+            // echo 'biop';die;
+            $this->db->insert('site.biop_email_log', [
+                'smtp_user'  => $smtp_user,
+                'recipient'  => $to.','.$cc,
+                'subject'    => $subject,
+                'status'     => 'SUCCESS',
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+        }elseif($type == 'spk'){
+            $this->db->insert('mpm.po_email_log', [
+                'smtp_user'  => $smtp_user,
+                'recipient'  => $to.','.$cc,
+                'subject'    => $subject,
+                'status'     => 'SUCCESS',
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+        }
     }
 
-    private function log_email_failed($smtp_user, $to, $subject, $error)
+    private function log_email_failed($smtp_user, $to, $cc, $subject, $error, $type)
     {
-        $this->db->insert('mpm.po_email_log', [
-            'smtp_user'     => $smtp_user,
-            'recipient'     => $to,
-            'subject'       => $subject,
-            'status'        => 'FAILED',
-            'error_message' => $error,
-            'created_at'    => date('Y-m-d H:i:s')
-        ]);
+        if ($type == 'biop'){
+            $this->db->insert('site.biop_email_log', [
+                'smtp_user'     => $smtp_user,
+                'recipient'     => $to.','.$cc,
+                'subject'       => $subject,
+                'status'        => 'FAILED',
+                'error_message' => $error,
+                'created_at'    => date('Y-m-d H:i:s')
+            ]);
+        }elseif($type == 'spk'){
+            $this->db->insert('mpm.po_email_log', [
+                'smtp_user'     => $smtp_user,
+                'recipient'     => $to.','.$cc,
+                'subject'       => $subject,
+                'status'        => 'FAILED',
+                'error_message' => $error,
+                'created_at'    => date('Y-m-d H:i:s')
+            ]);
+        }
     }
 
     public function get_trans($no_relokasi){

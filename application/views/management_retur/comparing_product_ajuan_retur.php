@@ -12,8 +12,7 @@
     }
 
     th {
-        font-size: 14px;
-        text-align: center;
+        font-size: 12px;
     }
 </style>
 
@@ -30,12 +29,12 @@
 
         <div class="row mt-3">
             <div class="col-md-12">
-                Subbranch : <?= $branch_name." - ".$nama_comp ?>
+                Branch : <?= $branch_name ?>
             </div>
         </div>
-        <div class="row mt-1">
+        <div class="row mt-3">
             <div class="col-md-12">
-                No : <?= $no_pengajuan ?>
+                SubBranch : <?= $nama_comp ?>
             </div>
         </div>
 
@@ -44,22 +43,49 @@
         <div class="card-block mt-3">
             <div class="row">
                 <div class="col-md-12">
-                    <table id="example">
+                    <table id="example" class="display" style="display: inline-block;" width="100%">
                         <thead>
                             <tr>
-                                <th colspan="11"><strong><i>Data Original Ajuan Retur (setelah di sum)</i></strong></th>
+                                <th colspan="10" style="background-color: darkslategray;" class="text-center">
+                                    <font color="white"><strong><i>Data Original Ajuan Retur (setelah di
+                                                sum)</i></strong>
+                                    </font>
+                                </th>
+                                <th colspan="1" class="text-center">#</font>
+                                </th>
                             </tr>
                             <tr>
-                                <th>Kodeprod</th>
-                                <th>BatchNumber</th>
-                                <th>ED</th>
-                                <!-- <th>Alasan</th> -->
-                                <th>Satuan</th>
-                                <th>Outlet</th>
-                                <th>Keterangan</th>
-                                <th>QtyAjuan</th>
-                                <th>QtyLPK</th>
-                                <th>QtyLPK</th>
+                                <th style="background-color: darkslategray;" class="text-center">
+                                    <font color="white">Kodeprod
+                                </th>
+                                <th style="background-color: darkslategray;" class="text-center col-md-3">
+                                    <font color="white">Namaprod
+                                </th>
+                                <th style="background-color: darkslategray;" class="text-center">
+                                    <font color="white">BatchNumber
+                                </th>
+                                <th style="background-color: darkslategray;" class="text-center">
+                                    <font color="white">ED
+                                </th>
+                                <th style="background-color: darkslategray;" class="text-center">
+                                    <font color="white">Jumlah
+                                </th>
+                                <th style="background-color: darkslategray;" class="text-center">
+                                    <font color="white">Alasan
+                                </th>
+                                <th style="background-color: darkslategray;" class="text-center">
+                                    <font color="white">Satuan
+                                </th>
+                                <th style="background-color: darkslategray;" class="text-center">
+                                    <font color="white">Outlet
+                                </th>
+                                <th style="background-color: darkslategray;" class="text-center">
+                                    <font color="white">Keterangan
+                                </th>
+                                <th style="background-color: darkslategray;" class="text-center">
+                                    <font color="white">QtyLPK
+                                </th>
+                                <th class="text-center">Qty LPK</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -67,21 +93,24 @@
                         foreach ($get_product_ajuan_retur->result() as $a) : ?>
                             <!-- # versi baru jumlah dirubah jadi qty approval -->
                             <tr>
-                                <td><?= $a->kodeprod.' - '.$a->namaprod; ?></td>
+                                <td><?= $a->kodeprod; ?></td>
+                                <td><?= $a->namaprod; ?></td>
                                 <td><?= $a->batch_number; ?></td>
                                 <td><?= $a->expired_date; ?></td>
-                                <!-- <td><?= $a->alasan; ?></td> -->
+                                <td><?= $a->jumlah; ?></td>
+                                <td><?= $a->alasan; ?></td>
                                 <td><?= $a->satuan; ?></td>
                                 <td><?= $a->nama_outlet; ?></td>
                                 <td><?= $a->keterangan; ?></td>
-                                <td><?= $a->jumlah; ?></td>
                                 <td>
                                     <?= ($a->qty_lpk) ? $a->qty_lpk : '<font color="red"><i>NULL</i></font>' ?>
                                     <!-- <?= $a->qty_lpk; ?> -->
                                 </td>
                                 <td>
                                     <input type="hidden" name="id[]" value="<?= $a->id; ?>" size="3">
-                                    <input type="number" name="qty_lpk[]" value="<?= ($a->qty_lpk != NULL && $a->qty_lpk != 0) ? $a->qty_lpk : ($a->qty_final != NULL) ? $a->qty_final : $a->qty_approval_ho ?>" size="2" class="form-control">
+                                    <input type="number" name="qty_lpk[]"
+                                        value="<?= ($a->qty_lpk != NULL && $a->qty_lpk != 0) ? $a->qty_lpk : ($a->qty_final != NULL) ? $a->qty_final : $a->qty_approval_ho ?>"
+                                        size="2">
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -91,7 +120,7 @@
             </div>
         </div>
 
-        <div class="row mt-3 mb-5">
+        <div class="row mt-3">
             <div class="col-md-5">
                 <input type="hidden" name="signature_ajuan_retur" value="<?= $signature_ajuan_retur ?>">
                 <button type="submit" class="btn btn-info">Update Qty LPK dan Lanjut ke Create Draft Nota Retur</button>
@@ -107,7 +136,23 @@
     $(document).ready(function () {
         $("#example").DataTable({
             paging: false,
-            scrollCollapse: true,            
+            scrollCollapse: true,
+            scrollY: '500px'
         });
     });
+</script>
+
+<script>
+    $.ajax({
+        type: 'POST',
+        url: "<?= base_url('database_afiliasi/branch'); ?>",
+        data: '',
+        success: function (hasil_branch) {
+            $("select[name = branch]").html(hasil_branch);
+        }
+    });
+</script>
+
+<script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
+<script type="text/javascript" language="javascript" src="<?php echo base_url() ?>assets_new/js/checkbox_all.js">
 </script>

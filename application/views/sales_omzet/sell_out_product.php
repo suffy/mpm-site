@@ -7,12 +7,10 @@ foreach ($get_supp->result() as $value) {
 $group = array();
 $group['0'] = '--';
 
-// $interval = date('Y') - 2012;
-$interval = date('Y') - 2020;
+$interval = date('Y') - 2012;
 $options = array();
 for ($i = 1; $i <= $interval; $i++) {
-    // $options['' . $i + 2012] = '' . $i + 2012;
-    $options['' . $i + 2020] = '' . $i + 2020;
+    $options['' . $i + 2012] = '' . $i + 2012;
 }
 
 $kondisi_class = array();

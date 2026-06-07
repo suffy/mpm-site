@@ -164,6 +164,8 @@ if($tgl > 7){
                         </div>
                     </div>
 
+                    
+
                     <!-- <div class="col-lg-2">
                         <div class="checkbox-color checkbox-primary">
                             <input id="checkbox13" type="checkbox"  name="gss" value="026" class="checkbox">
@@ -184,6 +186,15 @@ if($tgl > 7){
                             <input id="gss" type="checkbox"  name="gss" value="026" class="checkbox">
                             <label for="gss">
                                 GSS
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2">
+                        <div class="checkbox-color checkbox-primary">
+                            <input id="dualima" type="checkbox"  name="dualima" value="027" class="checkbox">
+                            <label for="dualima">
+                                Dualima
                             </label>
                         </div>
                     </div>
