@@ -1104,17 +1104,17 @@ class Management_claim extends MY_Controller
         $this->excel_generator->set_query($query);
         $this->excel_generator->set_header(array
         (
-            'principal', 'nomor_surat', 'nama_program', 'nama_kategori', 'from', 'to', 'duedate program', 'site_code', 
+            'principal', 'nomor_surat', 'nama_program', 'nama_kategori', 'segment', 'from', 'to', 'duedate program', 'site_code', 
             'branch_name', 'nama_comp', 'nomor_ajuan', 'nama_status', 'nama_status_internal', 'pic_userid_username',
             'duedate_response' 
         ));
         $this->excel_generator->set_column(array
         ( 
-            'namasupp', 'nomor_surat', 'nama_program', 'nama_kategori', 'from', 'to', 'duedate', 'site_code', 
+            'namasupp', 'nomor_surat', 'nama_program', 'nama_kategori', 'segment', 'from', 'to', 'duedate', 'site_code', 
             'branch_name', 'nama_comp', 'nomor_ajuan', 'nama_status', 'nama_status_internal', 'pic_userid_username',
             'duedate_response' 
         ));
-        $this->excel_generator->set_width(array(10,10,10,10,10,10,10,10,10,10,10,10,10,10,10)); 
+        $this->excel_generator->set_width(array(10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10)); 
         $this->excel_generator->exportTo2007('export claim'); 
 
     }

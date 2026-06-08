@@ -132,6 +132,7 @@
         <th class="text-center">Principal</th>
         <th class="text-center" style="width: 150px">No Surat</th>
         <th class="text-center">Kategori</th>
+        <th class="text-center">segment</th>
         <th class="text-center" style="width: 150px">Nama Program</th>
         <th>Subbranch</th>
         <th class="text-center" style="width: 1%">Status Internal</th> 
@@ -160,6 +161,7 @@
           <a href="<?= $url.'registrasi_program/'.$a->upload_pdf ?>" class="btn btn-submit pending-scm" target="_blank" style="border:none"><?= strlen($a->nomor_surat) > 30 ? substr($a->nomor_surat,0,30).'...' : $a->nomor_surat ?></a>
         </td>
         <td><?= strlen($a->nama_kategori) > 10 ? substr($a->nama_kategori,0,10).'...' : $a->nama_kategori ?></td>
+        <td><?= strlen($a->segment) > 10 ? substr($a->segment,0,10).'...' : $a->segment ?></td>
         <td><?= strlen($a->nama_program) > 30 ? substr($a->nama_program,0,30).'...' : $a->nama_program ?></td>                    
         <td>
             <?php 
